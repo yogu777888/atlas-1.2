@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
 import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
+import { Features } from "@/components/Features";
 import { LocalTime } from "@/components/LocalTime";
 import { FlipMark } from "@/components/Logo";
 import { MatchTable } from "@/components/MatchTable";
@@ -16,15 +17,6 @@ import { site } from "@/lib/site";
 import { tools } from "@/lib/tools";
 
 export const revalidate = 300;
-
-const features = [
-  { title: "Реальные шансы, а не мнение", body: "Берём коэффициенты десятков мировых букмекеров, убираем маржу и получаем справедливую вероятность каждого исхода.", span: "md:col-span-2" },
-  { title: "Выгодный коэффициент — отмечен", body: "Если коэффициент PARI выше справедливого, отмечаем жёлтым флипом.", span: "" },
-  { title: "Рейтинг команд", body: "Независимая оценка силы команд по рейтингу Glicko-2 и ожидаемые голы (xG).", span: "" },
-  { title: "Бонусы без мелкого шрифта", body: "Ключевые условия — прямо на карточке, до перехода на сайт букмекера.", span: "" },
-];
-
-const legal = { title: "Только легальные букмекеры", body: "Ссылки ведут только к конторам с лицензией ФНС России. Никаких офшоров." };
 
 const faqs = [
   { q: "Откуда берутся шансы?", a: "Из коэффициентов крупных мировых букмекеров. Мы убираем из них маржу и усредняем — получается оценка рынка, которая обычно точнее любого эксперта." },
@@ -100,30 +92,7 @@ export default async function Home() {
       {/* Features */}
       <section className="container-x pt-28">
         <SectionHeading eyebrow="Зачем tag.bet" title="Ставить — ваше решение. Понимать шансы — наша работа." />
-        <div className="grid gap-4 md:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className={`card p-7 ${f.span}`}>
-              <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{f.body}</p>
-            </div>
-          ))}
-          <div className="card flex flex-col justify-between bg-gradient-to-br from-accent/10 to-transparent p-7">
-            <p className="text-sm text-muted">Ответственная игра</p>
-            <p className="mt-6 text-sm leading-relaxed">Лимиты, паузы и честные слова о рисках. Мы за то, чтобы ставить с умом, а не больше.</p>
-            <Link href="/responsible-gambling" className="mt-4 text-sm text-accent hover:underline">
-              Наш подход →
-            </Link>
-          </div>
-          <div className="card p-7 md:col-span-2">
-            <h3 className="text-xl font-semibold tracking-tight">{legal.title}</h3>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{legal.body}</p>
-          </div>
-          <Link href="/tools" className="card group flex flex-col justify-between p-7 transition hover:border-line-strong">
-            <p className="text-sm text-muted">Калькуляторы</p>
-            <p className="mt-6 text-sm leading-relaxed">Маржа, вероятность, экспресс — проверьте любой коэффициент сами.</p>
-            <span className="mt-4 text-sm text-accent group-hover:underline">Посчитать →</span>
-          </Link>
-        </div>
+        <Features />
       </section>
 
       {/* Bookmakers */}
