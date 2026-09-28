@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FlipMark } from "./Logo";
-import { edge, odds, OUTCOMES, outcomeShort, type Match } from "@/lib/matches";
+import { edge, isValue, odds, OUTCOMES, outcomeShort, type Match } from "@/lib/matches";
 import { LocalTime } from "./LocalTime";
 import { ProbBar } from "./ProbBar";
 
@@ -8,16 +8,23 @@ export function MatchTable({ matches, empty }: { matches: Match[]; empty?: strin
   if (matches.length === 0) {
     return <div className="card p-10 text-center text-sm text-muted">{empty ?? "В ближайшие дни матчей нет."}</div>;
   }
+  // Top leagues first (each group stays in kick-off order), the rest below a divider.
+  const top = matches.filter((m) => m.league.key !== "other");
+  const ordered = [...top, ...matches.filter((m) => m.league.key === "other")];
+  const firstOther = top.length;
   return (
     <div className="card overflow-hidden">
-      <div className="hidden grid-cols-[1fr_12rem_14rem] items-center gap-6 border-b border-line px-5 py-3 font-mono text-[11px] tracking-wider text-subtle uppercase md:grid">
+      <div className="hidden grid-cols-[1fr_12rem_14rem] items-center gap-6 border-b border-line px-5 py-3 text-[11px] tracking-wider text-subtle uppercase md:grid">
         <span>Матч</span>
         <span>Шансы по рынку</span>
         <span className="text-center">PARI · П1 X П2</span>
       </div>
       <ul className="divide-y divide-line">
-        {matches.map((m) => (
+        {ordered.map((m, i) => (
           <li key={m.id}>
+            {i === firstOther && firstOther > 0 && (
+              <p className="border-b border-line bg-surface-2/60 px-5 py-2 text-xs tracking-wider text-subtle uppercase">Другие турниры</p>
+            )}
             <Row m={m} />
           </li>
         ))}
@@ -44,7 +51,7 @@ function Row({ m }: { m: Match }) {
         {OUTCOMES.map((o) => {
           const price = m.pari?.odds[o];
           const value = price && m.fair ? edge(price, m.fair[o]) : null;
-          const good = value !== null && value > 0;
+          const good = !!price && !!m.fair && isValue(price, m.fair[o]);
           return (
             <span
               key={o}

@@ -9,7 +9,7 @@ import { getBookmaker } from "@/lib/bookmakers";
 import { getMatch, getMatchDetail } from "@/lib/data";
 import { getArticle } from "@/content/articles";
 import type { MatchDetail } from "@/lib/data";
-import { edge, margin, odds, OUTCOMES, outcomeLabel, pct, verdict, type Match, type Probs1x2 } from "@/lib/matches";
+import { edge, isSuspect, isValue, margin, odds, OUTCOMES, outcomeLabel, pct, verdict, type Match, type Probs1x2 } from "@/lib/matches";
 import { site } from "@/lib/site";
 
 export const revalidate = 300;
@@ -84,7 +84,8 @@ export default async function MatchPage({ params }: Props) {
               {OUTCOMES.map((o, i) => {
                 const price = m.pari!.odds[o];
                 const value = fair ? edge(price, fair[o]) : null;
-                const good = value !== null && value > 0;
+                const good = fair ? isValue(price, fair[o]) : false;
+                const suspect = fair ? isSuspect(price, fair[o]) : false;
                 return (
                   <div key={o} className={`rounded-xl border p-3 ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-xs text-subtle">{outcomeLabel(m, o)}</p>
@@ -92,9 +93,8 @@ export default async function MatchPage({ params }: Props) {
                       <FlipText text={odds(price)} delay={200 + i * 180} />
                     </p>
                     {value !== null && (
-                      <p className={`text-xs tabular-nums ${good ? "text-accent" : "text-subtle"}`}>
-                        {value > 0 ? "+" : ""}
-                        {(value * 100).toFixed(1)}%
+                      <p className={`text-xs tabular-nums ${good ? "text-accent" : "text-subtle"}`} title={suspect ? "Слишком большой разрыв с рынком: скорее всего, линия устарела. Не отмечаем как выгодный." : undefined}>
+                        {suspect ? "проверяем" : `${value > 0 ? "+" : ""}${(value * 100).toFixed(1)}%`}
                       </p>
                     )}
                   </div>
@@ -223,12 +223,14 @@ function summary(m: Match, fair: Probs1x2 | null, d: MatchDetail): string[] {
     );
   }
   if (m.pari) {
-    const good = OUTCOMES.filter((o) => edge(m.pari!.odds[o], fair[o]) > 0);
+    const good = OUTCOMES.filter((o) => isValue(m.pari!.odds[o], fair[o]));
     out.push(`Маржа PARI на исход матча — ${(margin(m.pari.odds) * 100).toFixed(1).replace(".", ",")}%.`);
     out.push(
       good.length
         ? `Выше справедливой цены: ${good.map((o) => `${outcomeLabel(m, o)} по ${odds(m.pari!.odds[o])} (${(edge(m.pari!.odds[o], fair[o]) * 100).toFixed(1).replace(".", ",")}%)`).join(", ")}. Это перевес на длинной дистанции, а не гарантия результата.`
-        : "Все коэффициенты PARI ниже справедливых: явно выгодной ставки на исход здесь нет.",
+        : OUTCOMES.some((o) => isSuspect(m.pari!.odds[o], fair[o]))
+          ? "Один из коэффициентов PARI сильно расходится с рынком — скорее всего, линия устарела. Проверьте итоговый коэффициент в купоне."
+          : "Все коэффициенты PARI ниже справедливых: явно выгодной ставки на исход здесь нет.",
     );
   }
   return out;

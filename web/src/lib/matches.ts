@@ -51,6 +51,20 @@ export function edge(price: number, prob: number): number {
   return price * prob - 1;
 }
 
+/**
+ * Real edges against a sharp market are small. Anything above this is far more
+ * likely a stale line or a mismatched game than a gift, so it is not flagged.
+ */
+export const MAX_CREDIBLE_EDGE = 0.12;
+
+/** Worth flagging: priced above fair, but not so far above that the data is suspect. */
+export function isValue(price: number, prob: number): boolean {
+  const e = edge(price, prob);
+  return e > 0 && e <= MAX_CREDIBLE_EDGE;
+}
+
+export const isSuspect = (price: number, prob: number) => edge(price, prob) > MAX_CREDIBLE_EDGE;
+
 export const pct = (x: number, digits = 0) => `${(x * 100).toFixed(digits)}%`;
 export const odds = (x: number) => x.toFixed(2);
 
@@ -68,7 +82,7 @@ export function verdict(m: Match): string | null {
 /** True when PARI prices at least one outcome above its fair chance. */
 export function hasValue(m: Match): boolean {
   const { pari, fair } = m;
-  return !!pari && !!fair && OUTCOMES.some((o) => edge(pari.odds[o], fair[o]) > 0);
+  return !!pari && !!fair && OUTCOMES.some((o) => isValue(pari.odds[o], fair[o]));
 }
 
 /** Russian plural: plural(5, ["матч", "матча", "матчей"]) → "матчей". */

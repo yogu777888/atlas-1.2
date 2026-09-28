@@ -12,7 +12,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { BONUS_TERMS, bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatches } from "@/lib/data";
 import { leagues } from "@/lib/leagues";
-import { edge, hasValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
+import { hasValue, isValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
 import { articles } from "@/content/articles";
 import { site } from "@/lib/site";
 import { tools } from "@/lib/tools";
@@ -87,7 +87,7 @@ export default async function Home() {
       {/* Matches */}
       <section className="container-x pt-24">
         <SectionHeading eyebrow="Ближайшие матчи" title="Шансы и коэффициенты рядом." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты PARI; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
-        <MatchTable matches={matches.slice(0, 8)} />
+        <MatchTable matches={[...matches.filter((m) => m.league.key !== "other"), ...matches.filter((m) => m.league.key === "other")].slice(0, 8)} />
       </section>
 
       {/* Features */}
@@ -200,7 +200,7 @@ function HeroCard({ m }: { m: Match }) {
             <div className="grid grid-cols-3 gap-2">
               {OUTCOMES.map((o, i) => {
                 const price = m.pari!.odds[o];
-                const good = m.fair ? edge(price, m.fair[o]) > 0 : false;
+                const good = m.fair ? isValue(price, m.fair[o]) : false;
                 return (
                   <div key={o} className={`rounded-xl border p-2.5 text-center ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-[11px] text-subtle">{outcomeLabel(m, o)}</p>
