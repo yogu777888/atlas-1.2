@@ -1,0 +1,38 @@
+import Link from "next/link";
+import { nav } from "@/lib/site";
+import { Logo } from "./Logo";
+
+export function SiteHeader() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-xl">
+      <div className="container-x flex h-14 items-center justify-between gap-4">
+        <Link href="/" aria-label="tag.bet home">
+          <Logo />
+        </Link>
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+          {nav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-full px-3 py-1.5 text-sm text-muted transition hover:bg-white/5 hover:text-fg"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link href="/odds" className="btn-primary h-8 px-4 text-[13px]">
+            Compare odds
+          </Link>
+        </div>
+      </div>
+      <nav className="container-x flex gap-1 overflow-x-auto pb-2 md:hidden" aria-label="Main mobile">
+        {nav.map((item) => (
+          <Link key={item.href} href={item.href} className="shrink-0 rounded-full px-3 py-1 text-sm text-muted hover:text-fg">
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </header>
+  );
+}

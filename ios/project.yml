@@ -1,0 +1,58 @@
+name: TagBet
+options:
+  bundleIdPrefix: bet.tag
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: "" # set your Apple Developer Team ID
+targets:
+  TagBet:
+    type: application
+    platform: iOS
+    sources: [TagBet]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: bet.tag.app
+        PRODUCT_NAME: tag.bet
+        PRODUCT_MODULE_NAME: TagBet
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TAGBET_API_BASE_URL: https://tag.bet
+      configs:
+        Debug:
+          # Point the simulator at `npm run dev` on your Mac
+          TAGBET_API_BASE_URL: http://localhost:3000
+    info:
+      path: TagBet/Info.plist
+      properties:
+        CFBundleDisplayName: tag.bet
+        TagBetAPIBaseURL: $(TAGBET_API_BASE_URL)
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIUserInterfaceStyle: Dark
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+  TagBetTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [TagBetTests]
+    dependencies:
+      - target: TagBet
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  TagBet:
+    build:
+      targets:
+        TagBet: all
+    test:
+      targets: [TagBetTests]
