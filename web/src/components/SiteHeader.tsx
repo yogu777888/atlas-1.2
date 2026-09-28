@@ -21,8 +21,8 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/matches" className="btn-primary h-8 px-4 text-[13px]">
-            Матчи
+          <Link href="/matches?value=1" className="btn-primary h-8 gap-1.5 px-4 text-[13px]">
+            Выгодные кэфы
           </Link>
         </div>
       </div>

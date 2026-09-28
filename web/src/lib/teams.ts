@@ -1,0 +1,73 @@
+/**
+ * Russian names for well-known clubs. sstats (and its PARI feed) spell teams in
+ * English; anything not listed here is shown as-is.
+ */
+const RU: Record<string, string> = {
+  // РПЛ
+  "zenit": "Зенит", "zenit saint petersburg": "Зенит", "zenit st petersburg": "Зенит",
+  "spartak moscow": "Спартак", "spartak moskva": "Спартак", "cska moscow": "ЦСКА", "cska moskva": "ЦСКА",
+  "lokomotiv moscow": "Локомотив", "lokomotiv moskva": "Локомотив", "dinamo moscow": "Динамо", "dynamo moscow": "Динамо",
+  "krasnodar": "Краснодар", "rostov": "Ростов", "rubin": "Рубин", "rubin kazan": "Рубин", "akhmat grozny": "Ахмат",
+  "krylya sovetov": "Крылья Советов", "krylia sovetov": "Крылья Советов", "fakel": "Факел", "fakel voronezh": "Факел",
+  "orenburg": "Оренбург", "gazovik orenburg": "Оренбург", "nizhny novgorod": "Пари НН", "pari nn": "Пари НН",
+  "dynamo makhachkala": "Динамо Махачкала", "dinamo makhachkala": "Динамо Махачкала", "akron": "Акрон", "akron togliatti": "Акрон",
+  "baltika": "Балтика", "baltika kaliningrad": "Балтика", "sochi": "Сочи", "khimki": "Химки", "torpedo moscow": "Торпедо",
+  // АПЛ
+  "manchester united": "Манчестер Юнайтед", "manchester city": "Манчестер Сити", "arsenal": "Арсенал", "chelsea": "Челси",
+  "liverpool": "Ливерпуль", "tottenham": "Тоттенхэм", "tottenham hotspur": "Тоттенхэм", "newcastle": "Ньюкасл",
+  "newcastle united": "Ньюкасл", "aston villa": "Астон Вилла", "west ham": "Вест Хэм", "west ham united": "Вест Хэм",
+  "brighton": "Брайтон", "everton": "Эвертон", "fulham": "Фулхэм", "crystal palace": "Кристал Пэлас", "brentford": "Брентфорд",
+  "wolves": "Вулверхэмптон", "wolverhampton": "Вулверхэмптон", "nottingham forest": "Ноттингем Форест",
+  "bournemouth": "Борнмут", "leeds": "Лидс", "leeds united": "Лидс", "burnley": "Бернли", "sunderland": "Сандерленд",
+  // Ла Лига
+  "real madrid": "Реал Мадрид", "barcelona": "Барселона", "atletico madrid": "Атлетико", "sevilla": "Севилья",
+  "real betis": "Бетис", "real sociedad": "Реал Сосьедад", "villarreal": "Вильярреал", "athletic club": "Атлетик",
+  "athletic bilbao": "Атлетик", "valencia": "Валенсия", "celta vigo": "Сельта", "girona": "Жирона", "osasuna": "Осасуна",
+  "getafe": "Хетафе", "mallorca": "Мальорка", "rayo vallecano": "Райо Вальекано", "espanyol": "Эспаньол", "alaves": "Алавес",
+  "levante": "Леванте", "elche": "Эльче", "oviedo": "Овьедо", "real oviedo": "Овьедо",
+  // Серия А
+  "inter": "Интер", "inter milan": "Интер", "ac milan": "Милан", "milan": "Милан", "juventus": "Ювентус", "napoli": "Наполи",
+  "as roma": "Рома", "roma": "Рома", "lazio": "Лацио", "atalanta": "Аталанта", "fiorentina": "Фиорентина", "bologna": "Болонья",
+  "torino": "Торино", "genoa": "Дженоа", "udinese": "Удинезе", "sassuolo": "Сассуоло", "como": "Комо", "lecce": "Лечче",
+  "cagliari": "Кальяри", "verona": "Верона", "hellas verona": "Верона", "parma": "Парма", "cremonese": "Кремонезе", "pisa": "Пиза",
+  // Бундеслига
+  "bayern munchen": "Бавария", "bayern munich": "Бавария", "borussia dortmund": "Боруссия Д", "bayer leverkusen": "Байер",
+  "rb leipzig": "РБ Лейпциг", "eintracht frankfurt": "Айнтрахт", "vfb stuttgart": "Штутгарт", "sc freiburg": "Фрайбург",
+  "borussia monchengladbach": "Боруссия М", "vfl wolfsburg": "Вольфсбург", "werder bremen": "Вердер", "1899 hoffenheim": "Хоффенхайм",
+  "hoffenheim": "Хоффенхайм", "fsv mainz 05": "Майнц", "mainz 05": "Майнц", "fc augsburg": "Аугсбург", "union berlin": "Унион Берлин",
+  "1 fc heidenheim": "Хайденхайм", "heidenheim": "Хайденхайм", "fc st pauli": "Санкт-Паули", "st pauli": "Санкт-Паули",
+  "1 fc koln": "Кёльн", "fc koln": "Кёльн", "hamburger sv": "Гамбург",
+  // Лига 1
+  "paris saint germain": "ПСЖ", "psg": "ПСЖ", "marseille": "Марсель", "lyon": "Лион", "monaco": "Монако", "lille": "Лилль",
+  "nice": "Ницца", "lens": "Ланс", "rennes": "Ренн", "strasbourg": "Страсбург", "nantes": "Нант", "toulouse": "Тулуза",
+  "brest": "Брест", "stade brestois 29": "Брест", "auxerre": "Осер", "angers": "Анже", "le havre": "Гавр", "lorient": "Лорьян",
+  "metz": "Метц", "paris fc": "Париж",
+  // Еврокубки
+  "benfica": "Бенфика", "porto": "Порту", "fc porto": "Порту", "sporting cp": "Спортинг", "sporting lisbon": "Спортинг",
+  "ajax": "Аякс", "psv eindhoven": "ПСВ", "psv": "ПСВ", "feyenoord": "Фейеноорд", "celtic": "Селтик", "rangers": "Рейнджерс",
+  "club brugge": "Брюгге", "club brugge kv": "Брюгге", "galatasaray": "Галатасарай", "fenerbahce": "Фенербахче",
+  "besiktas": "Бешикташ", "olympiakos piraeus": "Олимпиакос", "olympiacos": "Олимпиакос", "shakhtar donetsk": "Шахтёр",
+  "dinamo zagreb": "Динамо Загреб", "crvena zvezda": "Црвена Звезда", "red star belgrade": "Црвена Звезда",
+  "red bull salzburg": "Зальцбург", "salzburg": "Зальцбург", "sturm graz": "Штурм", "bsc young boys": "Янг Бойз",
+  "young boys": "Янг Бойз", "slavia praha": "Славия", "sparta praha": "Спарта Прага", "fc copenhagen": "Копенгаген",
+  "copenhagen": "Копенгаген", "bodo glimt": "Будё-Глимт", "qarabag": "Карабах", "union st gilloise": "Юнион Сент-Жиллуаз",
+  "kairat almaty": "Кайрат", "kairat": "Кайрат",
+};
+
+function key(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/ø/g, "o")
+    .replace(/ß/g, "ss")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Russian club name when we know it, otherwise the original spelling. */
+export function teamRu(name: string): string {
+  const k = key(name);
+  return RU[k] ?? RU[k.replace(/^(fc|fk|ac|sc) | (fc|fk|cf)$/g, "")] ?? name;
+}

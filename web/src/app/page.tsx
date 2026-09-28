@@ -9,14 +9,14 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatches } from "@/lib/data";
 import { leagues } from "@/lib/leagues";
-import { edge, odds, OUTCOMES, outcomeLabel, verdict, type Match } from "@/lib/matches";
+import { edge, hasValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
 import { site } from "@/lib/site";
 
 export const revalidate = 300;
 
 const features = [
   { title: "Реальные шансы, а не мнение", body: "Берём коэффициенты десятков мировых букмекеров, убираем маржу и получаем справедливую вероятность каждого исхода.", span: "md:col-span-2" },
-  { title: "Выгодный коэффициент — отмечен", body: "Если коэффициент PARI выше справедливого, подсвечиваем его зелёным.", span: "" },
+  { title: "Выгодный коэффициент — отмечен", body: "Если коэффициент PARI выше справедливого, отмечаем жёлтым флипом.", span: "" },
   { title: "Рейтинг команд", body: "Независимая оценка силы команд по рейтингу Glicko-2 и ожидаемые голы (xG).", span: "" },
   { title: "Бонусы без мелкого шрифта", body: "Ключевые условия — прямо на карточке, до перехода на сайт букмекера.", span: "" },
   { title: "Только легальные букмекеры", body: "Ссылки ведут только к конторам с лицензией ФНС России. Никаких офшоров.", span: "md:col-span-2" },
@@ -24,7 +24,7 @@ const features = [
 
 const faqs = [
   { q: "Откуда берутся шансы?", a: "Из коэффициентов крупных мировых букмекеров. Мы убираем из них маржу и усредняем — получается оценка рынка, которая обычно точнее любого эксперта." },
-  { q: "Что значит зелёный коэффициент?", a: "Коэффициент PARI выше справедливого: на длинной дистанции такие ставки выгоднее средних. Это не гарантия выигрыша в конкретном матче." },
+  { q: "Что значит жёлтый коэффициент?", a: "Коэффициент PARI выше справедливого: на длинной дистанции такие ставки выгоднее средних. Это не гарантия выигрыша в конкретном матче." },
   { q: "tag.bet — это букмекер?", a: "Нет. Мы не принимаем ставки и не храним деньги. Мы разбираем матчи и рассказываем о легальных букмекерах." },
   { q: "Как tag.bet зарабатывает?", a: "Некоторые букмекеры платят нам за привлечённых клиентов. Такие ссылки помечены как реклама. На расчёт шансов это не влияет." },
 ];
@@ -32,7 +32,9 @@ const faqs = [
 export default async function Home() {
   const matches = await getMatches();
   const top = bookmakersByRating();
-  const hero = matches.find((m) => m.fair && m.pari) ?? matches.find((m) => m.fair) ?? matches[0];
+  const hero = pickHero(matches);
+  const topCount = matches.filter((m) => m.league.key !== "other").length;
+  const otherCount = matches.length - topCount;
 
   return (
     <>
@@ -47,7 +49,10 @@ export default async function Home() {
                 <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
                 {dataSource() === "live" ? "LIVE" : "ДЕМО"}
               </span>
-              {matches.length} матчей топ-лиг в ближайшие дни →
+              {topCount
+                ? `${topCount} ${plural(topCount, ["матч", "матча", "матчей"])} топ-лиг на неделе${otherCount ? ` · ещё ${otherCount} в других турнирах` : ""}`
+                : `${matches.length} ${plural(matches.length, ["матч", "матча", "матчей"])} на неделе`}{" "}
+              →
             </Link>
             <h1 className="text-gradient text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
               Разбор матча
@@ -84,7 +89,7 @@ export default async function Home() {
 
       {/* Matches */}
       <section className="container-x pt-24">
-        <SectionHeading eyebrow="Ближайшие матчи" title="Шансы и коэффициенты рядом." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты PARI; зелёные выше справедливых." href="/matches" cta="Все матчи" />
+        <SectionHeading eyebrow="Ближайшие матчи" title="Шансы и коэффициенты рядом." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты PARI; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
         <MatchTable matches={matches.slice(0, 8)} />
       </section>
 
@@ -196,7 +201,7 @@ function HeroCard({ m }: { m: Match }) {
                 return (
                   <div key={o} className={`rounded-xl border p-2.5 text-center ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-[11px] text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className={`font-mono text-lg tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
+                    <p className={`text-lg font-semibold tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
                   </div>
                 );
               })}
@@ -207,4 +212,15 @@ function HeroCard({ m }: { m: Match }) {
       </Link>
     </div>
   );
+}
+
+/**
+ * The showcase match: top leagues first, then one PARI prices above fair, then any
+ * with market chances. Skips kick-offs in the next 30 minutes so it isn't stale on arrival.
+ */
+function pickHero(matches: Match[]): Match | undefined {
+  const soon = Date.now() + 30 * 60_000;
+  const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
+  const score = (m: Match) => (m.league.key !== "other" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0);
+  return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
 }

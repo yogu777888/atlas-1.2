@@ -60,8 +60,8 @@ export default async function MatchPage({ params }: Props) {
                 {OUTCOMES.map((o) => (
                   <div key={o} className="rounded-xl bg-surface-2 p-3">
                     <p className="truncate text-xs text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className="mt-1 font-mono text-lg tabular-nums">{pct(fair[o])}</p>
-                    <p className="font-mono text-xs text-subtle">справедл. {odds(1 / fair[o])}</p>
+                    <p className="mt-1 text-lg font-semibold tabular-nums">{pct(fair[o])}</p>
+                    <p className="text-xs text-subtle tabular-nums">справедл. {odds(1 / fair[o])}</p>
                   </div>
                 ))}
               </div>
@@ -84,9 +84,9 @@ export default async function MatchPage({ params }: Props) {
                 return (
                   <div key={o} className={`rounded-xl border p-3 ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-xs text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className={`mt-1 font-mono text-2xl tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
+                    <p className={`mt-1 text-2xl font-semibold tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
                     {value !== null && (
-                      <p className={`font-mono text-xs ${good ? "text-accent" : "text-subtle"}`}>
+                      <p className={`text-xs tabular-nums ${good ? "text-accent" : "text-subtle"}`}>
                         {value > 0 ? "+" : ""}
                         {(value * 100).toFixed(1)}%
                       </p>
@@ -134,8 +134,8 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   return (
     <div className="rounded-xl bg-surface-2 p-4">
       <p className="truncate text-xs text-subtle">{label}</p>
-      <p className="mt-1 font-mono text-xl tabular-nums">{value}</p>
-      {sub && <p className="font-mono text-xs text-subtle">{sub}</p>}
+      <p className="mt-1 text-xl font-semibold tabular-nums">{value}</p>
+      {sub && <p className="text-xs text-subtle tabular-nums">{sub}</p>}
     </div>
   );
 }

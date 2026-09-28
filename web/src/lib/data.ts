@@ -2,6 +2,7 @@ import { classifyLeague, getLeague, leagues } from "./leagues";
 import { consensus, OUTCOMES, type Match, type Odds1x2 } from "./matches";
 import { mockEvents } from "./odds/mock";
 import { findPariLine, pariLines } from "./pari";
+import { teamRu } from "./teams";
 import { sstats } from "./sstats/client";
 import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
 
@@ -69,8 +70,8 @@ async function liveMatches(): Promise<Match[]> {
       id: `ss-${g.id}`,
       sstatsId: g.id,
       league,
-      home: g.homeTeam.name,
-      away: g.awayTeam.name,
+      home: teamRu(g.homeTeam.name),
+      away: teamRu(g.awayTeam.name),
       commenceTime: new Date(start).toISOString(),
       market,
       fair: market ? consensus([market]) : null,

@@ -68,7 +68,7 @@ body {
   @apply btn border border-line-strong text-fg hover:bg-white/5;
 }
 @utility odds-pill {
-  @apply inline-flex min-w-16 items-center justify-center rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 font-mono text-sm tabular-nums;
+  @apply inline-flex min-w-16 items-center justify-center rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-sm font-medium tabular-nums;
 }
 @utility odds-pill-best {
   @apply border-accent/40 bg-accent/10 text-accent;

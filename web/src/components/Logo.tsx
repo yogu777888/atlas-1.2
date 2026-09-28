@@ -13,11 +13,11 @@ export function FlipMark({ className = "size-3" }: { className?: string }) {
 
 /** "tag", the flip in place of the dot, "bet". */
 export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
-  const text = size === "lg" ? "text-4xl" : "text-[22px]";
+  const text = size === "lg" ? "text-4xl" : "text-[27px]";
   return (
     <span className={`inline-flex items-baseline font-extrabold leading-none tracking-[-0.055em] ${text}`} aria-label="tag.bet">
       <span aria-hidden="true">tag</span>
-      <FlipMark className="mx-[0.05em] ml-[0.07em] size-[0.3em] self-baseline" />
+      <FlipMark className="mr-[0.05em] ml-[0.08em] size-[0.34em] self-baseline" />
       <span aria-hidden="true">bet</span>
     </span>
   );

@@ -64,3 +64,17 @@ export function verdict(m: Match): string | null {
   if (!fav) return `Рынок ждёт ничью (${pct(draw)}).`;
   return `Фаворит — ${fav}: шанс победы ${pct(max)}.`;
 }
+
+/** True when PARI prices at least one outcome above its fair chance. */
+export function hasValue(m: Match): boolean {
+  const { pari, fair } = m;
+  return !!pari && !!fair && OUTCOMES.some((o) => edge(pari.odds[o], fair[o]) > 0);
+}
+
+/** Russian plural: plural(5, ["матч", "матча", "матчей"]) → "матчей". */
+export function plural(n: number, [one, few, many]: [string, string, string]): string {
+  const d = n % 10, dd = n % 100;
+  if (d === 1 && dd !== 11) return one;
+  if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return few;
+  return many;
+}
