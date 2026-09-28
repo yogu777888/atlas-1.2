@@ -6,7 +6,9 @@ import { OutboundButton } from "@/components/OutboundButton";
 import { ProbBar } from "@/components/ProbBar";
 import { getBookmaker } from "@/lib/bookmakers";
 import { getMatch, getMatchDetail } from "@/lib/data";
-import { edge, odds, OUTCOMES, outcomeLabel, pct, verdict } from "@/lib/matches";
+import { getArticle } from "@/content/articles";
+import type { MatchDetail } from "@/lib/data";
+import { edge, margin, odds, OUTCOMES, outcomeLabel, pct, verdict, type Match, type Probs1x2 } from "@/lib/matches";
 import { site } from "@/lib/site";
 
 export const revalidate = 300;
@@ -16,9 +18,10 @@ type Props = { params: Promise<{ id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const m = await getMatch((await params).id);
   if (!m) return { title: "Матч не найден" };
+  const chances = m.fair ? ` Шансы: ${m.home} ${pct(m.fair.home)}, ничья ${pct(m.fair.draw)}, ${m.away} ${pct(m.fair.away)}.` : "";
   return {
-    title: `${m.home} — ${m.away}: прогноз и коэффициенты`,
-    description: `${m.league.label}. ${verdict(m) ?? ""} Шансы по мировому рынку и коэффициенты PARI.`,
+    title: `${m.home} — ${m.away}: прогноз, шансы и коэффициенты на ${dayRu(m.commenceTime)}`,
+    description: `${m.league.label}, ${dayRu(m.commenceTime)}.${chances} Коэффициенты PARI и где они выше справедливых.`,
     alternates: { canonical: `/matches/${m.id}` },
   };
 }
@@ -74,7 +77,7 @@ export default async function MatchPage({ params }: Props) {
         {/* PARI */}
         <section className="card p-6">
           <h2 className="font-medium">Коэффициенты PARI</h2>
-          <p className="mt-1 text-sm text-muted">Легальный букмекер. Зелёным — коэффициент выше справедливого.</p>
+          <p className="mt-1 text-sm text-muted">Легальный букмекер. Жёлтым — коэффициент выше справедливого.</p>
           {m.pari ? (
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
               {OUTCOMES.map((o) => {
@@ -116,15 +119,41 @@ export default async function MatchPage({ params }: Props) {
         </section>
       )}
 
-      <section className="mt-10 max-w-2xl space-y-3 text-sm leading-relaxed text-muted">
-        <h2 className="text-base font-medium text-fg">Как читать эту страницу</h2>
-        <p>
-          Букмекеры закладывают в коэффициенты маржу. Мы берём коэффициенты многих контор, убираем маржу и получаем «справедливые»
-          шансы. Если коэффициент PARI выше справедливого, ставка на этот исход математически выгоднее средней — но это не гарантия
-          выигрыша в конкретном матче.
-        </p>
+      <section className="mt-12 grid gap-10 lg:grid-cols-[1.2fr_1fr]">
+        <div className="max-w-2xl space-y-3 leading-relaxed text-muted">
+          <h2 className="text-xl font-semibold tracking-tight text-fg">Коротко о матче</h2>
+          {summary(m, fair, d).map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+        <div className="space-y-3">
+          <p className="text-sm text-subtle">Как мы это считаем</p>
+          {explainers.map((a) => (
+            <ArticleLink key={a!.slug} slug={a!.slug} />
+          ))}
+          <Link href="/tools/marzha" className="block text-sm text-accent hover:underline">
+            Посчитать маржу самому →
+          </Link>
+        </div>
       </section>
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SportsEvent",
+            name: `${m.home} — ${m.away}`,
+            sport: "Football",
+            startDate: m.commenceTime,
+            eventStatus: "https://schema.org/EventScheduled",
+            superEvent: { "@type": "SportsEvent", name: m.league.label },
+            homeTeam: { "@type": "SportsTeam", name: m.home },
+            awayTeam: { "@type": "SportsTeam", name: m.away },
+            url: `${site.url}/matches/${m.id}`,
+          }),
+        }}
+      />
       <p className="mt-8 text-xs text-subtle">Коэффициенты меняются. Проверяйте итоговый коэффициент в купоне букмекера. {site.warning}</p>
     </div>
   );
@@ -138,4 +167,61 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
       {sub && <p className="text-xs text-subtle tabular-nums">{sub}</p>}
     </div>
   );
+}
+
+const explainers = ["koefficient-v-veroyatnost", "valuinaya-stavka"].map(getArticle).filter(Boolean);
+
+function ArticleLink({ slug }: { slug: string }) {
+  const a = getArticle(slug)!;
+  return (
+    <Link href={`/articles/${a.slug}`} className="group flex items-center justify-between gap-4 rounded-xl border border-line p-4 transition hover:border-line-strong">
+      <span className="min-w-0">
+        <span className="block text-xs text-subtle">
+          {a.cover.figure} · {a.minutes} мин
+        </span>
+        <span className="block font-medium group-hover:text-accent">{a.title}</span>
+      </span>
+      <span className="text-muted">→</span>
+    </Link>
+  );
+}
+
+/** "5 октября" in Moscow time, for titles. */
+function dayRu(iso: string): string {
+  return new Date(iso).toLocaleDateString("ru-RU", { day: "numeric", month: "long", timeZone: "Europe/Moscow" });
+}
+
+function timeRu(iso: string): string {
+  return new Date(iso).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Moscow" });
+}
+
+/**
+ * A few plain sentences built only from this match's numbers, so every page
+ * says something specific instead of boilerplate.
+ */
+function summary(m: Match, fair: Probs1x2 | null, d: MatchDetail): string[] {
+  const out = [`${m.league.label}. Матч начнётся ${dayRu(m.commenceTime)} в ${timeRu(m.commenceTime)} по Москве.`];
+  if (!fair) {
+    out.push("Мировой рынок по этому матчу ещё не сформировался — шансы появятся, когда букмекеры откроют линию.");
+    return out;
+  }
+  out.push(`По мировому рынку шансы такие: ${m.home} — ${pct(fair.home)}, ничья — ${pct(fair.draw)}, ${m.away} — ${pct(fair.away)}. ${verdict({ ...m, fair }) ?? ""}`.trim());
+  if (d.glicko) {
+    const gap = d.glicko.home - fair.home;
+    out.push(
+      Math.abs(gap) < 0.06
+        ? `Рейтинг Glicko-2 оценивает матч так же, как рынок: ${m.home} — ${pct(d.glicko.home)}.`
+        : `Рейтинг Glicko-2 ${gap > 0 ? `сильнее верит в ${m.home}` : `сильнее верит в ${m.away}`}: ${m.home} — ${pct(d.glicko.home)}, ${m.away} — ${pct(d.glicko.away)}. Рейтинг не учитывает составы и мотивацию, рынок — учитывает.`,
+    );
+  }
+  if (m.pari) {
+    const good = OUTCOMES.filter((o) => edge(m.pari!.odds[o], fair[o]) > 0);
+    out.push(`Маржа PARI на исход матча — ${(margin(m.pari.odds) * 100).toFixed(1).replace(".", ",")}%.`);
+    out.push(
+      good.length
+        ? `Выше справедливой цены: ${good.map((o) => `${outcomeLabel(m, o)} по ${odds(m.pari!.odds[o])} (${(edge(m.pari!.odds[o], fair[o]) * 100).toFixed(1).replace(".", ",")}%)`).join(", ")}. Это перевес на длинной дистанции, а не гарантия результата.`
+        : "Все коэффициенты PARI ниже справедливых: явно выгодной ставки на исход здесь нет.",
+    );
+  }
+  return out;
 }

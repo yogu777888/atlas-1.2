@@ -93,3 +93,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Number inputs in the calculators */
+@utility field {
+  @apply h-12 w-full min-w-0 rounded-xl border border-line bg-surface-2 px-3.5 text-lg font-semibold tabular-nums text-fg outline-none transition placeholder:text-subtle focus:border-accent/70 focus:bg-surface;
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArticleCard } from "@/components/ArticleCard";
 import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
 import { LocalTime } from "@/components/LocalTime";
@@ -10,7 +11,9 @@ import { bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatches } from "@/lib/data";
 import { leagues } from "@/lib/leagues";
 import { edge, hasValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
+import { articles } from "@/content/articles";
 import { site } from "@/lib/site";
+import { tools } from "@/lib/tools";
 
 export const revalidate = 300;
 
@@ -129,6 +132,25 @@ export default async function Home() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {top.slice(0, 3).map((b) => (
             <BonusCard key={b.slug} b={b} source="home-bonus" />
+          ))}
+        </div>
+      </section>
+
+      {/* Learn */}
+      <section className="container-x pt-28">
+        <SectionHeading eyebrow="Разобраться" title="Как букмекер считает коэффициенты." sub="Короткие статьи с формулами и примерами — и калькуляторы, чтобы проверить на своих цифрах." href="/articles" cta="Все статьи" />
+        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          {["marzha-bukmekera", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
+            const a = articles.find((x) => x.slug === slug)!;
+            return <ArticleCard key={slug} a={a} />;
+          })}
+        </div>
+        <div className="mt-10 flex flex-wrap items-center gap-2">
+          <span className="mr-2 text-sm text-subtle">Калькуляторы:</span>
+          {tools.map((t) => (
+            <Link key={t.slug} href={`/tools/${t.slug}`} className="rounded-full border border-line px-4 py-2 text-sm text-muted transition hover:border-line-strong hover:text-fg">
+              {t.short}
+            </Link>
           ))}
         </div>
       </section>

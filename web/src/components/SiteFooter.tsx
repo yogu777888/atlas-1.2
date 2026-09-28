@@ -5,13 +5,14 @@ import { Logo } from "./Logo";
 const columns = [
   { title: "Сервис", links: [{ href: "/matches", label: "Матчи" }, { href: "/matches?league=rpl", label: "РПЛ" }, { href: "/matches?league=ucl", label: "Лига чемпионов" }, { href: "/bonuses", label: "Бонусы" }] },
   { title: "Букмекеры", links: [{ href: "/bookmakers", label: "Рейтинг" }, { href: "/bookmakers/fonbet", label: "Фонбет" }, { href: "/bookmakers/pari", label: "PARI" }, { href: "/bookmakers/winline", label: "Winline" }] },
+  { title: "Полезное", links: [{ href: "/articles", label: "Статьи" }, { href: "/tools/marzha", label: "Калькулятор маржи" }, { href: "/tools/veroyatnost", label: "Конвертер коэффициентов" }, { href: "/tools/ekspress", label: "Калькулятор экспресса" }] },
   { title: "О сайте", links: [{ href: "/responsible-gambling", label: "Ответственная игра" }, { href: "/disclosure", label: "Как мы зарабатываем" }, { href: "/privacy", label: "Конфиденциальность" }, { href: "/terms", label: "Условия использования" }] },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-line">
-      <div className="container-x grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div className="space-y-4">
           <Logo />
           <p className="max-w-xs text-sm leading-relaxed text-muted">{site.description}</p>

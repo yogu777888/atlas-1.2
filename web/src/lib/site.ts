@@ -13,5 +13,6 @@ export const nav = [
   { href: "/matches", label: "Матчи" },
   { href: "/bookmakers", label: "Букмекеры" },
   { href: "/bonuses", label: "Бонусы" },
-  { href: "/responsible-gambling", label: "Ответственная игра" },
+  { href: "/articles", label: "Статьи" },
+  { href: "/tools", label: "Калькуляторы" },
 ] as const;
