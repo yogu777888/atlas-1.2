@@ -12,6 +12,29 @@
  * carry an erid token and the advertiser's details. CTAs are only rendered for
  * bookmakers whose AFF_/ERID_/ADV_ variables are all set (see .env.example).
  */
+export type BonusKind = "freebet" | "deposit" | "welcome";
+
+/**
+ * Welcome offer. The four key terms are shown as tiles on every card; leave a
+ * term out until you have the current value from the partner programme — the
+ * card then says "уточняется" instead of guessing.
+ */
+export type Bonus = {
+  kind: BonusKind;
+  headline: string;
+  detail: string;
+  /** e.g. "до 15 000 ₽" */
+  amount?: string;
+  /** e.g. "×1" or "без отыгрыша" */
+  wager?: string;
+  /** e.g. "от 1.80" */
+  minOdds?: string;
+  /** e.g. "14 дней" */
+  expires?: string;
+  /** Operator-specific fine print; the general 18+ line is shown once per page */
+  terms?: string;
+};
+
 export type Bookmaker = {
   slug: string;
   name: string;
@@ -22,7 +45,7 @@ export type Bookmaker = {
   monogram: string;
   rating: number; // 0-5, editorial
   homepage: string;
-  bonus: { headline: string; detail: string; terms: string };
+  bonus: Bonus;
   payout: string;
   minDeposit: string;
   avgMargin: number; // typical match-winner margin, e.g. 0.05 = 5%
@@ -33,7 +56,8 @@ export type Bookmaker = {
   subIdParam: string;
 };
 
-const BONUS_TERMS = "18+. Для новых игроков. Размер бонуса, сроки и условия отыгрыша — на сайте букмекера.";
+/** Shown once under bonus lists and on reviews when an offer has no terms of its own */
+export const BONUS_TERMS = "18+. Для новых игроков. Размер бонуса, сроки и условия отыгрыша — на сайте букмекера.";
 
 export const bookmakers: Bookmaker[] = [
   {
@@ -44,7 +68,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "Ф",
     rating: 4.7,
     homepage: "https://www.fon.bet",
-    bonus: { headline: "Фрибет новым игрокам", detail: "Бесплатная ставка после регистрации и подтверждения личности.", terms: BONUS_TERMS },
+    bonus: { kind: "freebet", headline: "Фрибет новым игрокам", detail: "Бесплатная ставка после регистрации и подтверждения личности." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.055,
@@ -61,7 +85,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "W",
     rating: 4.6,
     homepage: "https://winline.ru",
-    bonus: { headline: "Фрибет за регистрацию", detail: "Бонус начисляется после первой ставки.", terms: BONUS_TERMS },
+    bonus: { kind: "freebet", headline: "Фрибет за регистрацию", detail: "Бонус начисляется после первой ставки." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.05,
@@ -78,7 +102,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "P",
     rating: 4.5,
     homepage: "https://www.pari.ru",
-    bonus: { headline: "Бонус на первый депозит", detail: "Дополнительные средства для ставок после пополнения.", terms: BONUS_TERMS },
+    bonus: { kind: "deposit", headline: "Бонус на первый депозит", detail: "Дополнительные средства для ставок после пополнения." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.05,
@@ -95,7 +119,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "BB",
     rating: 4.4,
     homepage: "https://betboom.ru",
-    bonus: { headline: "Фрибет для новых игроков", detail: "Бесплатная ставка после регистрации.", terms: BONUS_TERMS },
+    bonus: { kind: "freebet", headline: "Фрибет для новых игроков", detail: "Бесплатная ставка после регистрации." },
     payout: "до 1 дня",
     minDeposit: "50 ₽",
     avgMargin: 0.055,
@@ -112,7 +136,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "ЛС",
     rating: 4.3,
     homepage: "https://www.ligastavok.ru",
-    bonus: { headline: "Приветственный бонус", detail: "Бонус для новых клиентов после регистрации.", terms: BONUS_TERMS },
+    bonus: { kind: "welcome", headline: "Приветственный бонус", detail: "Бонус для новых клиентов после регистрации." },
     payout: "1–2 дня",
     minDeposit: "50 ₽",
     avgMargin: 0.06,
@@ -129,7 +153,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "М",
     rating: 4.4,
     homepage: "https://www.marathonbet.ru",
-    bonus: { headline: "Бонус новым игрокам", detail: "Приветственное предложение после первой ставки.", terms: BONUS_TERMS },
+    bonus: { kind: "welcome", headline: "Бонус новым игрокам", detail: "Приветственное предложение после первой ставки." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.04,
@@ -146,7 +170,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "О",
     rating: 4.1,
     homepage: "https://www.olimp.bet",
-    bonus: { headline: "Фрибет за регистрацию", detail: "Бесплатная ставка для новых клиентов.", terms: BONUS_TERMS },
+    bonus: { kind: "freebet", headline: "Фрибет за регистрацию", detail: "Бесплатная ставка для новых клиентов." },
     payout: "1–2 дня",
     minDeposit: "50 ₽",
     avgMargin: 0.06,
@@ -163,7 +187,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "БС",
     rating: 4.0,
     homepage: "https://betcity.ru",
-    bonus: { headline: "Приветственный бонус", detail: "Бонус для новых игроков.", terms: BONUS_TERMS },
+    bonus: { kind: "welcome", headline: "Приветственный бонус", detail: "Бонус для новых игроков." },
     payout: "1–2 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.055,
@@ -206,3 +230,11 @@ export function canAdvertise(b: Bookmaker): boolean {
 export function goLink(slug: string, source: string): string {
   return `/go/${slug}?src=${encodeURIComponent(source)}`;
 }
+
+export const bonusTerms = (b: Bookmaker) => b.bonus.terms ?? BONUS_TERMS;
+
+export const BONUS_KINDS: { key: BonusKind; label: string }[] = [
+  { key: "freebet", label: "Фрибеты" },
+  { key: "deposit", label: "За депозит" },
+  { key: "welcome", label: "Приветственные" },
+];

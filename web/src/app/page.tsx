@@ -9,7 +9,7 @@ import { FlipMark } from "@/components/Logo";
 import { MatchTable } from "@/components/MatchTable";
 import { ProbBar } from "@/components/ProbBar";
 import { SectionHeading } from "@/components/SectionHeading";
-import { bookmakersByRating } from "@/lib/bookmakers";
+import { BONUS_TERMS, bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatches } from "@/lib/data";
 import { leagues } from "@/lib/leagues";
 import { edge, hasValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
@@ -114,6 +114,7 @@ export default async function Home() {
             <BonusCard key={b.slug} b={b} source="home-bonus" />
           ))}
         </div>
+        <p className="mt-4 text-xs text-subtle">{BONUS_TERMS}</p>
       </section>
 
       {/* Learn */}

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BonusFacts } from "@/components/BonusFacts";
 import { BookLogo } from "@/components/BookLogo";
 import { OutboundButton } from "@/components/OutboundButton";
 import { Rating } from "@/components/Rating";
-import { bookmakers, getBookmaker } from "@/lib/bookmakers";
+import { bookmakers, getBookmaker, bonusTerms } from "@/lib/bookmakers";
 import { site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -68,7 +69,7 @@ export default async function BookmakerPage({ params }: Props) {
             {facts.map((f) => (
               <div key={f.k} className="bg-surface p-4">
                 <dt className="text-xs text-subtle">{f.k}</dt>
-                <dd className="mt-1 font-mono text-sm">{f.v}</dd>
+                <dd className="mt-1 text-sm font-medium tabular-nums">{f.v}</dd>
               </div>
             ))}
           </dl>
@@ -110,14 +111,16 @@ export default async function BookmakerPage({ params }: Props) {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card relative overflow-hidden p-6">
-            <div className="pointer-events-none absolute -top-20 -right-20 size-48 rounded-full opacity-25 blur-3xl" style={{ background: b.color }} />
             <p className="eyebrow">Бонус</p>
             <p className="mt-3 text-2xl leading-tight font-semibold tracking-tight">{b.bonus.headline}</p>
             <p className="mt-2 text-sm text-muted">{b.bonus.detail}</p>
-            <div className="mt-6">
+            <div className="mt-5">
+              <BonusFacts bonus={b.bonus} />
+            </div>
+            <div className="mt-5">
               <OutboundButton b={b} source={`review-${b.slug}`} label={`Перейти в ${b.name}`} className="h-11 w-full" />
             </div>
-            <p className="mt-3 text-[11px] leading-snug text-subtle">{b.bonus.terms}</p>
+            <p className="mt-3 text-[11px] leading-snug text-subtle">{bonusTerms(b)}</p>
           </div>
         </aside>
       </div>
