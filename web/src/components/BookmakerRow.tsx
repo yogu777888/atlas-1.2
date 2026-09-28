@@ -17,7 +17,7 @@ export function BookmakerRow({ b, rank, source }: { b: Bookmaker; rank: number; 
       </div>
       <div className="col-span-2 flex items-center justify-between gap-4 sm:col-span-1 sm:justify-end">
         <Rating value={b.rating} />
-        <span className="text-xs text-subtle tabular-nums">маржа ~{(b.avgMargin * 100).toFixed(1)}%</span>
+        <span className="text-xs text-subtle tabular-nums">маржа ≈{(b.avgMargin * 100).toFixed(1).replace(".", ",")}%</span>
       </div>
       <div className="col-span-2 sm:col-span-1">
         <OutboundButton b={b} source={source} label={`Перейти в ${b.name}`} className="h-9 w-full" />

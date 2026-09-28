@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!b) return {};
   return {
     title: `${b.name}: обзор букмекера — коэффициенты, бонусы, выплаты`,
-    description: `${b.name} — оценка ${b.rating} из 5. Маржа около ${(b.avgMargin * 100).toFixed(1)}%, выплаты ${b.payout}, минимальный депозит ${b.minDeposit}.`,
+    description: `${b.name} — оценка ${b.rating} из 5. Маржа около ${(b.avgMargin * 100).toFixed(1).replace(".", ",")}%, выплаты ${b.payout}, минимальный депозит ${b.minDeposit}.`,
     alternates: { canonical: `/bookmakers/${b.slug}` },
   };
 }
@@ -30,7 +30,7 @@ export default async function BookmakerPage({ params }: Props) {
 
   const facts = [
     { k: "Оценка", v: <Rating value={b.rating} /> },
-    { k: "Средняя маржа", v: `~${(b.avgMargin * 100).toFixed(1)}%` },
+    { k: "Средняя маржа", v: `~${(b.avgMargin * 100).toFixed(1).replace(".", ",")}%` },
     { k: "Выплаты", v: b.payout },
     { k: "Мин. депозит", v: b.minDeposit },
     { k: "Лицензия", v: "ФНС России" },
@@ -102,7 +102,7 @@ export default async function BookmakerPage({ params }: Props) {
           <div className="mt-10 max-w-2xl space-y-4 leading-relaxed text-muted">
             <h2 className="text-xl font-semibold tracking-tight text-fg">Итог</h2>
             <p>
-              Средняя маржа {b.name} на исход матча — около {(b.avgMargin * 100).toFixed(1)}%, {verdict}. {b.pros[0]}. Главный
+              Средняя маржа {b.name} на исход матча — около {(b.avgMargin * 100).toFixed(1).replace(".", ",")}%, {verdict}. {b.pros[0]}. Главный
               минус: {b.cons[0].toLowerCase()}.
             </p>
             <p>Сравнивайте коэффициенты на tag.bet: на конкретный матч лучшая цена часто оказывается у другой конторы.</p>
