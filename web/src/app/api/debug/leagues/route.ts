@@ -6,7 +6,7 @@ import { classifyLeague } from "@/lib/leagues";
 export async function GET() {
   if (process.env.NODE_ENV === "production") return NextResponse.json({ error: "not available" }, { status: 404 });
   const d = (n: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Moscow" }).format(new Date(Date.now() + n * 86_400_000));
-  const games = await upcomingGames(d(0), d(3));
+  const games = await upcomingGames(d(0), d(7));
   const counts = new Map<string, { id: number; country: string; name: string; games: number; ours: string | null }>();
   for (const g of games) {
     const l = g.season?.league;
