@@ -86,7 +86,7 @@ export const articles: Article[] = [
     category: "Основы",
     minutes: 4,
     updated: "2026-09-28",
-    cover: { figure: "1.90 → 52,6%", caption: "вероятность, которую закладывает букмекер" },
+    cover: { figure: "52,6%", caption: "вероятность внутри коэффициента 1.90" },
     toc: [
       { id: "prostaya-formula", title: "Простая формула" },
       { id: "bez-marzhi", title: "Честная вероятность без маржи" },
@@ -207,7 +207,7 @@ export const articles: Article[] = [
     category: "Стратегия",
     minutes: 4,
     updated: "2026-09-28",
-    cover: { figure: "3 × 1.90 = 6.86", caption: "а маржа растёт с 4,2% до 13,2%" },
+    cover: { figure: "13,2%", caption: "маржа экспресса из трёх событий по 1.90" },
     toc: [
       { id: "kak-schitaetsya", title: "Как считается экспресс" },
       { id: "marzha", title: "Маржа умножается" },

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/ArticleCard";
+import { ArticleVisual } from "@/components/ArticleVisuals";
 import { Cover } from "@/components/Cover";
 import { articles, getArticle } from "@/content/articles";
 import { site } from "@/lib/site";
@@ -44,7 +45,7 @@ export default async function ArticlePage({ params }: Props) {
           <h1 className="mt-3 text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-5xl">{a.title}</h1>
           <p className="mt-4 max-w-xl text-lg text-pretty text-muted">{a.description}</p>
         </div>
-        <Cover figure={a.cover.figure} caption={a.cover.caption} size="lg" />
+        <Cover figure={a.cover.figure} caption={a.cover.caption} size="lg" visual={<ArticleVisual slug={a.slug} />} />
       </header>
 
       <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_16rem]">
