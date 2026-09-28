@@ -22,7 +22,7 @@ export const tools: Tool[] = [
     title: "Конвертер коэффициентов и вероятности",
     short: "Коэффициент ↔ вероятность",
     description: "Переводит десятичные, дробные и американские коэффициенты друг в друга и в вероятность.",
-    cover: { figure: "1.90 = 52,6%", caption: "коэффициент ↔ вероятность" },
+    cover: { figure: "52,6%", caption: "коэффициент 1.90 в четырёх форматах" },
     article: "koefficient-v-veroyatnost",
   },
   {
@@ -30,7 +30,7 @@ export const tools: Tool[] = [
     title: "Калькулятор экспресса",
     short: "Экспресс",
     description: "Итоговый коэффициент, выплата и сколько маржи накапливается в экспрессе.",
-    cover: { figure: "× 6.86", caption: "три события по 1.90" },
+    cover: { figure: "6.86", caption: "итоговый коэффициент экспресса" },
     article: "ekspress-matematika",
   },
 ];

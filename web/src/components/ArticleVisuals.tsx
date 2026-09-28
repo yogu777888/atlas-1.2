@@ -24,6 +24,28 @@ export function ArticleVisual({ slug }: { slug: string }) {
   }
 }
 
+/** Drawing for each calculator. */
+export function ToolVisual({ slug }: { slug: string }) {
+  if (slug === "marzha") return <OddsInputs />;
+  if (slug === "veroyatnost") return <Formats />;
+  if (slug === "ekspress") return <Multiply />;
+  return null;
+}
+
+/** One price in four notations. */
+function Formats() {
+  return (
+    <div className="flex items-center gap-1 text-xs font-semibold tabular-nums" aria-hidden>
+      {["1.90", "9/10", "−111"].map((k) => (
+        <span key={k} className="rounded-md border border-line bg-surface px-1.5 py-1">
+          {k}
+        </span>
+      ))}
+      <span className="rounded-md border border-accent/60 bg-surface px-1.5 py-1 text-accent">52,6%</span>
+    </div>
+  );
+}
+
 /** The margin calculator's three inputs. */
 export function OddsInputs() {
   return (
