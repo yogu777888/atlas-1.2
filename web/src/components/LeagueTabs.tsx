@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { leagues } from "@/lib/leagues";
+import { leagues, otherLeague } from "@/lib/leagues";
 
 export function LeagueTabs({ active }: { active?: string }) {
-  const tabs = [{ key: undefined as string | undefined, short: "Все матчи" }, ...leagues];
+  const tabs = [{ key: undefined as string | undefined, short: "Все матчи" }, ...leagues, otherLeague];
   return (
     <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Турниры">
       {tabs.map((t) => {

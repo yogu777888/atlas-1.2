@@ -20,7 +20,11 @@ const RULES: Rule[] = [
 
 export const leagues: League[] = RULES.map(({ key, label, short }) => ({ key, label, short }));
 
+/** Tab for games outside the top leagues */
+export const otherLeague: League = { key: "other", label: "Другие турниры", short: "Другие" };
+
 export function getLeague(key: string | null | undefined): League | undefined {
+  if (key === otherLeague.key) return otherLeague;
   return leagues.find((l) => l.key === key);
 }
 

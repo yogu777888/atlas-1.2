@@ -7,7 +7,10 @@ import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
 
 export type DataSource = "live" | "demo";
 
-const DAYS_AHEAD = 3;
+const DAYS_AHEAD = 7;
+/** Other leagues' games shown when the top leagues are quiet (midweek, international breaks) */
+const MIN_TOP_MATCHES = 12;
+const OTHER_LIMIT = 30;
 
 /** YYYY-MM-DD in Moscow time, `plusDays` from today. */
 function moscowDate(plusDays = 0): string {
@@ -50,14 +53,19 @@ async function liveMatches(): Promise<Match[]> {
 
   const now = Date.now();
   const out: Match[] = [];
+  const others: Match[] = [];
   for (const g of games) {
-    const league = classifyLeague(g.season?.league ?? null);
-    if (!league || !g.dateUtc) continue;
+    const l = g.season?.league ?? null;
+    const top = classifyLeague(l);
+    if (!g.dateUtc || !l) continue;
+    // Outside the top leagues keep only games with a priced market, labelled with their own league name
+    if (!top && !winner(g.odds)) continue;
+    const league = top ?? { key: "other", label: `${l.name}${l.country ? ` (${l.country.name})` : ""}`, short: l.name };
     const start = g.dateUtc * 1000;
     if (start < now) continue;
     const market = winner(g.odds);
     const line = findPariLine(lines, start, g.homeTeam.name, g.awayTeam.name);
-    out.push({
+    (top ? out : others).push({
       id: `ss-${g.id}`,
       sstatsId: g.id,
       league,
@@ -68,6 +76,11 @@ async function liveMatches(): Promise<Match[]> {
       fair: market ? consensus([market]) : null,
       pari: line?.odds ? { odds: line.odds, url: line.url, updatedAt: line.updatedAt } : null,
     });
+  }
+  if (out.length < MIN_TOP_MATCHES) {
+    // Prefer games PARI prices, then the soonest ones
+    others.sort((a, b) => Number(!!b.pari) - Number(!!a.pari) || a.commenceTime.localeCompare(b.commenceTime));
+    out.push(...others.slice(0, OTHER_LIMIT));
   }
   return out;
 }

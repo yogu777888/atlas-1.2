@@ -30,7 +30,7 @@ function Row({ m }: { m: Match }) {
     <Link href={`/matches/${m.id}`} className="grid grid-cols-1 gap-3 px-5 py-4 transition hover:bg-white/[0.025] md:grid-cols-[1fr_12rem_14rem] md:items-center md:gap-6">
       <div className="min-w-0">
         <div className="mb-1 flex items-center gap-2 text-xs text-subtle">
-          <span>{m.league.short}</span>
+          <span className="truncate">{m.league.short}</span>
           <span>·</span>
           <LocalTime iso={m.commenceTime} />
         </div>
