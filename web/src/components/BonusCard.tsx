@@ -19,7 +19,7 @@ export function BonusCard({ b, source }: { b: Bookmaker; source: string }) {
         {kind && <span className="shrink-0 rounded-full border border-line px-2.5 py-0.5 text-[11px] text-muted">{kind}</span>}
       </div>
       <h3 className="text-lg leading-snug font-semibold tracking-tight text-balance">{b.bonus.headline}</h3>
-      <p className="mt-1.5 text-sm text-muted">{b.bonus.detail}</p>
+      <p className="mt-1.5 line-clamp-2 min-h-[2lh] text-sm text-muted">{b.bonus.detail}</p>
       <div className="mt-5">
         <BonusFacts bonus={b.bonus} />
       </div>
