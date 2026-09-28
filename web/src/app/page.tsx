@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
 import { LocalTime } from "@/components/LocalTime";
+import { LogoMark } from "@/components/Logo";
 import { MatchTable } from "@/components/MatchTable";
 import { ProbBar } from "@/components/ProbBar";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -66,7 +67,7 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          {hero && <HeroCard m={hero} />}
+          {hero ? <HeroCard m={hero} /> : <EmptyHero />}
         </div>
       </section>
 
@@ -154,6 +155,16 @@ export default async function Home() {
         />
       </section>
     </>
+  );
+}
+
+function EmptyHero() {
+  return (
+    <div className="card flex animate-rise flex-col items-center justify-center gap-4 p-10 text-center [animation-delay:150ms]">
+      <LogoMark className="size-16" />
+      <p className="text-lg font-semibold tracking-tight">Линия на ближайшие дни ещё не открыта</p>
+      <p className="max-w-xs text-sm text-muted">Как только букмекеры выставят коэффициенты на матчи топ-лиг, разбор появится здесь.</p>
+    </div>
   );
 }
 

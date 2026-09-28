@@ -7,7 +7,7 @@ import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
 
 export type DataSource = "live" | "demo";
 
-const DAYS_AHEAD = 4;
+const DAYS_AHEAD = 3;
 
 /** YYYY-MM-DD in Moscow time, `plusDays` from today. */
 function moscowDate(plusDays = 0): string {
@@ -25,9 +25,21 @@ const winner = (bets: { marketId: number; odds: { name: string; value: number }[
 
 // ------------------------------------------------------------------ live (sstats.net + PARI)
 
+/** All upcoming games in the window. The API returns at most 1000 per call, and a few days hold several thousand. */
+export async function upcomingGames(from: string, to: string): Promise<SsGame[]> {
+  const all: SsGame[] = [];
+  const limit = 1000;
+  for (let page = 0; page < 10; page++) {
+    const batch = await sstats<SsGame[]>("/Games/list", { Upcoming: true, From: from, To: to, TimeZone: 3, Limit: limit, Offset: page * limit }, 1800);
+    all.push(...batch);
+    if (batch.length < limit) break;
+  }
+  return all;
+}
+
 async function liveMatches(): Promise<Match[]> {
   const from = moscowDate(0), to = moscowDate(DAYS_AHEAD);
-  const games = await sstats<SsGame[]>("/Games/list", { Upcoming: true, From: from, To: to, TimeZone: 3, Limit: 1000 }, 1800);
+  const games = await upcomingGames(from, to);
 
   let lines: Awaited<ReturnType<typeof pariLines>> = [];
   try {
