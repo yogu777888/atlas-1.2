@@ -1,0 +1,152 @@
+<title>tag.bet — табло v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&family=Oswald:wght@600&display=swap">
+<style>
+/* Layout: three stacked brand studies; each shows the mark big, in a site header, on light paper and as favicons */
+:root{
+  --bg:#0b0b09; --panel:#121210; --line:#26251f; --fg:#f4f1e6; --muted:#9a978a;
+  --yellow:#ffc629; --ink:#161300; --flap:#1d1c18; --flap2:#24231e;
+  --paper:#f3f0e6; --paperfg:#161510;
+  --body:"Onest",system-ui,sans-serif; --flapfont:"Oswald","Arial Narrow",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);padding:32px 16px 64px}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:28px}
+.intro h1{font:800 26px/1.15 var(--body);letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);max-width:64ch}
+.opt{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.opt-h{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line)}
+.opt-h b{font-size:17px}.opt-h span{color:var(--muted);font-size:13px}
+.stage{display:grid;place-items:center;padding:48px 20px;min-height:200px;overflow-x:auto}
+.demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));border-top:1px solid var(--line)}
+.demo>div{padding:18px 20px;display:flex;align-items:center;gap:16px;min-width:0}
+.demo>div+div{border-left:1px solid var(--line)}
+@media (max-width:600px){.demo>div+div{border-left:0;border-top:1px solid var(--line)}}
+.hdr{justify-content:space-between}
+.hdr nav{display:flex;gap:14px;color:var(--muted);font-size:13px}
+.light{background:var(--paper);color:var(--paperfg)}
+.fav{gap:12px!important;color:var(--muted);font-size:12px}
+.note{padding:0 20px 18px;color:var(--muted);font-size:14px;max-width:70ch}
+button.replay{font:500 13px var(--body);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+button.replay:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+
+/* A — split-flap tiles */
+.flaps{display:flex;gap:var(--g,5px)}
+.flap{position:relative;display:grid;place-items:center;width:var(--w,54px);height:var(--h,76px);border-radius:var(--rr,6px);
+  background:linear-gradient(var(--flap2) 0 50%,var(--flap) 50% 100%);color:var(--fg);
+  font:600 var(--fs,52px)/1 var(--flapfont);text-transform:uppercase;box-shadow:inset 0 0 0 1px #0006}
+.flap::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .75px);height:1.5px;background:#0b0b09}
+.flap.dot{background:var(--yellow);color:var(--ink);width:calc(var(--w,54px)*.5)}
+.flap.dot::after{background:#0b0b0955}
+.sm{--w:17px;--h:24px;--fs:17px;--g:2px;--rr:3px}
+.light .flap{background:linear-gradient(#2a2924 0 50%,#1f1e1a 50% 100%);color:#f4f1e6}
+.light .flap.dot{background:var(--yellow);color:var(--ink)}
+
+/* B — dot matrix */
+.matrix svg{display:block;max-width:100%;height:auto}
+
+/* C — word + flap dot */
+.wm{display:flex;align-items:baseline;font:800 var(--size,64px)/1 var(--body);letter-spacing:-.055em}
+.wm .sq{display:inline-block;position:relative;width:.3em;height:.3em;margin:0 .04em 0 .06em;background:var(--yellow);border-radius:.05em;align-self:baseline}
+.wm .sq::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .02em);height:.04em;background:var(--bg)}
+.light .wm .sq::after{background:var(--paper)}
+.wm.s{--size:22px}
+.flipin{animation:flip .6s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes flip{from{transform:rotateX(90deg)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.flipin{animation:none}}
+.pick{color:var(--muted);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <h1>tag.bet: табло, вторая итерация</h1>
+    <p>Все три варианта взяты из первого. Идея табло теперь лежит в самой форме логотипа, а не в картинке рядом с ним. Шрифт сайта во всех трёх — Onest, современный гротеск с хорошей кириллицей.</p>
+  </header>
+
+  <section class="opt">
+    <div class="opt-h"><b>A · Перекидное табло</b><span>буквы на флипах, точка — жёлтый флип</span></div>
+    <div class="stage"><div class="flaps" id="flapsA"></div></div>
+    <div class="demo">
+      <div class="hdr"><div class="flaps sm" data-word="TAG.BET"></div><nav><span>Матчи</span><span>Бонусы</span></nav></div>
+      <div class="light"><div class="flaps sm" data-word="TAG.BET"></div></div>
+      <div class="fav">
+        <svg width="48" height="48" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#ffc629"/><rect y="15.3" width="32" height="1.4" fill="#0b0b09" opacity=".35"/><text x="16" y="24" text-anchor="middle" font-family="Oswald,Arial Narrow,sans-serif" font-weight="600" font-size="22" fill="#161300">T</text></svg>
+        <svg width="16" height="16" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#ffc629"/><text x="16" y="25" text-anchor="middle" font-family="Oswald,Arial Narrow,sans-serif" font-weight="600" font-size="24" fill="#161300">T</text></svg>
+        <button class="replay" data-replay="A">Перелистать ещё раз</button>
+      </div>
+    </div>
+    <p class="note">Самый «табло». Узнаётся сразу, и на загрузке сайта буквы перелистываются, как на вокзале. Минус: в шапке он длинный, на телефоне займёт ширину.</p>
+  </section>
+
+  <section class="opt">
+    <div class="opt-h"><b>B · Светодиодная матрица</b><span>буквы из точек, как на стадионе</span></div>
+    <div class="stage matrix" id="matrixBig"></div>
+    <div class="demo">
+      <div class="hdr"><div class="matrix" data-matrix="s"></div><nav><span>Матчи</span><span>Бонусы</span></nav></div>
+      <div class="light"><div class="matrix" data-matrix="light"></div></div>
+      <div class="fav"><div data-matrix="fav48"></div><div data-matrix="fav16"></div><span>точка — жёлтый диод</span></div>
+    </div>
+    <p class="note">Самый необычный, такой ни у кого из БК-сайтов нет. Минус: в 16 px точки сливаются, поэтому для иконки нужен упрощённый вариант.</p>
+  </section>
+
+  <section class="opt">
+    <div class="opt-h"><b>C · Слово + жёлтый флип</b><span>спокойное слово, вся идея в точке</span></div>
+    <div class="stage"><div class="wm flipwrap"><span>tag</span><span class="sq flipin"></span><span>bet</span></div></div>
+    <div class="demo">
+      <div class="hdr"><div class="wm s"><span>tag</span><span class="sq"></span><span>bet</span></div><nav><span>Матчи</span><span>Бонусы</span></nav></div>
+      <div class="light"><div class="wm s"><span>tag</span><span class="sq"></span><span>bet</span></div></div>
+      <div class="fav">
+        <svg width="48" height="48" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#ffc629"/><rect y="15.3" width="32" height="1.4" fill="#0b0b09"/></svg>
+        <svg width="16" height="16" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#ffc629"/><rect y="15" width="32" height="2" fill="#0b0b09"/></svg>
+        <span>иконка — просто жёлтый флип</span>
+      </div>
+    </div>
+    <p class="note">Подход Vercel и Stripe: одна простая форма, которую можно поставить куда угодно — на иконку, на кнопку, в индикатор «цена выше честной». Самый «кремниевый» и самый практичный.</p>
+  </section>
+
+  <p class="pick">Моя рекомендация — C: чище всего смотрится и хорошо масштабируется. A можно оставить как анимацию на главной. Напишите букву.</p>
+</div>
+
+<script>
+// A: split-flap
+const CH="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function flaps(el,word,animate){
+  el.innerHTML="";
+  const tiles=[...word].map(c=>{const t=document.createElement("span");t.className="flap"+(c==="."?" dot":"");t.textContent=c==="."?"":c;el.appendChild(t);return t});
+  if(!animate||matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  tiles.forEach((t,i)=>{
+    if(t.classList.contains("dot"))return;
+    const final=t.textContent;let n=6+i*3;
+    const tick=()=>{if(n--<=0){t.textContent=final;return}t.textContent=CH[Math.random()*CH.length|0];setTimeout(tick,55)};
+    tick();
+  });
+}
+const big=document.getElementById("flapsA");
+flaps(big,"TAG.BET",true);
+document.querySelectorAll("[data-word]").forEach(el=>flaps(el,el.dataset.word,false));
+document.querySelector('[data-replay="A"]').addEventListener("click",()=>flaps(big,"TAG.BET",true));
+
+// B: 5x7 dot matrix
+const G={T:["11111","00100","00100","00100","00100","00100","00100"],A:["01110","10001","10001","11111","10001","10001","10001"],
+G:["01110","10001","10000","10111","10001","10001","01111"],B:["11110","10001","10001","11110","10001","10001","11110"],
+E:["11111","10000","10000","11110","10000","10000","11111"],".":["0","0","0","0","0","0","1"]};
+function matrix(word,{d=8,on="#f4f1e6",off="#23221d",dot="#ffc629"}={}){
+  let x=0;const circles=[];
+  for(const c of word){const g=G[c];
+    for(let r=0;r<7;r++)for(let k=0;k<g[0].length;k++){
+      const lit=g[r][k]==="1";
+      circles.push(`<circle cx="${(x+k)*d+d/2}" cy="${r*d+d/2}" r="${d*.38}" fill="${lit?(c==="."?dot:on):off}"/>`);
+    }
+    x+=g[0].length+1;}
+  const w=(x-1)*d,h=7*d;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="tag.bet">${circles.join("")}</svg>`;
+}
+document.getElementById("matrixBig").innerHTML=matrix("TAG.BET",{d:12});
+document.querySelector('[data-matrix="s"]').innerHTML=matrix("TAG.BET",{d:3.4});
+document.querySelector('[data-matrix="light"]').innerHTML=matrix("TAG.BET",{d:3.4,on:"#161510",off:"#e2ded0"});
+const favT=(s)=>{const d=s/9;let c="";const g=G.T;for(let r=0;r<7;r++)for(let k=0;k<5;k++)if(g[r][k]==="1")c+=`<circle cx="${(k+2)*d+d/2}" cy="${(r+1)*d+d/2}" r="${d*.42}" fill="#161300"/>`;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><rect width="${s}" height="${s}" rx="${s*.22}" fill="#ffc629"/>${c}</svg>`};
+document.querySelector('[data-matrix="fav48"]').innerHTML=favT(48);
+document.querySelector('[data-matrix="fav16"]').innerHTML=favT(16);
+</script>
