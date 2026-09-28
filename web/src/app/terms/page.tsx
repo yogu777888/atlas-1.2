@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { Prose } from "@/components/Prose";
 
-export const metadata: Metadata = { title: "Terms of use", alternates: { canonical: "/terms" } };
+export const metadata: Metadata = { title: "Условия использования", alternates: { canonical: "/terms" } };
 
 export default function Page() {
   return (
-    <Prose eyebrow="Legal" title="Terms of use">
+    <Prose eyebrow="Документы" title="Условия использования">
       <p>
-        <em>Template — have this reviewed by a lawyer before launch.</em>
+        <em>Шаблон. Перед запуском согласуйте текст с юристом.</em>
       </p>
       <ul>
-        <li>You must be 18 or older, and of legal gambling age where you live, to use tag.bet.</li>
-        <li>tag.bet is an information service. We don&apos;t accept bets and aren&apos;t a party to any bet you place.</li>
-        <li>Odds and offers change constantly and may be delayed or inaccurate. The bookmaker&apos;s bet slip is always final.</li>
-        <li>Nothing on tag.bet is financial advice or a guarantee of winnings, including &quot;sure bets&quot;.</li>
-        <li>It&apos;s your responsibility to check that online betting is legal where you are.</li>
+        <li>Сайт предназначен только для лиц старше 18 лет.</li>
+        <li>tag.bet — информационный сервис. Мы не принимаем ставки и не являемся стороной пари.</li>
+        <li>Коэффициенты и условия бонусов меняются постоянно и могут отображаться с задержкой. Итоговые условия — в купоне и на сайте букмекера.</li>
+        <li>Материалы сайта не являются рекомендацией делать ставки и не гарантируют выигрыш, в том числе на «вилках».</li>
+        <li>Мы размещаем информацию только о букмекерах с лицензией ФНС России.</li>
       </ul>
     </Prose>
   );

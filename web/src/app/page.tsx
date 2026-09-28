@@ -4,29 +4,28 @@ import { BookLogo } from "@/components/BookLogo";
 import { BookmakerRow } from "@/components/BookmakerRow";
 import { LocalTime } from "@/components/LocalTime";
 import { OddsTable } from "@/components/OddsTable";
-import { PhoneMockup } from "@/components/PhoneMockup";
 import { SectionHeading } from "@/components/SectionHeading";
 import { bookmakers, bookmakersByRating } from "@/lib/bookmakers";
 import { bookMargin, formatOdds, formatPct } from "@/lib/odds/math";
-import type { EventSummary } from "@/lib/odds/types";
 import { getEvents, oddsSource } from "@/lib/odds/provider";
+import type { EventSummary } from "@/lib/odds/types";
 import { site } from "@/lib/site";
 
 export const revalidate = 120;
 
 const features = [
-  { title: "Best price, tagged", body: "Every outcome is scanned across every book. The highest price gets the tag — you never leave value on the table.", span: "md:col-span-2" },
-  { title: "Sure-bet radar", body: "When the best prices add up to less than 100%, we flag it and split your stake for a locked-in return.", span: "" },
-  { title: "Margin X-ray", body: "See exactly how much each bookmaker keeps on every market, so you know who's giving you a fair deal.", span: "" },
-  { title: "Offers worth taking", body: "Welcome bonuses ranked by real value, with the terms up front. No fine-print surprises.", span: "" },
-  { title: "Built for your pocket", body: "A native iPhone app with every price, the sure-bet radar and your starred matches one tap away.", span: "md:col-span-2" },
+  { title: "Лучший коэффициент — отмечен", body: "Каждый исход сравниваем у всех букмекеров. Самая высокая цена подсвечена — та же ставка, больше выплата.", span: "md:col-span-2" },
+  { title: "Вилки", body: "Когда лучшие коэффициенты в сумме дают меньше 100%, мы это отмечаем и считаем, как распределить сумму.", span: "" },
+  { title: "Маржа букмекера", body: "Показываем, сколько каждая контора закладывает в линию, — видно, кто даёт честную цену.", span: "" },
+  { title: "Бонусы без мелкого шрифта", body: "Ключевые условия — прямо на карточке, до перехода на сайт букмекера.", span: "" },
+  { title: "Только легальные букмекеры", body: "Все конторы на сайте имеют лицензию ФНС России. Никаких офшоров.", span: "md:col-span-2" },
 ];
 
 const faqs = [
-  { q: "Is tag.bet a bookmaker?", a: "No. We don't take bets or hold money. We compare prices from licensed bookmakers and link you to them." },
-  { q: "How does tag.bet make money?", a: "Some bookmakers pay us a commission when you open an account through our links. It never affects the odds shown or which price gets tagged as best — that's pure maths." },
-  { q: "How fresh are the odds?", a: "Prices refresh every few minutes. Always confirm the final price on the bookmaker's bet slip before you place a bet." },
-  { q: "What is a sure bet?", a: "When different bookmakers disagree enough, backing every outcome at the best price can guarantee a small profit. They're rare, disappear fast and bookmakers may limit accounts that take them." },
+  { q: "tag.bet — это букмекер?", a: "Нет. Мы не принимаем ставки и не храним деньги. Мы сравниваем коэффициенты легальных российских букмекеров и рассказываем о них." },
+  { q: "Как tag.bet зарабатывает?", a: "Некоторые букмекеры платят нам за привлечённых клиентов. Такие ссылки помечены как реклама. На коэффициенты и на то, какая цена отмечена как лучшая, это не влияет — это просто математика." },
+  { q: "Насколько свежие коэффициенты?", a: "Коэффициенты обновляются регулярно, но линия меняется постоянно. Перед ставкой всегда проверяйте итоговый коэффициент в купоне букмекера." },
+  { q: "Что такое вилка?", a: "Ситуация, когда разные букмекеры оценивают матч настолько по-разному, что ставки на все исходы по лучшим коэффициентам дают небольшую гарантированную прибыль. Вилки редки, быстро исчезают, а букмекеры могут ограничивать таких игроков." },
 ];
 
 export default async function Home() {
@@ -47,30 +46,31 @@ export default async function Home() {
             <Link href="/odds" className="mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
               <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-mono text-accent">
                 <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
-                {oddsSource() === "live" ? "LIVE" : "DEMO"}
+                {oddsSource() === "live" ? "LIVE" : "ДЕМО"}
               </span>
-              {bookmakers.length} books · {events.length} events priced right now →
+              {bookmakers.length} букмекеров · {events.length} матчей в линии →
             </Link>
             <h1 className="text-gradient text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              Every line.
+              Лучший коэффициент.
               <br />
-              One tag.
+              С одного взгляда.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted">
-              tag.bet scans the world&apos;s top sportsbooks and tags the best price on every outcome. Same bet, bigger payout — in one tap.
+              tag.bet сравнивает линии легальных российских букмекеров и отмечает самую высокую цену на каждый исход. Та же
+              ставка — больше выплата.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/odds" className="btn-primary h-11 px-6">
-                Compare odds now
+                Сравнить коэффициенты
               </Link>
-              <Link href="#app" className="btn-ghost h-11 px-6">
-                Get the iPhone app
+              <Link href="/bookmakers" className="btn-ghost h-11 px-6">
+                Рейтинг букмекеров
               </Link>
             </div>
             <dl className="mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-6">
-              <Stat label="Sportsbooks" value={String(bookmakers.length)} />
-              <Stat label="Avg book margin" value={formatPct(avgBookMargin)} />
-              <Stat label="Margin at best price" value={formatPct(avgBestMargin)} accent />
+              <Stat label="Букмекеров" value={String(bookmakers.length)} />
+              <Stat label="Средняя маржа" value={formatPct(avgBookMargin)} />
+              <Stat label="Маржа по лучшим ценам" value={formatPct(avgBestMargin)} accent />
             </dl>
           </div>
 
@@ -82,7 +82,7 @@ export default async function Home() {
                   <LocalTime iso={hero.commenceTime} />
                 </div>
                 <p className="mt-2 text-lg font-semibold tracking-tight">
-                  {hero.home} <span className="text-subtle">vs</span> {hero.away}
+                  {hero.home} <span className="text-subtle">—</span> {hero.away}
                 </p>
                 <div className="mt-5 space-y-1.5">
                   {hero.books.slice(0, 6).map((book) => (
@@ -102,15 +102,15 @@ export default async function Home() {
                   ))}
                 </div>
                 <div className="mt-5 flex items-center justify-between rounded-xl bg-accent/10 px-4 py-3 text-sm">
-                  <span className="text-accent/80">Best-price margin</span>
+                  <span className="text-accent/80">Маржа по лучшим ценам</span>
                   <span className="font-mono font-semibold text-accent">{formatPct(hero.bestMargin)}</span>
                 </div>
                 <div className="absolute -top-3 -right-3 rotate-6 rounded-lg bg-accent px-2.5 py-1 font-mono text-[11px] font-bold text-accent-ink shadow-lg">
-                  TAGGED
+                  ЛУЧШАЯ ЦЕНА
                 </div>
               </div>
               <p className="mt-4 text-center text-xs text-subtle">
-                Average bookmaker margin on this match {formatPct(avgMargin(hero))} → at tagged prices{" "}
+                Средняя маржа букмекеров на этот матч {formatPct(avgMargin(hero))} → по отмеченным ценам{" "}
                 <span className="text-accent">{formatPct(hero.bestMargin)}</span>
               </p>
             </div>
@@ -131,29 +131,25 @@ export default async function Home() {
 
       {/* Odds */}
       <section className="container-x pt-24">
-        <SectionHeading eyebrow="Odds board" title="The best price for every match, tagged." sub="Green is the highest price on the market right now. Tap any match to see every bookmaker side by side." href="/odds" cta="All odds" />
+        <SectionHeading eyebrow="Линия" title="Лучшая цена на каждый матч." sub="Зелёным отмечен самый высокий коэффициент на рынке. Нажмите на матч, чтобы сравнить всех букмекеров." href="/odds" cta="Все матчи" />
         <OddsTable events={events.slice(0, 8)} />
       </section>
 
       {/* Features bento */}
       <section className="container-x pt-28">
-        <SectionHeading eyebrow="Why tag.bet" title="Betting has an information problem. We fixed it." />
+        <SectionHeading eyebrow="Зачем tag.bet" title="Разница в коэффициентах — это ваши деньги." />
         <div className="grid gap-4 md:grid-cols-3">
-          {features.map((f, i) => (
+          {features.map((f) => (
             <div key={f.title} className={`card relative overflow-hidden p-7 ${f.span}`}>
-              <span className="font-mono text-xs text-subtle">0{i + 1}</span>
-              <h3 className="mt-6 text-xl font-semibold tracking-tight">{f.title}</h3>
+              <h3 className="text-xl font-semibold tracking-tight">{f.title}</h3>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{f.body}</p>
-              {i === 0 && <div className="absolute -right-10 -bottom-16 size-56 rounded-full bg-accent/10 blur-3xl" aria-hidden />}
             </div>
           ))}
           <div className="card flex flex-col justify-between bg-gradient-to-br from-violet/15 to-transparent p-7">
-            <p className="text-sm text-muted">Responsible by design</p>
-            <p className="mt-6 text-sm leading-relaxed">
-              Deposit-limit reminders, cool-off links and zero dark patterns. We&apos;d rather you bet smart than bet more.
-            </p>
+            <p className="text-sm text-muted">Ответственная игра</p>
+            <p className="mt-6 text-sm leading-relaxed">Лимиты, паузы и честные слова о рисках. Мы за то, чтобы ставить с умом, а не больше.</p>
             <Link href="/responsible-gambling" className="mt-4 text-sm text-accent hover:underline">
-              Our approach →
+              Наш подход →
             </Link>
           </div>
         </div>
@@ -161,7 +157,7 @@ export default async function Home() {
 
       {/* Bookmakers */}
       <section className="container-x pt-28">
-        <SectionHeading eyebrow="Rankings" title="Top-rated sportsbooks" sub="Ranked on price quality, payout speed, markets and how they treat winning players." href="/bookmakers" cta="All reviews" />
+        <SectionHeading eyebrow="Рейтинг" title="Лучшие легальные букмекеры" sub="Оцениваем коэффициенты, скорость выплат, линию и удобство." href="/bookmakers" cta="Весь рейтинг" />
         <div className="card divide-y divide-line overflow-hidden">
           {top.slice(0, 5).map((b, i) => (
             <BookmakerRow key={b.slug} b={b} rank={i + 1} source="home-rank" />
@@ -171,51 +167,17 @@ export default async function Home() {
 
       {/* Bonuses */}
       <section className="container-x pt-28">
-        <SectionHeading eyebrow="Welcome offers" title="Bonuses worth your time" href="/bonuses" cta="All bonuses" />
+        <SectionHeading eyebrow="Бонусы" title="Предложения для новых игроков" href="/bonuses" cta="Все бонусы" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {top
-            .filter((b) => b.bonus.code || !b.bonus.headline.startsWith("Best odds"))
-            .slice(0, 3)
-            .map((b) => (
-              <BonusCard key={b.slug} b={b} source="home-bonus" />
-            ))}
-        </div>
-      </section>
-
-      {/* App */}
-      <section id="app" className="container-x scroll-mt-20 pt-28">
-        <div className="card relative grid items-center gap-12 overflow-hidden px-6 py-14 sm:px-12 lg:grid-cols-2">
-          <div className="bg-grid absolute inset-0 opacity-60" aria-hidden />
-          <div className="relative">
-            <p className="eyebrow">tag.bet for iPhone</p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">The sharpest line is in your pocket.</h2>
-            <ul className="mt-8 space-y-3 text-sm text-muted">
-              {["Best price tagged on every match", "Sure-bet radar with stake splitter", "Star the matches you follow", "Native, fast, no ads, no clutter"].map((t) => (
-                <li key={t} className="flex items-center gap-3">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-accent/15 text-[10px] text-accent">✓</span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-10">
-              {site.appStoreUrl ? (
-                <a href={site.appStoreUrl} className="btn-primary h-12 px-6">
-                  Download on the App Store
-                </a>
-              ) : (
-                <span className="btn-ghost h-12 cursor-default px-6">Coming soon to the App Store</span>
-              )}
-            </div>
-          </div>
-          <div className="relative">
-            <PhoneMockup events={events} />
-          </div>
+          {top.slice(0, 3).map((b) => (
+            <BonusCard key={b.slug} b={b} source="home-bonus" />
+          ))}
         </div>
       </section>
 
       {/* FAQ */}
       <section className="container-x pt-28">
-        <SectionHeading eyebrow="FAQ" title="Questions, answered." />
+        <SectionHeading eyebrow="Вопросы" title="Частые вопросы" />
         <div className="grid gap-3 md:grid-cols-2">
           {faqs.map((f) => (
             <details key={f.q} className="card group p-5 open:border-line-strong">
@@ -227,6 +189,7 @@ export default async function Home() {
             </details>
           ))}
         </div>
+        <p className="mt-8 text-xs text-subtle">{site.warning}</p>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

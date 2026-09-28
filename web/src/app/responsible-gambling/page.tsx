@@ -1,50 +1,38 @@
 import type { Metadata } from "next";
 import { Prose } from "@/components/Prose";
 
-export const metadata: Metadata = { title: "Responsible gambling", alternates: { canonical: "/responsible-gambling" } };
+export const metadata: Metadata = { title: "Ответственная игра", alternates: { canonical: "/responsible-gambling" } };
 
 export default function Page() {
   return (
-    <Prose eyebrow="Play safe" title="Responsible gambling">
+    <Prose eyebrow="Играйте безопасно" title="Ответственная игра">
       <p>
-        Betting should be entertainment, never a way to make money or escape problems. tag.bet helps you find better prices — it
-        does not make betting risk-free. Most bettors lose over time.
+        Ставки — это развлечение, а не способ заработать или уйти от проблем. tag.bet помогает найти лучший коэффициент, но
+        не делает ставки безопасными: на длинной дистанции большинство игроков проигрывает.
       </p>
-      <h2>Keep it in control</h2>
+      <h2>Как сохранять контроль</h2>
       <ul>
-        <li>Set a deposit limit with every bookmaker before you place your first bet.</li>
-        <li>Only bet what you can afford to lose. Never chase losses.</li>
-        <li>Take regular breaks, and don&apos;t bet when you&apos;re upset, stressed or drinking.</li>
-        <li>Use time-outs and self-exclusion if betting stops being fun.</li>
+        <li>Установите лимит депозита в личном кабинете букмекера до первой ставки. У легальных букмекеров это есть в настройках.</li>
+        <li>Ставьте только те деньги, которые готовы потерять. Никогда не отыгрывайтесь.</li>
+        <li>Делайте перерывы. Не ставьте, когда расстроены, устали или выпили.</li>
+        <li>Если игра перестала радовать, воспользуйтесь самоограничением или самоисключением — их обязаны предоставлять легальные букмекеры.</li>
       </ul>
-      <h2>Warning signs</h2>
+      <h2>Тревожные признаки</h2>
       <ul>
-        <li>Spending more money or time than you planned.</li>
-        <li>Borrowing money or hiding betting from people close to you.</li>
-        <li>Feeling anxious, irritable or low when you&apos;re not betting.</li>
+        <li>Вы тратите больше денег или времени, чем планировали.</li>
+        <li>Берёте в долг или скрываете ставки от близких.</li>
+        <li>Чувствуете тревогу или раздражение, когда не играете.</li>
       </ul>
-      <h2>Free, confidential help</h2>
+      <h2>Где получить помощь</h2>
       <ul>
         <li>
-          <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a> (UK) — 0808 8020 133
+          <a href="https://www.gamblingtherapy.org/ru/" target="_blank" rel="noopener noreferrer">Gambling Therapy</a> — бесплатная анонимная поддержка, в том числе на русском языке.
         </li>
-        <li>
-          <a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP</a> — self-exclusion from all UK-licensed sites
-        </li>
-        <li>
-          <a href="https://www.ncpgambling.org" target="_blank" rel="noopener noreferrer">NCPG</a> (US) — 1-800-GAMBLER
-        </li>
-        <li>
-          <a href="https://www.gamblingtherapy.org" target="_blank" rel="noopener noreferrer">Gambling Therapy</a> — worldwide, multilingual support
-        </li>
-        <li>
-          <a href="https://www.gamblersanonymous.org" target="_blank" rel="noopener noreferrer">Gamblers Anonymous</a>
-        </li>
+        <li>Группы взаимопомощи «Анонимные игроки» работают во многих городах России.</li>
+        <li>Обратитесь к психотерапевту или наркологу: игровая зависимость лечится, и стыдиться тут нечего.</li>
       </ul>
-      <h2>Under 18?</h2>
-      <p>
-        tag.bet is for adults only. Parents can block gambling sites with tools like Net Nanny, Qustodio or Gamban.
-      </p>
+      <h2>Младше 18?</h2>
+      <p>Сайт предназначен только для совершеннолетних. Ставки на спорт до 18 лет запрещены законом.</p>
     </Prose>
   );
 }

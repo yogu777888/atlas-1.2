@@ -7,16 +7,16 @@ import { LocalTime } from "./LocalTime";
 
 export function OddsTable({ events, empty }: { events: EventSummary[]; empty?: string }) {
   if (events.length === 0) {
-    return <div className="card p-10 text-center text-sm text-muted">{empty ?? "No upcoming events right now."}</div>;
+    return <div className="card p-10 text-center text-sm text-muted">{empty ?? "Сейчас нет ближайших матчей."}</div>;
   }
   return (
     <div className="card overflow-hidden">
       <div className="hidden grid-cols-[1fr_repeat(3,5.5rem)_5rem] items-center gap-3 border-b border-line px-5 py-3 font-mono text-[11px] uppercase tracking-wider text-subtle md:grid">
-        <span>Event</span>
-        <span className="text-center">1</span>
+        <span>Событие</span>
+        <span className="text-center">П1</span>
         <span className="text-center">X</span>
-        <span className="text-center">2</span>
-        <span className="text-right">Margin</span>
+        <span className="text-center">П2</span>
+        <span className="text-right">Маржа</span>
       </div>
       <ul className="divide-y divide-line">
         {events.map((e) => (
@@ -44,10 +44,10 @@ function EventRow({ event: e }: { event: EventSummary }) {
           <span className="truncate">{e.league}</span>
           <span>·</span>
           <LocalTime iso={e.commenceTime} />
-          {sure && <span className="rounded-full bg-accent px-1.5 py-px font-mono text-[10px] font-semibold text-accent-ink">SURE BET</span>}
+          {sure && <span className="rounded-full bg-accent px-1.5 py-px font-mono text-[10px] font-semibold text-accent-ink">ВИЛКА</span>}
         </div>
         <p className="truncate font-medium">
-          {e.home} <span className="text-subtle">vs</span> {e.away}
+          {e.home} <span className="text-subtle">—</span> {e.away}
         </p>
       </div>
       <div className={`grid gap-2 md:contents ${e.outcomes.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>

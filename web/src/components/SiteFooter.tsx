@@ -3,9 +3,9 @@ import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 
 const columns = [
-  { title: "Product", links: [{ href: "/odds", label: "Odds comparison" }, { href: "/odds?view=surebets", label: "Sure bets" }, { href: "/bonuses", label: "Bonuses" }, { href: "/#app", label: "iOS app" }] },
-  { title: "Bookmakers", links: [{ href: "/bookmakers", label: "All reviews" }, { href: "/bookmakers/pinnacle", label: "Pinnacle" }, { href: "/bookmakers/bet365", label: "bet365" }, { href: "/bookmakers/betfair", label: "Betfair" }] },
-  { title: "Company", links: [{ href: "/responsible-gambling", label: "Responsible gambling" }, { href: "/disclosure", label: "Affiliate disclosure" }, { href: "/privacy", label: "Privacy" }, { href: "/terms", label: "Terms" }] },
+  { title: "Сервис", links: [{ href: "/odds", label: "Сравнение коэффициентов" }, { href: "/odds?view=surebets", label: "Вилки" }, { href: "/bonuses", label: "Бонусы" }] },
+  { title: "Букмекеры", links: [{ href: "/bookmakers", label: "Рейтинг" }, { href: "/bookmakers/fonbet", label: "Фонбет" }, { href: "/bookmakers/winline", label: "Winline" }, { href: "/bookmakers/marathon", label: "Марафон" }] },
+  { title: "О сайте", links: [{ href: "/responsible-gambling", label: "Ответственная игра" }, { href: "/disclosure", label: "Как мы зарабатываем" }, { href: "/privacy", label: "Конфиденциальность" }, { href: "/terms", label: "Условия использования" }] },
 ];
 
 export function SiteFooter() {
@@ -36,23 +36,21 @@ export function SiteFooter() {
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span className="rounded border border-line-strong px-1.5 py-0.5 font-mono text-[11px] text-muted">18+</span>
             <span>
-              Gambling can be addictive. Please play responsibly. Free, confidential help:{" "}
-              <a className="underline hover:text-fg" href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">
-                BeGambleAware.org
-              </a>{" "}
-              ·{" "}
-              <a className="underline hover:text-fg" href="https://www.gamblingtherapy.org" target="_blank" rel="noopener noreferrer">
-                GamblingTherapy.org
-              </a>
+              {site.warning}{" "}
+              <Link className="underline hover:text-fg" href="/responsible-gambling">
+                Где получить помощь
+              </Link>
             </span>
           </p>
           <p>
-            tag.bet is an independent comparison service and does not accept bets. We may earn a commission when you sign up
-            with a bookmaker through our links; this never changes the odds you see or how we rank prices.{" "}
+            tag.bet — независимый информационный сервис. Мы не принимаем ставки и не проводим азартные игры. На сайте
+            представлены только букмекеры с лицензией ФНС России. Некоторые ссылки являются рекламой и помечены
+            соответствующим образом; вознаграждение партнёров не влияет на коэффициенты и на то, какая цена отмечена как
+            лучшая.{" "}
             <Link href="/disclosure" className="underline hover:text-fg">
-              How we make money
+              Подробнее
             </Link>
-            . Offers are subject to each operator&apos;s terms and are not available in every country.
+            .
           </p>
           <p>© {new Date().getFullYear()} tag.bet</p>
         </div>

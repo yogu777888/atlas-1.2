@@ -1,9 +1,9 @@
 import type { BestPrice, BookPrices, EventSummary, OddsEvent, OutcomeKey } from "./types";
 
 export const outcomeLabel = (e: Pick<OddsEvent, "home" | "away">, o: OutcomeKey) =>
-  o === "home" ? e.home : o === "away" ? e.away : "Draw";
+  o === "home" ? e.home : o === "away" ? e.away : "Ничья";
 
-export const shortLabel: Record<OutcomeKey, string> = { home: "1", draw: "X", away: "2" };
+export const shortLabel: Record<OutcomeKey, string> = { home: "П1", draw: "X", away: "П2" };
 
 export function impliedProbability(decimal: number): number {
   return 1 / decimal;

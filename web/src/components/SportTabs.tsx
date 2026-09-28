@@ -2,9 +2,9 @@ import Link from "next/link";
 import { sports } from "@/lib/sports";
 
 export function SportTabs({ active, view }: { active?: string; view?: string }) {
-  const tabs = [{ key: undefined, label: "All", emoji: "✦" }, ...sports];
+  const tabs = [{ key: undefined, label: "Все", emoji: "✦" }, ...sports];
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Sports">
+    <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Виды спорта">
       {tabs.map((t) => {
         const selected = view !== "surebets" && active === t.key;
         return (
@@ -30,7 +30,7 @@ export function SportTabs({ active, view }: { active?: string; view?: string }) 
           view === "surebets" ? "border-accent bg-accent text-accent-ink" : "border-accent/30 text-accent hover:bg-accent/10"
         }`}
       >
-        ⚡ Sure bets
+        ⚡ Вилки
       </Link>
     </div>
   );

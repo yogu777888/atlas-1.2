@@ -1,8 +1,15 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "tag.bet — Every line. One tag.";
+// Language-neutral card: the default OG font has no Cyrillic, so it shows the brand and a tagged odds row.
+export const alt = "tag.bet";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+const odds = [
+  { v: "2.10", best: true },
+  { v: "3.40", best: false },
+  { v: "3.65", best: true },
+];
 
 export default function OgImage() {
   return new ImageResponse(
@@ -20,16 +27,30 @@ export default function OgImage() {
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 40, fontWeight: 700 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 44, fontWeight: 700 }}>
           <div style={{ width: 64, height: 64, borderRadius: 18, background: "#c4ff3d" }} />
           <span>
             tag<span style={{ color: "#c4ff3d" }}>.</span>bet
           </span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 104, fontWeight: 700, letterSpacing: -4, lineHeight: 1 }}>Every line.</div>
-          <div style={{ fontSize: 104, fontWeight: 700, letterSpacing: -4, lineHeight: 1 }}>One tag.</div>
-          <div style={{ marginTop: 28, fontSize: 32, color: "#8b919a" }}>Compare odds across top sportsbooks. Best price, tagged.</div>
+        <div style={{ display: "flex", gap: 24 }}>
+          {odds.map((o, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                padding: "28px 44px",
+                borderRadius: 28,
+                fontSize: 88,
+                fontWeight: 700,
+                background: o.best ? "rgba(196,255,61,0.12)" : "#14171b",
+                border: o.best ? "3px solid rgba(196,255,61,0.5)" : "3px solid #262b1e",
+                color: o.best ? "#c4ff3d" : "#8b919a",
+              }}
+            >
+              {o.v}
+            </div>
+          ))}
         </div>
       </div>
     ),

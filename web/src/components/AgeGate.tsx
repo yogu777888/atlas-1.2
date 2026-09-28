@@ -32,21 +32,21 @@ export function AgeGate() {
         <LogoMark className="mb-5 size-10" />
         {denied ? (
           <>
-            <h2 id="age-title" className="text-xl font-semibold">Come back when you&apos;re 18</h2>
-            <p className="mt-2 text-sm text-muted">tag.bet is only for adults of legal gambling age in their country.</p>
+            <h2 id="age-title" className="text-xl font-semibold">Возвращайтесь, когда исполнится 18</h2>
+            <p className="mt-2 text-sm text-muted">Сайт предназначен только для совершеннолетних.</p>
           </>
         ) : (
           <>
-            <h2 id="age-title" className="text-xl font-semibold">Are you 18 or older?</h2>
+            <h2 id="age-title" className="text-xl font-semibold">Вам исполнилось 18 лет?</h2>
             <p className="mt-2 text-sm text-muted">
-              tag.bet compares sports betting odds. You must be of legal gambling age in your country to continue.
+              На сайте есть информация о ставках на спорт. Она предназначена только для совершеннолетних.
             </p>
             <div className="mt-6 grid grid-cols-2 gap-2">
               <button className="btn-ghost" onClick={() => setDenied(true)}>
-                No
+                Нет
               </button>
               <button className="btn-primary" onClick={confirm} autoFocus>
-                Yes, I&apos;m 18+
+                Да, мне 18+
               </button>
             </div>
           </>

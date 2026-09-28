@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { goLink, type Bookmaker } from "@/lib/bookmakers";
+import type { Bookmaker } from "@/lib/bookmakers";
 import { BookLogo } from "./BookLogo";
+import { OutboundButton } from "./OutboundButton";
 
 export function BonusCard({ b, source }: { b: Bookmaker; source: string }) {
   return (
@@ -15,20 +16,13 @@ export function BonusCard({ b, source }: { b: Bookmaker; source: string }) {
           <Link href={`/bookmakers/${b.slug}`} className="font-medium hover:underline">
             {b.name}
           </Link>
-          <p className="text-xs text-subtle">{b.license}</p>
+          <p className="text-xs text-subtle">Лицензия ФНС России</p>
         </div>
       </div>
       <h3 className="text-lg leading-snug font-semibold tracking-tight text-balance">{b.bonus.headline}</h3>
       <p className="mt-2 text-sm text-muted">{b.bonus.detail}</p>
-      {b.bonus.code && (
-        <p className="mt-4 inline-flex w-fit items-center gap-2 rounded-lg border border-dashed border-line-strong px-3 py-1.5 font-mono text-xs">
-          <span className="text-subtle">CODE</span> {b.bonus.code}
-        </p>
-      )}
       <div className="mt-auto pt-6">
-        <a href={goLink(b.slug, source)} rel="sponsored nofollow noopener" target="_blank" className="btn-primary w-full">
-          Claim offer
-        </a>
+        <OutboundButton b={b} source={source} label="Получить бонус" className="w-full" />
         <p className="mt-3 text-[11px] leading-snug text-subtle">{b.bonus.terms}</p>
       </div>
     </article>

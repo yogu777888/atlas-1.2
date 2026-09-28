@@ -1,10 +1,11 @@
 import { bookmakers } from "../bookmakers";
 import type { SportKey } from "../sports";
+import { slugify } from "../translit";
 import type { BookPrices, OddsEvent, OutcomeKey } from "./types";
 
 /**
- * Deterministic demo odds so the product looks alive without an API key.
- * Prices shift every few hours and kick-off times roll forward with the clock.
+ * Deterministic demo odds so the site looks alive before the live feed is
+ * connected. Prices shift every few hours and kick-off times roll forward.
  */
 type Fixture = {
   sport: SportKey;
@@ -13,39 +14,30 @@ type Fixture = {
   away: string;
   /** Hours from the current anchor until kick-off */
   inHours: number;
-  /** True probabilities for home / draw / away (draw omitted for 2-way sports) */
+  /** True probabilities for home / draw / away (draw omitted for 2-way markets) */
   p: [number, number, number?];
 };
 
 const fixtures: Fixture[] = [
-  { sport: "soccer", league: "Premier League", home: "Arsenal", away: "Chelsea", inHours: 3, p: [0.52, 0.25, 0.23] },
-  { sport: "soccer", league: "Premier League", home: "Liverpool", away: "Manchester City", inHours: 5, p: [0.4, 0.26, 0.34] },
-  { sport: "soccer", league: "Premier League", home: "Tottenham", away: "Newcastle", inHours: 26, p: [0.43, 0.26, 0.31] },
-  { sport: "soccer", league: "Champions League", home: "Real Madrid", away: "Bayern Munich", inHours: 29, p: [0.45, 0.25, 0.3] },
-  { sport: "soccer", league: "Champions League", home: "Inter", away: "PSG", inHours: 30, p: [0.36, 0.29, 0.35] },
-  { sport: "soccer", league: "La Liga", home: "Barcelona", away: "Atlético Madrid", inHours: 50, p: [0.55, 0.24, 0.21] },
-  { sport: "basketball", league: "NBA", home: "Boston Celtics", away: "Denver Nuggets", inHours: 8, p: [0.61, 0.39] },
-  { sport: "basketball", league: "NBA", home: "Los Angeles Lakers", away: "Golden State Warriors", inHours: 10, p: [0.48, 0.52] },
-  { sport: "basketball", league: "NBA", home: "New York Knicks", away: "Milwaukee Bucks", inHours: 32, p: [0.55, 0.45] },
-  { sport: "basketball", league: "EuroLeague", home: "Real Madrid", away: "Olympiacos", inHours: 28, p: [0.63, 0.37] },
-  { sport: "tennis", league: "ATP Tour", home: "Carlos Alcaraz", away: "Jannik Sinner", inHours: 6, p: [0.49, 0.51] },
-  { sport: "tennis", league: "ATP Tour", home: "Novak Djokovic", away: "Alexander Zverev", inHours: 7, p: [0.58, 0.42] },
-  { sport: "tennis", league: "WTA Tour", home: "Aryna Sabalenka", away: "Iga Świątek", inHours: 9, p: [0.5, 0.5] },
-  { sport: "mma", league: "UFC", home: "Islam Makhachev", away: "Arman Tsarukyan", inHours: 54, p: [0.68, 0.32] },
-  { sport: "mma", league: "UFC", home: "Alex Pereira", away: "Magomed Ankalaev", inHours: 55, p: [0.47, 0.53] },
-  { sport: "football", league: "NFL", home: "Kansas City Chiefs", away: "Buffalo Bills", inHours: 44, p: [0.54, 0.46] },
-  { sport: "football", league: "NFL", home: "Philadelphia Eagles", away: "Dallas Cowboys", inHours: 47, p: [0.62, 0.38] },
-  { sport: "football", league: "NFL", home: "Detroit Lions", away: "San Francisco 49ers", inHours: 48, p: [0.51, 0.49] },
+  { sport: "soccer", league: "РПЛ", home: "Зенит", away: "Спартак", inHours: 7, p: [0.5, 0.26, 0.24] },
+  { sport: "soccer", league: "РПЛ", home: "ЦСКА", away: "Локомотив", inHours: 9, p: [0.42, 0.28, 0.3] },
+  { sport: "soccer", league: "РПЛ", home: "Краснодар", away: "Динамо", inHours: 30, p: [0.46, 0.27, 0.27] },
+  { sport: "soccer", league: "РПЛ", home: "Ростов", away: "Рубин", inHours: 32, p: [0.44, 0.29, 0.27] },
+  { sport: "soccer", league: "АПЛ", home: "Арсенал", away: "Челси", inHours: 10, p: [0.52, 0.25, 0.23] },
+  { sport: "soccer", league: "АПЛ", home: "Ливерпуль", away: "Манчестер Сити", inHours: 34, p: [0.4, 0.26, 0.34] },
+  { sport: "soccer", league: "Лига чемпионов", home: "Реал Мадрид", away: "Бавария", inHours: 52, p: [0.45, 0.25, 0.3] },
+  { sport: "hockey", league: "КХЛ", home: "СКА", away: "ЦСКА", inHours: 8, p: [0.43, 0.22, 0.35] },
+  { sport: "hockey", league: "КХЛ", home: "Ак Барс", away: "Металлург Мг", inHours: 11, p: [0.41, 0.23, 0.36] },
+  { sport: "hockey", league: "КХЛ", home: "Авангард", away: "Локомотив", inHours: 29, p: [0.45, 0.22, 0.33] },
+  { sport: "hockey", league: "КХЛ", home: "Динамо Москва", away: "Трактор", inHours: 31, p: [0.47, 0.21, 0.32] },
+  { sport: "basketball", league: "Единая лига ВТБ", home: "ЦСКА", away: "Зенит", inHours: 12, p: [0.58, 0.42] },
+  { sport: "basketball", league: "Единая лига ВТБ", home: "УНИКС", away: "Локомотив-Кубань", inHours: 33, p: [0.55, 0.45] },
+  { sport: "basketball", league: "НБА", home: "Бостон Селтикс", away: "Денвер Наггетс", inHours: 16, p: [0.61, 0.39] },
+  { sport: "tennis", league: "ATP", home: "Даниил Медведев", away: "Андрей Рублёв", inHours: 6, p: [0.57, 0.43] },
+  { sport: "tennis", league: "ATP", home: "Карен Хачанов", away: "Янник Синнер", inHours: 13, p: [0.3, 0.7] },
+  { sport: "tennis", league: "WTA", home: "Мирра Андреева", away: "Арина Соболенко", inHours: 14, p: [0.42, 0.58] },
+  { sport: "mma", league: "UFC", home: "Ислам Махачев", away: "Арман Царукян", inHours: 54, p: [0.68, 0.32] },
 ];
-
-function slugify(s: string): string {
-  return s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 // mulberry32 seeded with a string hash
 function rng(seed: string): () => number {
@@ -85,7 +77,7 @@ export function mockEvents(now = new Date()): OddsEvent[] {
         const m = b.avgMargin * (0.8 + r() * 0.4);
         const prices: BookPrices["prices"] = {};
         outcomes.forEach((o, i) => {
-          const noise = 1 + (r() - 0.5) * 0.06;
+          const noise = 1 + (r() - 0.5) * 0.05;
           prices[o] = round2((1 / (probs[i] * (1 + m))) * noise);
         });
         return { bookmaker: b.slug, prices, updatedAt };

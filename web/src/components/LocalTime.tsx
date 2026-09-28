@@ -5,18 +5,20 @@ import { useEffect, useState } from "react";
 function format(iso: string, now: number): string {
   const d = new Date(iso);
   const diff = d.getTime() - now;
-  const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  if (diff > 0 && diff < 60 * 60_000) return `in ${Math.max(1, Math.round(diff / 60_000))} min`;
+  const time = d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  if (diff > 0 && diff < 60 * 60_000) return `через ${Math.max(1, Math.round(diff / 60_000))} мин`;
   const today = new Date(now);
   const tomorrow = new Date(now + 86_400_000);
-  if (d.toDateString() === today.toDateString()) return `Today ${time}`;
-  if (d.toDateString() === tomorrow.toDateString()) return `Tomorrow ${time}`;
-  return `${d.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} ${time}`;
+  if (d.toDateString() === today.toDateString()) return `Сегодня, ${time}`;
+  if (d.toDateString() === tomorrow.toDateString()) return `Завтра, ${time}`;
+  return `${d.toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "short" })}, ${time}`;
 }
 
-/** Renders a kick-off time in the viewer's timezone (UTC on the server). */
+/** Kick-off time in the viewer's timezone (Moscow time on the server render). */
 export function LocalTime({ iso }: { iso: string }) {
-  const [text, setText] = useState(() => new Date(iso).toISOString().slice(11, 16) + " UTC");
+  const [text, setText] = useState(() =>
+    new Date(iso).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Moscow" }) + " МСК",
+  );
   useEffect(() => {
     setText(format(iso, Date.now()));
     const t = setInterval(() => setText(format(iso, Date.now())), 30_000);

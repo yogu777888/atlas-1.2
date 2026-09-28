@@ -1,32 +1,27 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { bookmakersByRating, goLink, isAvailableIn } from "@/lib/bookmakers";
-import { countryFromHeaders } from "@/lib/geo";
+import { NextResponse } from "next/server";
+import { adInfo, bookmakersByRating, goLink } from "@/lib/bookmakers";
 import { site } from "@/lib/site";
 
-export async function GET(req: NextRequest) {
-  const country = countryFromHeaders(req.headers);
-  const platform = req.nextUrl.searchParams.get("platform") === "ios" ? "ios" : "api";
-  const bookmakers = bookmakersByRating().map((b) => ({
-    slug: b.slug,
-    name: b.name,
-    color: b.color,
-    ink: b.ink,
-    monogram: b.monogram,
-    rating: b.rating,
-    license: b.license,
-    payout: b.payout,
-    minDeposit: b.minDeposit,
-    avgMargin: b.avgMargin,
-    features: b.features,
-    pros: b.pros,
-    cons: b.cons,
-    bonus: b.bonus,
-    available: isAvailableIn(b, country),
-    link: `${site.url}${goLink(b.slug, `${platform}-bookmakers`)}`,
-  }));
-  return NextResponse.json(
-    { country, bookmakers },
-    // Response depends on the visitor's country, so never share it between users
-    { headers: { "Cache-Control": "private, max-age=300" } },
-  );
+export async function GET() {
+  const bookmakers = bookmakersByRating().map((b) => {
+    const ad = adInfo(b);
+    return {
+      slug: b.slug,
+      name: b.name,
+      color: b.color,
+      ink: b.ink,
+      monogram: b.monogram,
+      rating: b.rating,
+      payout: b.payout,
+      minDeposit: b.minDeposit,
+      avgMargin: b.avgMargin,
+      features: b.features,
+      pros: b.pros,
+      cons: b.cons,
+      bonus: b.bonus,
+      // Partner links are ads: only exposed together with their marking
+      ad: ad ? { link: `${site.url}${goLink(b.slug, "api")}`, erid: ad.erid, advertiser: ad.advertiser } : null,
+    };
+  });
+  return NextResponse.json({ bookmakers }, { headers: { "Cache-Control": "public, s-maxage=300" } });
 }

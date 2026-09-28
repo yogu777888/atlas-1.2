@@ -1,17 +1,17 @@
 export const site = {
   name: "tag.bet",
-  tagline: "Every line. One tag.",
+  tagline: "Лучший коэффициент — с одного взгляда.",
   description:
-    "tag.bet compares live odds across the world's top sportsbooks, tags the best price on every outcome and surfaces the welcome offers worth taking.",
+    "tag.bet сравнивает коэффициенты легальных российских букмекеров, отмечает лучшую цену на каждый исход и собирает бонусы с понятными условиями.",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://tag.bet").replace(/\/$/, ""),
-  appStoreUrl: process.env.NEXT_PUBLIC_APP_STORE_URL || null,
-  twitter: "@tagbet",
   supportEmail: "hello@tag.bet",
+  /** Required by Russian advertising law next to gambling content */
+  warning: "18+. Азартные игры могут вызывать зависимость. Играйте ответственно.",
 } as const;
 
 export const nav = [
-  { href: "/odds", label: "Odds" },
-  { href: "/bookmakers", label: "Bookmakers" },
-  { href: "/bonuses", label: "Bonuses" },
-  { href: "/#app", label: "App" },
+  { href: "/odds", label: "Коэффициенты" },
+  { href: "/bookmakers", label: "Букмекеры" },
+  { href: "/bonuses", label: "Бонусы" },
+  { href: "/responsible-gambling", label: "Ответственная игра" },
 ] as const;
