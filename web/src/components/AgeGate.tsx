@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogoMark } from "./Logo";
+import { FlipMark } from "./Logo";
 
 const KEY = "tagbet:age-ok";
 
@@ -29,7 +29,7 @@ export function AgeGate() {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="age-title">
       <div className="card w-full max-w-sm animate-rise p-6 shadow-2xl shadow-black">
-        <LogoMark className="mb-5 size-10" />
+        <FlipMark className="mb-5 size-10" />
         {denied ? (
           <>
             <h2 id="age-title" className="text-xl font-semibold">Возвращайтесь, когда исполнится 18</h2>

@@ -22,16 +22,15 @@ export default function OgImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 80,
-          background: "radial-gradient(ellipse at 50% -10%, #2a2466 0%, #07080a 60%)",
-          color: "#f4f5f6",
+          background: "#0b0b09",
+          color: "#f4f1e6",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 44, fontWeight: 700 }}>
-          <div style={{ width: 64, height: 64, borderRadius: 18, background: "#c4ff3d" }} />
-          <span>
-            tag<span style={{ color: "#c4ff3d" }}>.</span>bet
-          </span>
+        <div style={{ display: "flex", alignItems: "flex-end", fontSize: 72, fontWeight: 800, letterSpacing: -3 }}>
+          <span>tag</span>
+          <div style={{ width: 22, height: 22, borderRadius: 4, background: "#ffc629", margin: "0 4px 16px 6px" }} />
+          <span>bet</span>
         </div>
         <div style={{ display: "flex", gap: 24 }}>
           {odds.map((o, i) => (
@@ -43,9 +42,9 @@ export default function OgImage() {
                 borderRadius: 28,
                 fontSize: 88,
                 fontWeight: 700,
-                background: o.best ? "rgba(196,255,61,0.12)" : "#14171b",
-                border: o.best ? "3px solid rgba(196,255,61,0.5)" : "3px solid #262b1e",
-                color: o.best ? "#c4ff3d" : "#8b919a",
+                background: o.best ? "rgba(255,198,41,0.12)" : "#1a1915",
+                border: o.best ? "3px solid rgba(255,198,41,0.5)" : "3px solid #26251f",
+                color: o.best ? "#ffc629" : "#9a978a",
               }}
             >
               {o.v}

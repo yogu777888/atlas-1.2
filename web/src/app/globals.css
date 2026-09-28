@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #07080a;
-  --color-surface: #0e1013;
-  --color-surface-2: #14171b;
+  --color-bg: #0b0b09;
+  --color-surface: #121210;
+  --color-surface-2: #1a1915;
   --color-line: rgb(255 255 255 / 0.08);
   --color-line-strong: rgb(255 255 255 / 0.14);
-  --color-fg: #f4f5f6;
-  --color-muted: #8b919a;
-  --color-subtle: #5d636b;
-  --color-accent: #c4ff3d;
-  --color-accent-ink: #0b0f00;
-  --color-violet: #8b7bff;
+  --color-fg: #f4f1e6;
+  --color-muted: #9a978a;
+  --color-subtle: #66645a;
+  --color-accent: #ffc629;
+  --color-accent-ink: #161300;
+  --color-violet: #6f9cff;
   --color-danger: #ff5c5c;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
@@ -41,7 +41,6 @@ body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
 }
 
 ::selection {

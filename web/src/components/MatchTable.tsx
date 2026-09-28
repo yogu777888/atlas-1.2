@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FlipMark } from "./Logo";
 import { edge, odds, OUTCOMES, outcomeShort, type Match } from "@/lib/matches";
 import { LocalTime } from "./LocalTime";
 import { ProbBar } from "./ProbBar";
@@ -50,6 +51,7 @@ function Row({ m }: { m: Match }) {
               className={`odds-pill min-w-0 ${good ? "odds-pill-best" : ""}`}
               title={value !== null ? `${outcomeShort[o]}: ${value > 0 ? "выше" : "ниже"} справедливой цены на ${Math.abs(value * 100).toFixed(1)}%` : undefined}
             >
+              {good && <FlipMark className="mr-1 size-2" />}
               {price ? odds(price) : "—"}
             </span>
           );

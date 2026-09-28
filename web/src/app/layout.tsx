@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Onest } from "next/font/google";
 import { AgeGate } from "@/components/AgeGate";
 import { CookieConsent } from "@/components/CookieConsent";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const sans = Geist({ subsets: ["latin", "cyrillic"], variable: "--font-geist-sans" });
+const sans = Onest({ subsets: ["latin", "cyrillic"], variable: "--font-onest" });
 const mono = Geist_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07080a",
+  themeColor: "#0b0b09",
   colorScheme: "dark",
 };
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
 import { LocalTime } from "@/components/LocalTime";
-import { LogoMark } from "@/components/Logo";
+import { FlipMark } from "@/components/Logo";
 import { MatchTable } from "@/components/MatchTable";
 import { ProbBar } from "@/components/ProbBar";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -39,7 +39,7 @@ export default async function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="bg-grid absolute inset-0" aria-hidden />
-        <div className="absolute top-[-20%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-violet/15 blur-[120px]" aria-hidden />
+        <div className="absolute top-[-20%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[120px]" aria-hidden />
         <div className="container-x relative grid items-center gap-14 pt-20 pb-24 lg:grid-cols-[1.1fr_1fr] lg:pt-28">
           <div className="animate-rise">
             <Link href="/matches" className="mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
@@ -98,7 +98,7 @@ export default async function Home() {
               <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{f.body}</p>
             </div>
           ))}
-          <div className="card flex flex-col justify-between bg-gradient-to-br from-violet/15 to-transparent p-7">
+          <div className="card flex flex-col justify-between bg-gradient-to-br from-accent/10 to-transparent p-7">
             <p className="text-sm text-muted">Ответственная игра</p>
             <p className="mt-6 text-sm leading-relaxed">Лимиты, паузы и честные слова о рисках. Мы за то, чтобы ставить с умом, а не больше.</p>
             <Link href="/responsible-gambling" className="mt-4 text-sm text-accent hover:underline">
@@ -161,7 +161,7 @@ export default async function Home() {
 function EmptyHero() {
   return (
     <div className="card flex animate-rise flex-col items-center justify-center gap-4 p-10 text-center [animation-delay:150ms]">
-      <LogoMark className="size-16" />
+      <FlipMark className="size-16" />
       <p className="text-lg font-semibold tracking-tight">Линия на ближайшие дни ещё не открыта</p>
       <p className="max-w-xs text-sm text-muted">Как только букмекеры выставят коэффициенты на матчи топ-лиг, разбор появится здесь.</p>
     </div>
