@@ -1,5 +1,5 @@
-import { isValue, isSuspect, describe, expect, it } from "vitest";
-import { consensus, edge, fairFromOdds, margin } from "./matches";
+import { describe, expect, it } from "vitest";
+import { consensus, edge, fairFromOdds, isSuspect, isValue, margin } from "./matches";
 
 describe("match maths", () => {
   it("removes the margin", () => {
