@@ -3,8 +3,8 @@ import { site } from "@/lib/site";
 import { Logo } from "./Logo";
 
 const columns = [
-  { title: "Сервис", links: [{ href: "/odds", label: "Сравнение коэффициентов" }, { href: "/odds?view=surebets", label: "Вилки" }, { href: "/bonuses", label: "Бонусы" }] },
-  { title: "Букмекеры", links: [{ href: "/bookmakers", label: "Рейтинг" }, { href: "/bookmakers/fonbet", label: "Фонбет" }, { href: "/bookmakers/winline", label: "Winline" }, { href: "/bookmakers/marathon", label: "Марафон" }] },
+  { title: "Сервис", links: [{ href: "/matches", label: "Матчи" }, { href: "/matches?league=rpl", label: "РПЛ" }, { href: "/matches?league=ucl", label: "Лига чемпионов" }, { href: "/bonuses", label: "Бонусы" }] },
+  { title: "Букмекеры", links: [{ href: "/bookmakers", label: "Рейтинг" }, { href: "/bookmakers/fonbet", label: "Фонбет" }, { href: "/bookmakers/pari", label: "PARI" }, { href: "/bookmakers/winline", label: "Winline" }] },
   { title: "О сайте", links: [{ href: "/responsible-gambling", label: "Ответственная игра" }, { href: "/disclosure", label: "Как мы зарабатываем" }, { href: "/privacy", label: "Конфиденциальность" }, { href: "/terms", label: "Условия использования" }] },
 ];
 
@@ -45,8 +45,7 @@ export function SiteFooter() {
           <p>
             tag.bet — независимый информационный сервис. Мы не принимаем ставки и не проводим азартные игры. На сайте
             представлены только букмекеры с лицензией ФНС России. Некоторые ссылки являются рекламой и помечены
-            соответствующим образом; вознаграждение партнёров не влияет на коэффициенты и на то, какая цена отмечена как
-            лучшая.{" "}
+            соответствующим образом; вознаграждение партнёров не влияет на расчёт шансов и оценки коэффициентов.{" "}
             <Link href="/disclosure" className="underline hover:text-fg">
               Подробнее
             </Link>

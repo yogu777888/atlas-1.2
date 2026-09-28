@@ -6,8 +6,8 @@ export default function NotFound() {
       <p className="font-mono text-sm text-accent">404</p>
       <h1 className="mt-3 text-4xl font-semibold tracking-tight">Такого матча нет в линии.</h1>
       <p className="mt-3 text-muted">Страница переехала или матч уже начался.</p>
-      <Link href="/odds" className="btn-primary mt-8">
-        К коэффициентам
+      <Link href="/matches" className="btn-primary mt-8">
+        К матчам
       </Link>
     </div>
   );

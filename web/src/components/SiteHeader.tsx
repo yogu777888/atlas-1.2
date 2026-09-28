@@ -21,8 +21,8 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/odds" className="btn-primary h-8 px-4 text-[13px]">
-            Сравнить
+          <Link href="/matches" className="btn-primary h-8 px-4 text-[13px]">
+            Матчи
           </Link>
         </div>
       </div>
