@@ -18,7 +18,9 @@ export default function ToolsPage() {
       <div className="mt-12 grid gap-6 md:grid-cols-3">
         {tools.map((t) => (
           <Link key={t.slug} href={`/tools/${t.slug}`} className="group card flex flex-col gap-5 p-4 transition hover:border-line-strong">
-            <Cover figure={t.cover.figure} caption={t.cover.caption} />
+            <div className="h-36">
+              <Cover figure={t.cover.figure} caption={t.cover.caption} />
+            </div>
             <div className="space-y-1.5 px-2 pb-2">
               <h2 className="text-lg font-semibold tracking-tight group-hover:text-accent">{t.title}</h2>
               <p className="text-sm leading-relaxed text-muted">{t.description}</p>

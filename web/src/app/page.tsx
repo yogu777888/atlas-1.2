@@ -22,8 +22,9 @@ const features = [
   { title: "Выгодный коэффициент — отмечен", body: "Если коэффициент PARI выше справедливого, отмечаем жёлтым флипом.", span: "" },
   { title: "Рейтинг команд", body: "Независимая оценка силы команд по рейтингу Glicko-2 и ожидаемые голы (xG).", span: "" },
   { title: "Бонусы без мелкого шрифта", body: "Ключевые условия — прямо на карточке, до перехода на сайт букмекера.", span: "" },
-  { title: "Только легальные букмекеры", body: "Ссылки ведут только к конторам с лицензией ФНС России. Никаких офшоров.", span: "md:col-span-2" },
 ];
+
+const legal = { title: "Только легальные букмекеры", body: "Ссылки ведут только к конторам с лицензией ФНС России. Никаких офшоров." };
 
 const faqs = [
   { q: "Откуда берутся шансы?", a: "Из коэффициентов крупных мировых букмекеров. Мы убираем из них маржу и усредняем — получается оценка рынка, которая обычно точнее любого эксперта." },
@@ -113,6 +114,15 @@ export default async function Home() {
               Наш подход →
             </Link>
           </div>
+          <div className="card p-7 md:col-span-2">
+            <h3 className="text-xl font-semibold tracking-tight">{legal.title}</h3>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{legal.body}</p>
+          </div>
+          <Link href="/tools" className="card group flex flex-col justify-between p-7 transition hover:border-line-strong">
+            <p className="text-sm text-muted">Калькуляторы</p>
+            <p className="mt-6 text-sm leading-relaxed">Маржа, вероятность, экспресс — проверьте любой коэффициент сами.</p>
+            <span className="mt-4 text-sm text-accent group-hover:underline">Посчитать →</span>
+          </Link>
         </div>
       </section>
 

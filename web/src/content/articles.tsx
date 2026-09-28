@@ -148,7 +148,7 @@ export const articles: Article[] = [
     category: "Стратегия",
     minutes: 6,
     updated: "2026-09-28",
-    cover: { figure: "+4,0%", caption: "ожидаемая доходность ставки по 2.06 при шансе 50,5%" },
+    cover: { figure: "+4,0%", caption: "перевес ставки по 2.06 при шансе 50,5%" },
     toc: [
       { id: "ideya", title: "Идея" },
       { id: "raschet", title: "Как посчитать перевес" },
