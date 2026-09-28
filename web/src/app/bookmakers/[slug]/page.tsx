@@ -109,7 +109,7 @@ export default async function BookmakerPage({ params }: Props) {
           </div>
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside id="bonus" className="scroll-mt-24 lg:sticky lg:top-24 lg:self-start">
           <div className="card relative overflow-hidden p-6">
             <p className="eyebrow">Бонус</p>
             <p className="mt-3 text-2xl leading-tight font-semibold tracking-tight">{b.bonus.headline}</p>
@@ -118,7 +118,7 @@ export default async function BookmakerPage({ params }: Props) {
               <BonusFacts bonus={b.bonus} />
             </div>
             <div className="mt-5">
-              <OutboundButton b={b} source={`review-${b.slug}`} label={`Перейти в ${b.name}`} className="h-11 w-full" />
+              <OutboundButton b={b} source={`review-${b.slug}`} label={`Перейти в ${b.name}`} className="h-11 w-full" note="Ссылка на букмекера появится после проверки условий партнёрства." />
             </div>
             <p className="mt-3 text-[11px] leading-snug text-subtle">{bonusTerms(b)}</p>
           </div>

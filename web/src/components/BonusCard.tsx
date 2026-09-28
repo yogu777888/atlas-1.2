@@ -24,7 +24,7 @@ export function BonusCard({ b, source }: { b: Bookmaker; source: string }) {
         <BonusFacts bonus={b.bonus} />
       </div>
       <div className="mt-auto pt-5">
-        <OutboundButton b={b} source={source} label="Получить бонус" className="w-full" />
+        <OutboundButton b={b} source={source} label="Получить бонус" className="w-full" fallback={{ label: "Условия бонуса", href: `/bookmakers/${b.slug}#bonus` }} />
         {b.bonus.terms && <p className="mt-3 text-[11px] leading-snug text-subtle">{b.bonus.terms}</p>}
       </div>
     </article>
