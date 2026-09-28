@@ -2,7 +2,7 @@ import { statSync } from "node:fs";
 import path from "node:path";
 import { getBookmaker } from "@/lib/bookmakers";
 
-const EXTS = ["svg", "png", "webp"] as const;
+const EXTS = ["svg", "png", "webp", "jpg"] as const;
 const found = new Map<string, string | null>();
 
 /**
