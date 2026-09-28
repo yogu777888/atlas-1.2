@@ -56,7 +56,8 @@ function fromApi(e: ApiEvent, sport: SportKey): OddsEvent {
 
 async function fetchLive(sport: SportKey, apiKey: string): Promise<OddsEvent[]> {
   const def = sports.find((s) => s.key === sport)!;
-  const regions = "uk,eu,us";
+  // Every bookmaker we list with an oddsApiKey is covered by these two regions; each region costs one credit per request
+  const regions = "uk,eu";
   const results = await Promise.all(
     def.oddsApiKeys.map(async (key) => {
       const url = `https://api.the-odds-api.com/v4/sports/${key}/odds?apiKey=${apiKey}&regions=${regions}&markets=h2h&oddsFormat=decimal`;
