@@ -10,7 +10,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const staticPages = ["", "/matches", "/bookmakers", "/bonuses", "/articles", "/tools", "/responsible-gambling", "/disclosure", "/privacy", "/terms"];
+  const staticPages = ["", "/matches", "/bookmakers", "/bonuses", "/articles", "/tools", "/methodology", "/responsible-gambling", "/disclosure", "/privacy", "/terms"];
   const matches = await getMatches();
   return [
     ...staticPages.map((p) => ({ url: `${site.url}${p}`, lastModified: now, changeFrequency: "daily" as const, priority: p === "" ? 1 : 0.7 })),

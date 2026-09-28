@@ -4,7 +4,7 @@
  */
 export function FlipMark({ className = "size-3" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
+    <svg viewBox="0 0 32 32" className={`origin-center ${className}`} aria-hidden="true">
       <rect width="32" height="32" rx="6" fill="var(--color-accent)" />
       <rect y="15.2" width="32" height="1.6" fill="var(--color-bg)" />
     </svg>
@@ -17,7 +17,7 @@ export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
   return (
     <span className={`inline-flex items-baseline font-extrabold leading-none tracking-[-0.055em] ${text}`} aria-label="tag.bet">
       <span aria-hidden="true">tag</span>
-      <FlipMark className="mr-[0.05em] ml-[0.08em] size-[0.34em] self-baseline" />
+      <FlipMark className="mr-[0.05em] ml-[0.08em] size-[0.34em] self-baseline group-hover/logo:animate-flip-once" />
       <span aria-hidden="true">bet</span>
     </span>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FlipText } from "@/components/FlipText";
 import { LocalTime } from "@/components/LocalTime";
 import { OutboundButton } from "@/components/OutboundButton";
 import { ProbBar } from "@/components/ProbBar";
@@ -80,14 +81,16 @@ export default async function MatchPage({ params }: Props) {
           <p className="mt-1 text-sm text-muted">Легальный букмекер. Жёлтым — коэффициент выше справедливого.</p>
           {m.pari ? (
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-              {OUTCOMES.map((o) => {
+              {OUTCOMES.map((o, i) => {
                 const price = m.pari!.odds[o];
                 const value = fair ? edge(price, fair[o]) : null;
                 const good = value !== null && value > 0;
                 return (
                   <div key={o} className={`rounded-xl border p-3 ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-xs text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className={`mt-1 text-2xl font-semibold tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
+                    <p className={`mt-1 text-2xl font-semibold tabular-nums ${good ? "text-accent" : ""}`}>
+                      <FlipText text={odds(price)} delay={200 + i * 180} />
+                    </p>
                     {value !== null && (
                       <p className={`text-xs tabular-nums ${good ? "text-accent" : "text-subtle"}`}>
                         {value > 0 ? "+" : ""}
@@ -131,9 +134,14 @@ export default async function MatchPage({ params }: Props) {
           {explainers.map((a) => (
             <ArticleLink key={a!.slug} slug={a!.slug} />
           ))}
-          <Link href="/tools/marzha" className="block text-sm text-accent hover:underline">
-            Посчитать маржу самому →
-          </Link>
+          <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            <Link href="/methodology" className="text-accent hover:underline">
+              Методика целиком →
+            </Link>
+            <Link href="/tools/marzha" className="text-muted hover:text-fg">
+              Посчитать маржу самому →
+            </Link>
+          </div>
         </div>
       </section>
 

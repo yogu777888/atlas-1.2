@@ -6,7 +6,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-xl">
       <div className="container-x flex h-14 items-center justify-between gap-4">
-        <Link href="/" aria-label="tag.bet — главная">
+        <Link href="/" aria-label="tag.bet — главная" className="group/logo">
           <Logo />
         </Link>
         <nav className="hidden items-center gap-1 md:flex" aria-label="Основное меню">

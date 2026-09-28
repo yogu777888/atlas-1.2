@@ -4,6 +4,7 @@ import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
 import { Features } from "@/components/Features";
 import { LocalTime } from "@/components/LocalTime";
+import { FlipText } from "@/components/FlipText";
 import { FlipMark } from "@/components/Logo";
 import { MatchTable } from "@/components/MatchTable";
 import { ProbBar } from "@/components/ProbBar";
@@ -196,13 +197,15 @@ function HeroCard({ m }: { m: Match }) {
           <div className="mt-6">
             <p className="mb-2 text-xs text-subtle">Коэффициенты PARI</p>
             <div className="grid grid-cols-3 gap-2">
-              {OUTCOMES.map((o) => {
+              {OUTCOMES.map((o, i) => {
                 const price = m.pari!.odds[o];
                 const good = m.fair ? edge(price, m.fair[o]) > 0 : false;
                 return (
                   <div key={o} className={`rounded-xl border p-2.5 text-center ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
                     <p className="truncate text-[11px] text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className={`text-lg font-semibold tabular-nums ${good ? "text-accent" : ""}`}>{odds(price)}</p>
+                    <p className={`text-lg font-semibold tabular-nums ${good ? "text-accent" : ""}`}>
+                      <FlipText text={odds(price)} delay={700 + i * 180} />
+                    </p>
                   </div>
                 );
               })}

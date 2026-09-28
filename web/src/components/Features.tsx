@@ -17,12 +17,31 @@ export function Features() {
         title="Реальные шансы, а не мнение"
         body="Берём коэффициенты десятков мировых букмекеров, убираем маржу и получаем справедливую вероятность каждого исхода."
         visual={
-          <div className="w-full space-y-3">
-            <div className="flex justify-between text-xs text-subtle">
-              <span>Пример · П1 / X / П2</span>
+          <div className="w-full space-y-4">
+            <div className="flex items-center justify-between text-xs text-subtle">
+              <span>Пример · победа хозяев</span>
               <span>маржа убрана</span>
             </div>
-            <ProbBar p={{ home: 0.48, draw: 0.27, away: 0.25 }} />
+            <div className="flex items-center gap-3">
+              <div className="grid flex-1 gap-1.5">
+                {[
+                  ["Букмекер 1", "1.95"],
+                  ["Букмекер 2", "2.00"],
+                  ["Букмекер 3", "1.92"],
+                ].map(([n, k]) => (
+                  <div key={n} className="flex items-center justify-between rounded-lg border border-line bg-surface px-3 py-1.5 text-sm">
+                    <span className="text-subtle">{n}</span>
+                    <span className="font-medium tabular-nums">{k}</span>
+                  </div>
+                ))}
+              </div>
+              <span className="text-subtle" aria-hidden>→</span>
+              <div className="w-24 shrink-0 text-center">
+                <p className="text-4xl font-extrabold tracking-[-0.04em] tabular-nums">48%</p>
+                <p className="text-xs text-subtle">честный шанс</p>
+              </div>
+            </div>
+            <ProbBar p={{ home: 0.48, draw: 0.27, away: 0.25 }} compact />
           </div>
         }
       />
