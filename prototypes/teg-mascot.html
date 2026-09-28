@@ -1,0 +1,300 @@
+<title>Тэг — живой маскот</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700&display=swap">
+<style>
+/* Layout: one stage — mascot on top, mood chips + mini quiz below; stacks on phones */
+:root {
+  --bg: #f3f5ee;
+  --surface: #ffffff;
+  --line: #dfe3d6;
+  --fg: #14170f;
+  --muted: #5d6554;
+  --body: #b8f22e;       /* mascot body, brand lime */
+  --body-shade: #9ad414;
+  --eye: #11140c;
+  --good: #1f9d55;
+  --bad: #d64545;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --text: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0d09; --surface: #14170f; --line: #262b1f; --fg: #eef2e6; --muted: #98a18c;
+    --body: #c4ff3d; --body-shade: #a3e019; --eye: #0b0d09; --good: #4ade80; --bad: #f87171;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0d09; --surface: #14170f; --line: #262b1f; --fg: #eef2e6; --muted: #98a18c;
+  --body: #c4ff3d; --body-shade: #a3e019; --eye: #0b0d09; --good: #4ade80; --bad: #f87171;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--text); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 980px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 48px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 3.5vw, 2rem); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.hint { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 20px; min-width: 0; }
+.stage { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 380px; padding-top: 48px; position: relative; overflow: hidden; touch-action: none; }
+#teg { width: min(260px, 70vw); height: auto; overflow: visible; cursor: pointer; }
+.say { font-family: var(--display); font-weight: 500; font-size: 1rem; min-height: 1.5em; text-align: center; }
+.label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0 0 10px; font-weight: 700; }
+.moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 22px; }
+@media (max-width: 420px) { .moods { grid-template-columns: repeat(2, 1fr); } }
+.chip { font: 500 0.85rem var(--text); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 12px; padding: 9px 8px; cursor: pointer; transition: border-color .15s, background .15s; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { border-color: var(--fg); background: color-mix(in srgb, var(--body) 25%, transparent); }
+.chip:focus-visible, .opt:focus-visible, .next:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+.q { font-family: var(--display); font-weight: 500; font-size: 1.05rem; line-height: 1.35; margin: 0 0 12px; text-wrap: balance; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opt { font: 500 0.95rem var(--text); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; cursor: pointer; text-align: left; }
+.opt.good { border-color: var(--good); color: var(--good); }
+.opt.bad { border-color: var(--bad); color: var(--bad); }
+.opt:disabled { cursor: default; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.score { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; }
+.next { font: 700 0.9rem var(--text); color: #0b0d09; background: var(--body); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+.next[hidden] { display: none; }
+.confetti { position: absolute; width: 8px; height: 12px; border-radius: 2px; pointer-events: none; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)} 40%{transform:translateX(9px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(4px)} }
+@keyframes hop { 0%,100%{transform:translateY(0) scale(1,1)} 30%{transform:translateY(0) scale(1.08,.9)} 55%{transform:translateY(-34px) scale(.94,1.08)} 80%{transform:translateY(0) scale(1.06,.94)} }
+@keyframes breathe { 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.02,.98)} }
+#body-g { transform-origin: 130px 240px; animation: breathe 3.2s ease-in-out infinite; }
+#body-g.shake { animation: shake .5s ease; }
+#body-g.hop { animation: hop .7s cubic-bezier(.3,.7,.3,1); }
+@media (prefers-reduced-motion: reduce) { #body-g, #body-g.shake, #body-g.hop { animation: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Знакомьтесь: Тэг</h1>
+    <p class="hint">Поводите мышкой или пальцем — он следит глазами. Не трогайте 10 секунд — уснёт.</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel stage" id="stage" aria-label="Маскот">
+      <svg id="teg" viewBox="0 0 260 260" role="img" aria-label="Маскот Тэг">
+        <ellipse cx="130" cy="246" rx="78" ry="9" fill="var(--line)"></ellipse>
+        <g id="body-g">
+          <circle cx="130" cy="130" r="108" fill="var(--body-shade)"></circle>
+          <circle cx="130" cy="124" r="104" fill="var(--body)"></circle>
+          <g id="brows" opacity="0">
+            <path id="brow-l" d="M78 78 L112 88" stroke="var(--eye)" stroke-width="7" stroke-linecap="round" fill="none"></path>
+            <path id="brow-r" d="M182 78 L148 88" stroke="var(--eye)" stroke-width="7" stroke-linecap="round" fill="none"></path>
+          </g>
+          <g id="face">
+            <g class="eye" id="eye-l" transform="translate(98 122)">
+              <ellipse class="open" rx="15" ry="24" fill="var(--eye)"></ellipse>
+              <circle class="glint" cx="5" cy="-9" r="4.5" fill="var(--body)"></circle>
+              <path class="shape" d="" stroke="var(--eye)" stroke-width="7" stroke-linecap="round" fill="none"></path>
+            </g>
+            <g class="eye" id="eye-r" transform="translate(162 122)">
+              <ellipse class="open" rx="15" ry="24" fill="var(--eye)"></ellipse>
+              <circle class="glint" cx="5" cy="-9" r="4.5" fill="var(--body)"></circle>
+              <path class="shape" d="" stroke="var(--eye)" stroke-width="7" stroke-linecap="round" fill="none"></path>
+            </g>
+            <path id="mouth" d="" stroke="var(--eye)" stroke-width="6" stroke-linecap="round" fill="none"></path>
+          </g>
+          <text id="zzz" x="200" y="50" font-family="Unbounded, sans-serif" font-size="22" font-weight="700" fill="var(--muted)" opacity="0">z</text>
+        </g>
+      </svg>
+      <p class="say" id="say" aria-live="polite">Привет! Я Тэг.</p>
+    </section>
+
+    <section class="panel">
+      <p class="label">Настроение</p>
+      <div class="moods" id="moods"></div>
+
+      <p class="label">Попробуйте: вопрос из игры</p>
+      <p class="q" id="q"></p>
+      <div class="opts" id="opts"></div>
+      <div class="row">
+        <span class="score" id="score">Очки: 0</span>
+        <button class="next" id="next" hidden>Следующий вопрос</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const svg = $("teg"), bodyG = $("body-g"), say = $("say"), brows = $("brows"), mouth = $("mouth"), zzz = $("zzz");
+  const eyes = [$("eye-l"), $("eye-r")];
+  const base = [[98, 122], [162, 122]];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Each mood: eye form, optional brows (angle), mouth, and a line Тэг says
+  const MOODS = {
+    calm:     { label: "Спокойный",  eye: "oval", rx: 15, ry: 24, mouth: "", brows: null, text: "Всё под контролем." },
+    curious:  { label: "Любопытный", eye: "oval", rx: 17, ry: 28, mouth: "M122 176 q8 6 16 0", brows: null, text: "О, а что это у вас?" },
+    happy:    { label: "Радость",    eye: "arcUp", mouth: "M108 170 q22 22 44 0", brows: null, text: "Ура! Так держать!" },
+    sad:      { label: "Грусть",     eye: "oval", rx: 13, ry: 18, dy: 6, mouth: "M112 186 q18 -14 36 0", brows: "sad", text: "Эх… в следующий раз получится." },
+    sleepy:   { label: "Сонный",     eye: "line", mouth: "M124 178 q6 3 12 0", brows: null, text: "Хррр…" },
+    surprised:{ label: "Удивлён",    eye: "oval", rx: 19, ry: 30, mouth: "M130 180 m-9 0 a9 11 0 1 0 18 0 a9 11 0 1 0 -18 0", brows: "up", text: "Ого!" },
+    excited:  { label: "Азарт",      eye: "star", mouth: "M110 168 q20 18 40 0", brows: "up", text: "Ставлю всё на этот ответ!" },
+    thinking: { label: "Думает",     eye: "oval", rx: 14, ry: 22, look: [9, -9], mouth: "M120 178 l20 -3", brows: "think", text: "Хм, дайте подумать…" },
+  };
+
+  let mood = "curious", gaze = [0, 0], target = [0, 0], blinking = false, lastInput = Date.now();
+
+  function eyeShape(kind) {
+    if (kind === "arcUp") return "M-16 6 Q0 -16 16 6";
+    if (kind === "line") return "M-16 2 Q0 8 16 2";
+    if (kind === "star") return "M0 -18 L5 -5 L18 -5 L8 3 L12 17 L0 8 L-12 17 L-8 3 L-18 -5 L-5 -5 Z";
+    return "";
+  }
+
+  function render() {
+    const m = MOODS[mood];
+    const g = m.look ? [m.look[0] + gaze[0] * 0.3, m.look[1] + gaze[1] * 0.3] : gaze;
+    eyes.forEach((el, i) => {
+      const [bx, by] = base[i];
+      el.setAttribute("transform", `translate(${bx + g[0]} ${by + g[1] + (m.dy || 0)})`);
+      const open = el.querySelector(".open"), glint = el.querySelector(".glint"), shape = el.querySelector(".shape");
+      const isOval = m.eye === "oval";
+      open.style.display = isOval ? "" : "none";
+      glint.style.display = isOval ? "" : "none";
+      shape.style.display = isOval ? "none" : "";
+      shape.setAttribute("d", eyeShape(m.eye));
+      shape.setAttribute("fill", m.eye === "star" ? "var(--eye)" : "none");
+      shape.setAttribute("stroke-width", m.eye === "star" ? "3" : "7");
+      if (isOval) {
+        open.setAttribute("rx", m.rx);
+        open.setAttribute("ry", blinking ? 2 : m.ry);
+        glint.style.opacity = blinking ? 0 : 1;
+      }
+    });
+    mouth.setAttribute("d", m.mouth || "");
+    const bl = $("brow-l"), br = $("brow-r");
+    if (m.brows === "sad") { bl.setAttribute("d", "M78 88 L112 76"); br.setAttribute("d", "M182 88 L148 76"); }
+    else if (m.brows === "up") { bl.setAttribute("d", "M80 72 Q96 62 112 70"); br.setAttribute("d", "M180 72 Q164 62 148 70"); }
+    else if (m.brows === "think") { bl.setAttribute("d", "M80 82 L112 82"); br.setAttribute("d", "M180 70 Q164 62 148 74"); }
+    brows.setAttribute("opacity", m.brows ? 1 : 0);
+    zzz.setAttribute("opacity", mood === "sleepy" ? 1 : 0);
+  }
+
+  function setMood(name, speak = true) {
+    mood = name;
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.mood === name));
+    if (speak) say.textContent = MOODS[name].text;
+    render();
+  }
+
+  // Mood chips
+  const moodsEl = $("moods");
+  Object.entries(MOODS).forEach(([key, m]) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.dataset.mood = key; b.textContent = m.label;
+    b.addEventListener("click", () => { lastInput = Date.now(); setMood(key); if (key === "happy" || key === "excited") hop(); if (key === "sad") shake(); });
+    moodsEl.appendChild(b);
+  });
+
+  // Gaze follows pointer anywhere on the page
+  function onPoint(x, y) {
+    lastInput = Date.now();
+    if (mood === "sleepy") setMood("curious", true);
+    const r = svg.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * 0.47;
+    const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy) || 1;
+    const k = Math.min(1, d / 300);
+    target = [(dx / d) * 14 * k, (dy / d) * 12 * k];
+  }
+  addEventListener("pointermove", (e) => onPoint(e.clientX, e.clientY));
+  addEventListener("pointerdown", (e) => onPoint(e.clientX, e.clientY));
+
+  function tick() {
+    gaze[0] += (target[0] - gaze[0]) * 0.18;
+    gaze[1] += (target[1] - gaze[1]) * 0.18;
+    render();
+    if (Date.now() - lastInput > 10000 && mood !== "sleepy" && !answering) { setMood("sleepy"); target = [0, 4]; }
+    requestAnimationFrame(tick);
+  }
+
+  // Random blinking
+  function scheduleBlink() {
+    setTimeout(() => {
+      if (MOODS[mood].eye === "oval") {
+        blinking = true; render();
+        setTimeout(() => { blinking = false; render(); }, 120);
+      }
+      scheduleBlink();
+    }, 2200 + Math.random() * 3200);
+  }
+
+  function hop() { bodyG.classList.remove("hop", "shake"); void bodyG.getBBox(); bodyG.classList.add("hop"); }
+  function shake() { bodyG.classList.remove("hop", "shake"); void bodyG.getBBox(); bodyG.classList.add("shake"); }
+  bodyG.addEventListener("animationend", () => bodyG.classList.remove("hop", "shake"));
+
+  // Poking Тэг makes him jump
+  svg.addEventListener("click", () => { lastInput = Date.now(); setMood("surprised"); hop(); setTimeout(() => setMood("curious", false), 1200); });
+
+  function confetti() {
+    if (reduce) return;
+    const stage = $("stage"), r = stage.getBoundingClientRect();
+    const colors = ["var(--body)", "var(--good)", "var(--fg)", "var(--body-shade)"];
+    for (let i = 0; i < 26; i++) {
+      const p = document.createElement("span");
+      p.className = "confetti";
+      p.style.background = colors[i % colors.length];
+      p.style.left = r.width / 2 + "px"; p.style.top = r.height * 0.4 + "px";
+      stage.appendChild(p);
+      const a = Math.random() * Math.PI * 2, v = 90 + Math.random() * 140;
+      p.animate([
+        { transform: "translate(0,0) rotate(0deg)", opacity: 1 },
+        { transform: `translate(${Math.cos(a) * v}px, ${Math.sin(a) * v + 120}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+      ], { duration: 1100 + Math.random() * 500, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => p.remove();
+    }
+  }
+
+  // Mini quiz with points wagered on confidence
+  const QS = [
+    { q: "Какая планета ближе всего к Солнцу?", a: ["Венера", "Меркурий", "Марс", "Земля"], ok: 1 },
+    { q: "Сколько игроков одной команды на поле в футболе?", a: ["10", "12", "11", "9"], ok: 2 },
+    { q: "Кто написал «Евгения Онегина»?", a: ["Лермонтов", "Гоголь", "Толстой", "Пушкин"], ok: 3 },
+    { q: "Какой химический символ у золота?", a: ["Au", "Ag", "Go", "Gd"], ok: 0 },
+  ];
+  let qi = 0, score = 0, answering = false;
+  const qEl = $("q"), optsEl = $("opts"), nextEl = $("next"), scoreEl = $("score");
+
+  function showQ() {
+    const Q = QS[qi % QS.length];
+    qEl.textContent = Q.q;
+    optsEl.innerHTML = "";
+    nextEl.hidden = true;
+    answering = true;
+    setMood("thinking");
+    Q.a.forEach((text, i) => {
+      const b = document.createElement("button");
+      b.className = "opt"; b.type = "button"; b.textContent = text;
+      b.addEventListener("click", () => answer(i, b));
+      optsEl.appendChild(b);
+    });
+  }
+
+  function answer(i, btn) {
+    if (!answering) return;
+    answering = false; lastInput = Date.now();
+    const Q = QS[qi % QS.length];
+    [...optsEl.children].forEach((b, j) => { b.disabled = true; if (j === Q.ok) b.classList.add("good"); });
+    if (i === Q.ok) {
+      score += 100; setMood("happy"); hop(); confetti();
+    } else {
+      btn.classList.add("bad"); setMood("sad"); shake();
+    }
+    scoreEl.textContent = "Очки: " + score;
+    nextEl.hidden = false;
+  }
+  nextEl.addEventListener("click", () => { qi++; lastInput = Date.now(); showQ(); });
+
+  setMood("curious");
+  showQ();
+  say.textContent = "Привет! Я Тэг. Ответь на вопрос — посмотрим, как я отреагирую.";
+  scheduleBlink();
+  requestAnimationFrame(tick);
+})();
+</script>

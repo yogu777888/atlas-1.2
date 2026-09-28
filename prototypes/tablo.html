@@ -1,0 +1,737 @@
+<title>tag: Табло</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-screen game — score strip, host line, 5×3 board; question/wager/final as a sheet over the board */
+:root {
+  --bg: #0a0b08;
+  --bg-2: #10120d;
+  --tile: #171a12;
+  --tile-hi: #1f2318;
+  --line: #262b1e;
+  --fg: #eef2e4;
+  --muted: #8f9884;
+  --dim: #545b4a;
+  --lime: #c4ff3d;
+  --lime-ink: #0b0f00;
+  --violet: #9b7bff;
+  --coral: #ff6b5b;
+  --good: #4ade80;
+  --bad: #ff5c5c;
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --text: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--text); font-size: 15px; line-height: 1.45; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+
+.app { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 32px; min-height: 100%; display: flex; flex-direction: column; gap: 14px; position: relative; }
+main { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 1.05rem; letter-spacing: -0.02em; }
+.brand b { color: var(--lime); font-weight: 800; }
+.icon-btn { background: var(--tile); border: 1px solid var(--line); border-radius: 12px; padding: 7px 12px; font-size: 0.85rem; color: var(--muted); cursor: pointer; }
+
+/* ---------- start ---------- */
+.start { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; padding-block: 24px; }
+.start h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2.2rem, 9vw, 3.6rem); line-height: 0.95; letter-spacing: -0.04em; margin: 0; text-wrap: balance; }
+.start h1 span { color: var(--lime); }
+.start p { color: var(--muted); max-width: 30rem; margin: 0; text-wrap: balance; }
+.lineup { display: flex; gap: 22px; align-items: flex-end; justify-content: center; margin-block: 6px; }
+.lineup figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.lineup figcaption { font-size: 0.8rem; color: var(--muted); }
+.lineup figcaption b { display: block; color: var(--fg); font-weight: 700; }
+.btn { background: var(--lime); color: var(--lime-ink); border: 0; border-radius: 999px; padding: 15px 30px; font-family: var(--display); font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform .15s, filter .15s; }
+.btn:hover { filter: brightness(1.07); }
+.btn:active { transform: scale(0.97); }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.best { font-size: 0.85rem; color: var(--dim); font-variant-numeric: tabular-nums; }
+
+/* ---------- scores ---------- */
+.scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.player { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 8px; display: flex; align-items: center; gap: 6px; min-width: 0; transition: border-color .2s, background .2s; position: relative; }
+.player.turn { border-color: var(--lime); background: color-mix(in srgb, var(--lime) 6%, var(--bg-2)); }
+.player .who { min-width: 0; }
+.player .name { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player .pts { font-family: var(--display); font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.player .pts.neg { color: var(--bad); }
+.player .delta { position: absolute; right: 8px; top: -10px; font-family: var(--display); font-size: 0.8rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; pointer-events: none; }
+.delta.up { background: var(--good); color: #04210f; }
+.delta.down { background: var(--bad); color: #2a0606; }
+
+/* ---------- host ---------- */
+.host { display: flex; align-items: center; gap: 12px; min-height: 64px; }
+.bubble { background: var(--tile); border: 1px solid var(--line); border-radius: 16px 16px 16px 4px; padding: 10px 14px; font-size: 0.95rem; min-width: 0; flex: 1; }
+
+/* ---------- board ---------- */
+.board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.theme { font-family: var(--display); font-weight: 500; font-size: clamp(0.58rem, 2.3vw, 0.78rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); text-align: center; padding: 4px 2px 6px; display: flex; align-items: flex-end; justify-content: center; min-height: 2.6em; line-height: 1.15; min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.cell { aspect-ratio: 1 / 0.82; background: var(--tile); border: 1px solid var(--line); border-radius: 14px; font-family: var(--display); font-weight: 700; font-size: clamp(0.95rem, 4.2vw, 1.5rem); color: var(--lime); cursor: pointer; transition: transform .15s, background .15s, border-color .15s, opacity .3s; font-variant-numeric: tabular-nums; max-width: 100%; }
+.cell:hover:not(:disabled) { background: var(--tile-hi); border-color: color-mix(in srgb, var(--lime) 40%, var(--line)); transform: translateY(-2px); }
+.cell:disabled { cursor: default; }
+.cell.used { background: transparent; border-style: dashed; color: transparent; opacity: 0.45; }
+.cell.pick { animation: pick .9s ease; }
+@keyframes pick { 0%,100% { background: var(--tile); } 30%,70% { background: color-mix(in srgb, var(--lime) 30%, var(--tile)); transform: scale(1.06); } }
+.board.locked .cell:not(.used) { cursor: wait; }
+.progress { font-size: 0.8rem; color: var(--dim); text-align: center; font-variant-numeric: tabular-nums; }
+
+/* ---------- sheet (question / wager / result) ---------- */
+.sheet-wrap { position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; z-index: 10; padding-inline: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+@media (min-width: 640px) { .sheet-wrap { align-items: center; } }
+.sheet { width: 100%; max-width: 560px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 14px; animation: rise .35s cubic-bezier(.2,.8,.2,1); max-height: 100%; overflow-y: auto; }
+@keyframes rise { from { transform: translateY(24px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+.q-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tag { font-family: var(--display); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; background: var(--tile); color: var(--muted); }
+.tag.lime { background: var(--lime); color: var(--lime-ink); }
+.q-text { font-family: var(--display); font-weight: 500; font-size: clamp(1.1rem, 4.6vw, 1.4rem); line-height: 1.3; margin: 0; text-wrap: balance; }
+.timer { height: 6px; background: var(--tile); border-radius: 999px; overflow: hidden; }
+.timer i { display: block; height: 100%; width: 100%; background: var(--lime); transform-origin: left; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 380px) { .opts { grid-template-columns: 1fr; } }
+.opt { background: var(--tile); border: 1px solid var(--line); border-radius: 14px; padding: 14px 12px; text-align: left; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s, transform .1s; position: relative; min-height: 54px; }
+.opt:hover:not(:disabled) { background: var(--tile-hi); }
+.opt:active:not(:disabled) { transform: scale(0.98); }
+.opt:disabled { cursor: default; }
+.opt.right { border-color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--tile)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--tile)); }
+.opt .by { position: absolute; top: -9px; right: 10px; font-size: 0.7rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: #0a0b08; }
+.rivals { display: flex; gap: 8px; flex-wrap: wrap; }
+.rival { display: flex; align-items: center; gap: 6px; background: var(--tile); border-radius: 999px; padding: 4px 10px 4px 4px; font-size: 0.8rem; color: var(--muted); }
+.rival.hot { color: var(--fg); }
+.status { font-size: 0.9rem; color: var(--muted); min-height: 1.4em; }
+.wager { display: flex; flex-direction: column; gap: 10px; }
+.wager output { font-family: var(--display); font-weight: 800; font-size: 2.4rem; color: var(--lime); font-variant-numeric: tabular-nums; }
+.wager input[type=range] { width: 100%; accent-color: var(--lime); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { background: var(--tile); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; }
+.final-rows { display: grid; gap: 8px; }
+.final-row { display: flex; align-items: center; gap: 10px; background: var(--tile); border-radius: 14px; padding: 8px 12px; font-variant-numeric: tabular-nums; }
+.final-row .grow { flex: 1; min-width: 0; }
+.final-row .mark { font-family: var(--display); font-weight: 700; }
+
+/* ---------- end ---------- */
+.podium { display: grid; gap: 8px; }
+.place { display: flex; align-items: center; gap: 12px; background: var(--tile); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; }
+.place.me { border-color: var(--lime); }
+.place .rank { font-family: var(--display); font-weight: 800; font-size: 1.2rem; width: 1.6em; color: var(--muted); }
+.place .grow { flex: 1; min-width: 0; font-weight: 700; text-align: left; }
+.place .pts { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--tile); border-radius: 14px; padding: 10px; text-align: center; }
+.stat b { display: block; font-family: var(--display); font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 0.75rem; color: var(--muted); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row .btn { flex: 1; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; z-index: 20; }
+
+/* ---------- blobs ---------- */
+.blob { overflow: visible; display: block; flex: none; }
+.blob .bd { transform-origin: 50% 90%; transform-box: fill-box; }
+.blob.hop .bd { animation: hop .6s cubic-bezier(.3,.7,.3,1); }
+.blob.shake .bd { animation: shake .45s ease; }
+.blob.idle .bd { animation: breathe 3.4s ease-in-out infinite; }
+@keyframes hop { 0%,100% { transform: none; } 30% { transform: scale(1.1,.88); } 55% { transform: translateY(-22%) scale(.94,1.08); } 80% { transform: scale(1.05,.95); } }
+@keyframes shake { 0%,100% { transform: none; } 25% { transform: translateX(-10%); } 50% { transform: translateX(9%); } 75% { transform: translateX(-5%); } }
+@keyframes breathe { 0%,100% { transform: none; } 50% { transform: scale(1.025,.975); } }
+.confetti { position: fixed; width: 8px; height: 12px; border-radius: 2px; pointer-events: none; z-index: 30; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">tag<b>.</b>bet · Табло</div>
+    <button class="icon-btn" id="sound" type="button" aria-pressed="true">Звук: вкл</button>
+  </div>
+  <main id="screen"></main>
+</div>
+
+<script>
+(() => {
+  // ------------------------------------------------------------------ data
+  const THEMES = [
+    { name: "Книги", qs: [
+      { q: "Кто написал роман «Война и мир»?", a: ["Лев Толстой", "Фёдор Достоевский", "Антон Чехов", "Иван Тургенев"], ok: 0 },
+      { q: "Как зовут главного героя «Преступления и наказания»?", a: ["Евгений Базаров", "Родион Раскольников", "Григорий Печорин", "Илья Обломов"], ok: 1 },
+      { q: "Какой писатель придумал Шерлока Холмса?", a: ["Агата Кристи", "Эдгар По", "Артур Конан Дойл", "Чарльз Диккенс"], ok: 2 },
+    ]},
+    { name: "Кино", qs: [
+      { q: "Какой фильм 1997 года получил 11 «Оскаров»?", a: ["«Аватар»", "«Титаник»", "«Терминатор 2»", "«Гладиатор»"], ok: 1 },
+      { q: "Как зовут мага-наставника Фродо во «Властелине колец»?", a: ["Саруман", "Мерлин", "Дамблдор", "Гэндальф"], ok: 3 },
+      { q: "Кто снял фильм «Брат» (1997)?", a: ["Алексей Балабанов", "Никита Михалков", "Андрей Звягинцев", "Фёдор Бондарчук"], ok: 0 },
+    ]},
+    { name: "Наука", qs: [
+      { q: "Какая планета ближе всего к Солнцу?", a: ["Венера", "Марс", "Меркурий", "Земля"], ok: 2 },
+      { q: "Какой химический символ у золота?", a: ["Ag", "Au", "Go", "Gd"], ok: 1 },
+      { q: "Сколько костей в скелете взрослого человека?", a: ["186", "226", "256", "206"], ok: 3 },
+    ]},
+    { name: "Спорт", qs: [
+      { q: "Сколько игроков одной команды на поле в футболе?", a: ["10", "11", "12", "9"], ok: 1 },
+      { q: "Какая сборная выиграла чемпионат мира по футболу 2018 года?", a: ["Хорватия", "Бразилия", "Франция", "Бельгия"], ok: 2 },
+      { q: "Сколько минут длится один период в хоккее?", a: ["20", "15", "25", "30"], ok: 0 },
+    ]},
+    { name: "География", qs: [
+      { q: "Какой океан самый большой?", a: ["Атлантический", "Индийский", "Северный Ледовитый", "Тихий"], ok: 3 },
+      { q: "Какой город — столица Австралии?", a: ["Сидней", "Канберра", "Мельбурн", "Перт"], ok: 1 },
+      { q: "Какое озеро самое глубокое в мире?", a: ["Байкал", "Танганьика", "Каспийское море", "Виктория"], ok: 0 },
+    ]},
+  ];
+  const VALUES = [100, 200, 300];
+  const FINAL = { theme: "Космос", q: "В каком году человек впервые полетел в космос?", a: ["1957", "1961", "1965", "1969"], ok: 1 };
+  const Q_TIME = 15000;
+
+  const PLAYERS = [
+    { id: "me", name: "Вы", color: "var(--lime)", hex: "#c4ff3d", bot: false },
+    { id: "smart", name: "Умник", color: "var(--violet)", hex: "#9b7bff", bot: true, acc: 0.86, buzz: [5200, 9000], pickHigh: true, risk: 0.5 },
+    { id: "rush", name: "Торопыга", color: "var(--coral)", hex: "#ff6b5b", bot: true, acc: 0.6, buzz: [1800, 4200], pickHigh: false, risk: 0.9 },
+  ];
+
+  // ------------------------------------------------------------------ utils
+  const $ = (s, el = document) => el.querySelector(s);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ------------------------------------------------------------------ sound (synthesized, starts after first tap)
+  let audio = null, soundOn = store.get("tablo:sound") !== "0";
+  function tone(freq, dur = 0.12, type = "sine", gain = 0.08, delay = 0) {
+    if (!soundOn) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const t = audio.currentTime + delay;
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = type; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(audio.destination);
+      o.start(t); o.stop(t + dur + 0.02);
+    } catch {}
+  }
+  const sfx = {
+    tap: () => tone(660, 0.06, "triangle", 0.05),
+    open: () => { tone(392, 0.1, "triangle"); tone(523, 0.12, "triangle", 0.08, 0.08); },
+    right: () => { tone(523, 0.1, "triangle"); tone(659, 0.1, "triangle", 0.08, 0.09); tone(784, 0.18, "triangle", 0.09, 0.18); },
+    wrong: () => { tone(196, 0.22, "sawtooth", 0.05); tone(147, 0.28, "sawtooth", 0.05, 0.12); },
+    buzz: () => tone(880, 0.08, "square", 0.04),
+    win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.2, "triangle", 0.09, i * 0.11)),
+  };
+  const soundBtn = $("#sound");
+  function paintSound() { soundBtn.textContent = "Звук: " + (soundOn ? "вкл" : "выкл"); soundBtn.setAttribute("aria-pressed", soundOn); }
+  soundBtn.addEventListener("click", () => { soundOn = !soundOn; store.set("tablo:sound", soundOn ? "1" : "0"); paintSound(); sfx.tap(); });
+  paintSound();
+
+  // ------------------------------------------------------------------ blobs (Тэг and friends)
+  let blobSeq = 0;
+  function blob(color, size = 40, id = "") {
+    const uid = "b" + (++blobSeq);
+    return `<svg class="blob idle" id="${id || uid}" width="${size}" height="${size}" viewBox="0 0 100 100" aria-hidden="true">
+      <g class="bd">
+        <circle cx="50" cy="55" r="43" fill="${color}"></circle>
+        <circle cx="50" cy="55" r="43" fill="#000" opacity=".22"></circle>
+        <circle cx="50" cy="51" r="42" fill="${color}"></circle>
+        <g class="eyes">
+          <g class="eye" transform="translate(36 48)"><ellipse class="o" rx="6.5" ry="10" fill="#0a0b08"></ellipse><path class="s" d="" stroke="#0a0b08" stroke-width="4" stroke-linecap="round" fill="none"></path></g>
+          <g class="eye" transform="translate(64 48)"><ellipse class="o" rx="6.5" ry="10" fill="#0a0b08"></ellipse><path class="s" d="" stroke="#0a0b08" stroke-width="4" stroke-linecap="round" fill="none"></path></g>
+        </g>
+        <path class="m" d="" stroke="#0a0b08" stroke-width="4" stroke-linecap="round" fill="none"></path>
+      </g></svg>`;
+  }
+  const MOOD = {
+    idle: { eye: "o", ry: 10, m: "" },
+    happy: { eye: "M-7 3 Q0 -7 7 3", m: "M40 70 q10 10 20 0" },
+    sad: { eye: "o", ry: 7, dy: 3, m: "M41 76 q9 -7 18 0" },
+    think: { eye: "o", ry: 9, look: [4, -4], m: "M44 72 l12 -2" },
+    wow: { eye: "o", ry: 12, rx: 8, m: "M50 72 m-4 0 a4 5 0 1 0 8 0 a4 5 0 1 0 -8 0" },
+    sleep: { eye: "M-7 1 Q0 4 7 1", m: "" },
+  };
+  function setMood(svg, mood, look) {
+    if (!svg) return;
+    const M = MOOD[mood] || MOOD.idle;
+    const g = look || M.look || [0, 0];
+    svg.querySelectorAll(".eye").forEach((e, i) => {
+      const bx = i ? 64 : 36;
+      e.setAttribute("transform", `translate(${bx + g[0]} ${48 + g[1] + (M.dy || 0)})`);
+      const o = e.querySelector(".o"), s = e.querySelector(".s");
+      const oval = M.eye === "o";
+      o.style.display = oval ? "" : "none";
+      s.style.display = oval ? "none" : "";
+      if (oval) { o.setAttribute("ry", M.ry); o.setAttribute("rx", M.rx || 6.5); }
+      else s.setAttribute("d", M.eye);
+    });
+    svg.querySelector(".m").setAttribute("d", M.m);
+    svg.dataset.mood = mood;
+  }
+  function animate(svg, kind) {
+    if (!svg || reduce) return;
+    svg.classList.remove("hop", "shake", "idle");
+    void svg.getBBox();
+    svg.classList.add(kind);
+    setTimeout(() => { svg.classList.remove(kind); svg.classList.add("idle"); }, 650);
+  }
+  // Random blinking for every blob on screen
+  setInterval(() => {
+    document.querySelectorAll(".blob").forEach((svg) => {
+      if (Math.random() > 0.35 || (svg.dataset.mood && svg.dataset.mood !== "idle" && svg.dataset.mood !== "think")) return;
+      const os = svg.querySelectorAll(".o");
+      os.forEach((o) => { o.dataset.ry = o.getAttribute("ry"); o.setAttribute("ry", 1.5); });
+      setTimeout(() => os.forEach((o) => o.setAttribute("ry", o.dataset.ry)), 120);
+    });
+  }, 1400);
+  // The host's eyes follow the pointer
+  addEventListener("pointermove", (e) => {
+    const host = $("#host-blob");
+    if (!host || (host.dataset.mood && host.dataset.mood !== "idle")) return;
+    const r = host.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 260);
+    setMood(host, "idle", [(dx / d) * 6 * k, (dy / d) * 5 * k]);
+  });
+
+  function confetti(x, y) {
+    if (reduce) return;
+    const colors = ["#c4ff3d", "#9b7bff", "#ff6b5b", "#eef2e4", "#4ade80"];
+    for (let i = 0; i < 34; i++) {
+      const p = document.createElement("span");
+      p.className = "confetti";
+      p.style.background = colors[i % colors.length];
+      p.style.left = x + "px"; p.style.top = y + "px";
+      document.body.appendChild(p);
+      const a = rnd(0, Math.PI * 2), v = rnd(100, 260);
+      p.animate([
+        { transform: "translate(0,0) rotate(0)", opacity: 1 },
+        { transform: `translate(${Math.cos(a) * v}px, ${Math.sin(a) * v + 180}px) rotate(${rnd(0, 800)}deg)`, opacity: 0 },
+      ], { duration: rnd(1000, 1600), easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => p.remove();
+    }
+  }
+  function toast(text) {
+    const t = document.createElement("div");
+    t.className = "toast"; t.textContent = text; t.setAttribute("role", "status");
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1800);
+  }
+
+  // ------------------------------------------------------------------ game state
+  let S;
+  function newGame() {
+    const cells = [];
+    THEMES.forEach((t, ti) => VALUES.forEach((v, vi) => cells.push({ ti, vi, value: v, used: false, special: false })));
+    // Two hidden "Ставка" cells, never both in the same theme
+    const pool = [...cells].sort(() => Math.random() - 0.5);
+    const specials = [];
+    for (const c of pool) { if (specials.length < 2 && !specials.some((s) => s.ti === c.ti) && c.vi > 0) { c.special = true; specials.push(c); } }
+    S = {
+      cells,
+      scores: { me: 0, smart: 0, rush: 0 },
+      turn: "me",
+      log: [], // per question for the player: "right" | "wrong" | "skip"
+      rightCount: 0, answered: 0,
+    };
+  }
+
+  const screen = $("#screen");
+
+  // ------------------------------------------------------------------ start screen
+  function renderStart() {
+    const best = +(store.get("tablo:best") || 0);
+    screen.innerHTML = `
+      <section class="start">
+        <div class="lineup">
+          <figure>${blob("var(--violet)", 64, "sb-smart")}<figcaption><b>Умник</b>думает долго, ошибается редко</figcaption></figure>
+          <figure>${blob("var(--lime)", 96, "host-blob")}<figcaption><b>Тэг</b>ведущий</figcaption></figure>
+          <figure>${blob("var(--coral)", 64, "sb-rush")}<figcaption><b>Торопыга</b>жмёт первым, часто мажет</figcaption></figure>
+        </div>
+        <h1>Табло<span>.</span></h1>
+        <p>Выбирайте тему и стоимость, отвечайте быстрее соперников. Под двумя клетками спрятана «Ставка», в конце — финальный раунд, где решает смелость.</p>
+        <button class="btn" id="play" type="button">Играть</button>
+        ${best ? `<div class="best">Ваш рекорд: ${best}</div>` : ""}
+      </section>`;
+    setMood($("#host-blob"), "idle");
+    setMood($("#sb-smart"), "think");
+    setMood($("#sb-rush"), "happy");
+    $("#play").addEventListener("click", () => { sfx.open(); newGame(); renderGame(); say("Поехали! Вы выбираете первым. Жмите на любую клетку.", "happy"); });
+  }
+
+  // ------------------------------------------------------------------ game screen
+  function renderGame() {
+    screen.innerHTML = `
+      <div class="scores" id="scores">
+        ${PLAYERS.map((p) => `
+          <div class="player" id="pl-${p.id}">
+            ${blob(p.color, 30, "av-" + p.id)}
+            <div class="who"><div class="name">${p.name}</div><div class="pts" id="pts-${p.id}">0</div></div>
+          </div>`).join("")}
+      </div>
+      <div class="host">
+        ${blob("var(--lime)", 60, "host-blob")}
+        <div class="bubble" id="say" aria-live="polite"></div>
+      </div>
+      <div class="board" id="board">
+        ${THEMES.map((t) => `<div class="theme">${t.name}</div>`).join("")}
+        ${VALUES.map((v, vi) => THEMES.map((t, ti) => `<button class="cell" type="button" data-ti="${ti}" data-vi="${vi}" aria-label="${t.name} за ${v}">${v}</button>`).join("")).join("")}
+      </div>
+      <div class="progress" id="progress"></div>`;
+    PLAYERS.forEach((p) => setMood($("#av-" + p.id), "idle"));
+    setMood($("#host-blob"), "idle");
+    $("#board").addEventListener("click", (e) => {
+      const b = e.target.closest(".cell");
+      if (!b || b.disabled || S.turn !== "me" || S.busy) return;
+      sfx.tap();
+      openCell(cellAt(+b.dataset.ti, +b.dataset.vi), "me");
+    });
+    paintBoard();
+  }
+  const cellAt = (ti, vi) => S.cells.find((c) => c.ti === ti && c.vi === vi);
+  const player = (id) => PLAYERS.find((p) => p.id === id);
+
+  function paintBoard() {
+    S.cells.forEach((c) => {
+      const b = $(`.cell[data-ti="${c.ti}"][data-vi="${c.vi}"]`);
+      if (!b) return;
+      b.classList.toggle("used", c.used);
+      b.disabled = c.used || S.turn !== "me";
+    });
+    $("#board").classList.toggle("locked", S.turn !== "me");
+    PLAYERS.forEach((p) => {
+      $("#pl-" + p.id).classList.toggle("turn", S.turn === p.id);
+      const el = $("#pts-" + p.id);
+      el.textContent = S.scores[p.id];
+      el.classList.toggle("neg", S.scores[p.id] < 0);
+    });
+    const left = S.cells.filter((c) => !c.used).length;
+    $("#progress").textContent = left ? `Осталось вопросов: ${left} · ход: ${player(S.turn).name === "Вы" ? "ваш" : player(S.turn).name}` : "";
+  }
+
+  function say(text, mood = "idle") {
+    const b = $("#say"); if (b) b.textContent = text;
+    const h = $("#host-blob");
+    setMood(h, mood);
+    if (mood === "happy") animate(h, "hop");
+    if (mood === "sad") animate(h, "shake");
+    if (mood !== "idle") setTimeout(() => setMood(h, "idle"), 1600);
+  }
+
+  function addScore(id, delta) {
+    S.scores[id] += delta;
+    const card = $("#pl-" + id);
+    if (card) {
+      const d = document.createElement("span");
+      d.className = "delta " + (delta >= 0 ? "up" : "down");
+      d.textContent = (delta >= 0 ? "+" : "") + delta;
+      card.appendChild(d);
+      if (!reduce) d.animate([{ transform: "translateY(4px)", opacity: 0 }, { transform: "translateY(-6px)", opacity: 1, offset: 0.3 }, { transform: "translateY(-14px)", opacity: 0 }], { duration: 1300 }).onfinish = () => d.remove();
+      else setTimeout(() => d.remove(), 1300);
+    }
+    paintBoard();
+  }
+
+  // ------------------------------------------------------------------ bots choose a cell
+  async function botTurn() {
+    const bot = player(S.turn);
+    if (!bot || !bot.bot) return;
+    S.busy = true;
+    say(`${bot.name} выбирает…`, "think");
+    setMood($("#av-" + bot.id), "think");
+    await sleep(1100);
+    const free = S.cells.filter((c) => !c.used);
+    const c = bot.pickHigh ? free.sort((a, b) => b.value - a.value)[0] : pick(free);
+    const b = $(`.cell[data-ti="${c.ti}"][data-vi="${c.vi}"]`);
+    b.classList.add("pick");
+    say(`${bot.name}: «${THEMES[c.ti].name} за ${c.value}»`);
+    await sleep(900);
+    b.classList.remove("pick");
+    S.busy = false;
+    openCell(c, bot.id);
+  }
+
+  function nextTurn() {
+    paintBoard();
+    if (S.cells.every((c) => c.used)) return startFinal();
+    if (S.turn === "me") { say(pick(["Ваш ход! Выбирайте клетку.", "Табло ваше.", "Выбирайте тему!"])); }
+    else botTurn();
+  }
+
+  // ------------------------------------------------------------------ opening a cell
+  async function openCell(cell, chooser) {
+    cell.used = true;
+    paintBoard();
+    const Q = THEMES[cell.ti].qs[cell.vi];
+    sfx.open();
+    if (cell.special) {
+      say(`Ставка! Отвечает только ${chooser === "me" ? "тот, кто выбрал — то есть вы" : player(chooser).name}.`, "wow");
+      animate($("#host-blob"), "hop");
+      await sleep(700);
+      const max = Math.max(S.scores[chooser], 500);
+      let wager;
+      if (chooser === "me") wager = await askWager(`Ставка · ${THEMES[cell.ti].name}`, max, 100);
+      else {
+        const b = player(chooser);
+        wager = Math.max(100, Math.round((max * rnd(0.3, 1) * b.risk) / 100) * 100);
+        say(`${b.name} ставит ${wager}.`, "think");
+        await sleep(1100);
+      }
+      return question({ cell, Q, value: wager, only: chooser, label: `Ставка · ${wager}` });
+    }
+    question({ cell, Q, value: cell.value, only: null, label: `${THEMES[cell.ti].name} · ${cell.value}` });
+  }
+
+  // ------------------------------------------------------------------ a question round
+  function question({ cell, Q, value, only, label }) {
+    const eligible = only ? [only] : PLAYERS.map((p) => p.id);
+    const locked = new Set();
+    let open = true, pending = false, t0 = performance.now(), raf, timers = [];
+
+    const wrap = document.createElement("div");
+    wrap.className = "sheet-wrap";
+    wrap.innerHTML = `
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Вопрос">
+        <div class="q-head"><span class="tag ${only ? "lime" : ""}">${label}</span><span class="rivals" id="rv"></span></div>
+        <p class="q-text">${Q.q}</p>
+        <div class="timer"><i id="bar"></i></div>
+        <div class="opts">${Q.a.map((a, i) => `<button class="opt" type="button" data-i="${i}">${a}</button>`).join("")}</div>
+        <div class="status" id="st">${only && only !== "me" ? `Отвечает ${player(only).name}…` : only === "me" ? "Отвечаете только вы." : "Отвечайте быстрее соперников!"}</div>
+      </div>`;
+    document.body.appendChild(wrap);
+    const rv = $("#rv", wrap), st = $("#st", wrap), bar = $("#bar", wrap);
+    const optBtns = [...wrap.querySelectorAll(".opt")];
+    rv.innerHTML = PLAYERS.filter((p) => p.bot && eligible.includes(p.id)).map((p) => `<span class="rival" id="rv-${p.id}">${blob(p.color, 22, "rb-" + p.id)}<span>думает</span></span>`).join("");
+    PLAYERS.filter((p) => p.bot).forEach((p) => setMood($("#rb-" + p.id, wrap), "think"));
+    if (!eligible.includes("me")) optBtns.forEach((b) => (b.disabled = true));
+    optBtns[0].focus({ preventScroll: true });
+
+    function tickBar(now) {
+      const k = Math.max(0, 1 - (now - t0) / Q_TIME);
+      bar.style.transform = `scaleX(${k})`;
+      bar.style.background = k < 0.25 ? "var(--bad)" : "var(--lime)";
+      if (k <= 0) return finish(null);
+      if (open) raf = requestAnimationFrame(tickBar);
+    }
+    raf = requestAnimationFrame(tickBar);
+
+    // Bots buzz in at their own pace
+    PLAYERS.filter((p) => p.bot && eligible.includes(p.id)).forEach((b) => {
+      const at = only ? rnd(2200, 4200) : rnd(b.buzz[0], b.buzz[1]) * (1 + cell.vi * 0.12);
+      timers.push(setTimeout(() => botAnswer(b), at));
+    });
+
+    async function botAnswer(b) {
+      if (!open || locked.has(b.id)) return;
+      if (pending) { timers.push(setTimeout(() => botAnswer(b), 700)); return; }
+      pending = true;
+      sfx.buzz();
+      const chip = $("#rv-" + b.id, wrap);
+      if (chip) { chip.classList.add("hot"); chip.querySelector("span:last-child").textContent = "жмёт!"; }
+      setMood($("#rb-" + b.id, wrap), "wow");
+      st.textContent = `${b.name} нажал кнопку…`;
+      optBtns.forEach((x) => (x.disabled = true));
+      await sleep(850);
+      const acc = b.acc - cell.vi * 0.1;
+      const wrongs = [0, 1, 2, 3].filter((i) => i !== Q.ok && !optBtns[i].classList.contains("wrong"));
+      const idx = Math.random() < acc ? Q.ok : pick(wrongs);
+      pending = false;
+      resolve(b.id, idx);
+    }
+
+    optBtns.forEach((btn) => btn.addEventListener("click", () => {
+      if (!open || pending || locked.has("me") || !eligible.includes("me")) return;
+      resolve("me", +btn.dataset.i);
+    }));
+
+    function resolve(id, idx) {
+      if (!open) return;
+      const p = player(id), btn = optBtns[idx];
+      const tagEl = document.createElement("span");
+      tagEl.className = "by"; tagEl.textContent = p.name; tagEl.style.background = p.hex;
+      btn.appendChild(tagEl);
+      if (idx === Q.ok) {
+        btn.classList.add("right");
+        sfx.right();
+        addScore(id, value);
+        if (id === "me") { S.rightCount++; S.log.push("right"); const r = btn.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top); }
+        animate($("#av-" + id), "hop"); setMood($("#av-" + id), "happy"); setTimeout(() => setMood($("#av-" + id), "idle"), 1500);
+        st.textContent = id === "me" ? `Верно! +${value}` : `${p.name} отвечает верно: +${value}`;
+        S.turn = id;
+        return finish(id);
+      }
+      btn.classList.add("wrong");
+      sfx.wrong();
+      addScore(id, -value);
+      if (id === "me") S.log.push("wrong");
+      animate($("#av-" + id), "shake"); setMood($("#av-" + id), "sad"); setTimeout(() => setMood($("#av-" + id), "idle"), 1500);
+      locked.add(id);
+      const chip = $("#rv-" + id, wrap);
+      if (chip) { chip.querySelector("span:last-child").textContent = "мимо"; setMood($("#rb-" + id, wrap), "sad"); }
+      const left = eligible.filter((e) => !locked.has(e));
+      if (!left.length) return finish(null);
+      st.textContent = `${p.name} ошибся (−${value}). Остальные ещё могут ответить.`;
+      optBtns.forEach((x) => (x.disabled = x.classList.contains("wrong") || !left.includes("me")));
+    }
+
+    async function finish(winner) {
+      if (!open) return;
+      open = false;
+      cancelAnimationFrame(raf);
+      timers.forEach(clearTimeout);
+      optBtns.forEach((x) => (x.disabled = true));
+      if (!winner) {
+        optBtns[Q.ok].classList.add("right");
+        if (eligible.includes("me") && !locked.has("me")) S.log.push("skip");
+        st.textContent = `Правильный ответ: ${Q.a[Q.ok]}.`;
+      }
+      if (eligible.includes("me")) S.answered++;
+      await sleep(winner ? 1500 : 2100);
+      wrap.remove();
+      if (winner === "me") say(pick(["Красиво!", "Вот это знания!", "Есть! Очки ваши."]), "happy");
+      else if (winner) say(`${player(winner).name} забирает очки и выбирает дальше.`, "sad");
+      else say("Никто не угадал. Ход остаётся у того, кто выбирал.", "idle");
+      await sleep(900);
+      nextTurn();
+    }
+  }
+
+  // ------------------------------------------------------------------ wager sheet
+  function askWager(title, max, min) {
+    return new Promise((done) => {
+      const wrap = document.createElement("div");
+      wrap.className = "sheet-wrap";
+      const start = Math.min(max, Math.max(min, Math.round(max / 2 / 100) * 100));
+      wrap.innerHTML = `
+        <div class="sheet" role="dialog" aria-modal="true" aria-label="Ставка">
+          <div class="q-head"><span class="tag lime">${title}</span></div>
+          <p class="q-text">Сколько ставите на свой ответ?</p>
+          <div class="wager">
+            <output id="wv">${start}</output>
+            <input type="range" id="wr" min="${min}" max="${max}" step="100" value="${start}" aria-label="Размер ставки">
+            <div class="chips">
+              <button class="chip" type="button" data-v="${min}">Минимум</button>
+              <button class="chip" type="button" data-v="${Math.round(max / 2 / 100) * 100 || min}">Половина</button>
+              <button class="chip" type="button" data-v="${max}">Ва-банк · ${max}</button>
+            </div>
+          </div>
+          <button class="btn" id="wok" type="button">Ставлю</button>
+        </div>`;
+      document.body.appendChild(wrap);
+      const r = $("#wr", wrap), out = $("#wv", wrap);
+      r.addEventListener("input", () => { out.textContent = r.value; sfx.tap(); });
+      wrap.querySelectorAll(".chip").forEach((c) => c.addEventListener("click", () => { r.value = c.dataset.v; out.textContent = r.value; sfx.tap(); }));
+      $("#wok", wrap).addEventListener("click", () => { sfx.open(); wrap.remove(); done(+r.value); });
+      r.focus();
+    });
+  }
+
+  // ------------------------------------------------------------------ final round
+  async function startFinal() {
+    say("Все клетки открыты. Финал! Каждый ставит часть своих очков на один вопрос.", "wow");
+    animate($("#host-blob"), "hop");
+    await sleep(1400);
+    const myMax = Math.max(0, S.scores.me);
+    const myWager = myMax > 0 ? await askWager(`Финал · ${FINAL.theme}`, myMax, 0) : 0;
+    const botW = {};
+    PLAYERS.filter((p) => p.bot).forEach((b) => {
+      const s = Math.max(0, S.scores[b.id]);
+      const behind = S.scores.me > S.scores[b.id];
+      botW[b.id] = Math.round((s * (behind ? rnd(0.7, 1) : rnd(0.2, 0.6) * b.risk)) / 100) * 100;
+    });
+
+    const wrap = document.createElement("div");
+    wrap.className = "sheet-wrap";
+    wrap.innerHTML = `
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Финальный вопрос">
+        <div class="q-head"><span class="tag lime">Финал · ${FINAL.theme}</span><span class="tag">ваша ставка ${myWager}</span></div>
+        <p class="q-text">${FINAL.q}</p>
+        <div class="timer"><i id="fbar"></i></div>
+        <div class="opts">${FINAL.a.map((a, i) => `<button class="opt" type="button" data-i="${i}">${a}</button>`).join("")}</div>
+        <div class="status" id="fst">Соперники уже ответили. Ваш выбор?</div>
+        <div class="final-rows" id="frows" hidden></div>
+        <button class="btn" id="fdone" type="button" hidden>Итоги</button>
+      </div>`;
+    document.body.appendChild(wrap);
+    const opts = [...wrap.querySelectorAll(".opt")], bar = $("#fbar", wrap);
+    let open = true, t0 = performance.now();
+    const loop = (now) => {
+      const k = Math.max(0, 1 - (now - t0) / 20000);
+      bar.style.transform = `scaleX(${k})`;
+      if (k <= 0) return reveal(null);
+      if (open) requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+    opts.forEach((b) => b.addEventListener("click", () => reveal(+b.dataset.i)));
+
+    async function reveal(myIdx) {
+      if (!open) return;
+      open = false;
+      opts.forEach((b) => (b.disabled = true));
+      if (myIdx !== null) opts[myIdx].classList.add(myIdx === FINAL.ok ? "right" : "wrong");
+      opts[FINAL.ok].classList.add("right");
+      const results = [{ id: "me", ok: myIdx === FINAL.ok, w: myWager }];
+      PLAYERS.filter((p) => p.bot).forEach((b) => results.push({ id: b.id, ok: Math.random() < b.acc - 0.1, w: botW[b.id] }));
+      S.log.push(myIdx === FINAL.ok ? "right" : myIdx === null ? "skip" : "wrong");
+      if (myIdx === FINAL.ok) S.rightCount++;
+      S.answered++;
+      const rows = $("#frows", wrap);
+      rows.hidden = false;
+      $("#fst", wrap).textContent = `Правильный ответ: ${FINAL.a[FINAL.ok]} — полёт Юрия Гагарина.`;
+      for (const r of results) {
+        await sleep(650);
+        const p = player(r.id);
+        const delta = r.ok ? r.w : -r.w;
+        rows.insertAdjacentHTML("beforeend", `<div class="final-row">${blob(p.color, 26)}<span class="grow">${p.name} · ставка ${r.w}</span><span class="mark" style="color:${r.ok ? "var(--good)" : "var(--bad)"}">${r.ok ? "+" : "−"}${r.w}</span></div>`);
+        (r.ok ? sfx.right : sfx.wrong)();
+        addScore(r.id, delta);
+      }
+      const done = $("#fdone", wrap);
+      done.hidden = false; done.focus();
+      done.addEventListener("click", () => { wrap.remove(); renderEnd(); });
+    }
+  }
+
+  // ------------------------------------------------------------------ end screen
+  function renderEnd() {
+    const ranking = PLAYERS.map((p) => ({ ...p, pts: S.scores[p.id] })).sort((a, b) => b.pts - a.pts);
+    const place = ranking.findIndex((p) => p.id === "me") + 1;
+    const best = Math.max(+(store.get("tablo:best") || 0), S.scores.me);
+    store.set("tablo:best", String(best));
+    const acc = S.answered ? Math.round((S.rightCount / S.answered) * 100) : 0;
+    const titles = ["Победа!", "Второе место", "Третье место"];
+    const lines = ["Вы обыграли и Умника, и Торопыгу. Настоящий эрудит.", "Почти! Ещё пара верных ответов — и табло ваше.", "Бывает. Реванш?"];
+    screen.innerHTML = `
+      <section class="start" style="justify-content:flex-start">
+        ${blob("var(--lime)", 96, "host-blob")}
+        <h1>${titles[place - 1]}</h1>
+        <p>${lines[place - 1]}</p>
+        <div class="podium" style="width:100%;max-width:420px">
+          ${ranking.map((p, i) => `<div class="place ${p.id === "me" ? "me" : ""}"><span class="rank">${i + 1}</span>${blob(p.color, 30)}<span class="grow">${p.name}</span><span class="pts">${p.pts}</span></div>`).join("")}
+        </div>
+        <div class="stats" style="width:100%;max-width:420px">
+          <div class="stat"><b>${S.rightCount}/${S.answered}</b><span>верных</span></div>
+          <div class="stat"><b>${acc}%</b><span>точность</span></div>
+          <div class="stat"><b>${best}</b><span>рекорд</span></div>
+        </div>
+        <div class="row" style="width:100%;max-width:420px">
+          <button class="btn ghost" id="share" type="button">Поделиться</button>
+          <button class="btn" id="again" type="button">Реванш</button>
+        </div>
+      </section>`;
+    const host = $("#host-blob");
+    if (place === 1) { setMood(host, "happy"); animate(host, "hop"); sfx.win(); const r = host.getBoundingClientRect(); confetti(r.left + r.width / 2, r.top + 20); }
+    else setMood(host, place === 2 ? "idle" : "sad");
+    $("#again").addEventListener("click", () => { sfx.open(); newGame(); renderGame(); say("Реванш! Вы снова начинаете.", "happy"); });
+    $("#share").addEventListener("click", async () => {
+      const grid = S.log.map((r) => (r === "right" ? "🟩" : r === "wrong" ? "🟥" : "⬜")).join("");
+      const text = `tag.bet · Табло\n${place === 1 ? "🏆 Победа" : place + "-е место"} · ${S.scores.me} очков\n${grid}\nСыграй: tag.bet`;
+      try { await navigator.clipboard.writeText(text); toast("Скопировано — отправьте друзьям"); }
+      catch { toast(text.replace(/\n/g, " · ")); }
+    });
+  }
+
+  renderStart();
+})();
+</script>
