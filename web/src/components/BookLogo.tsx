@@ -1,18 +1,29 @@
-import { existsSync } from "node:fs";
+import { statSync } from "node:fs";
 import path from "node:path";
 import { getBookmaker } from "@/lib/bookmakers";
 
 const EXTS = ["svg", "png", "webp"] as const;
 const found = new Map<string, string | null>();
 
-/** Official logo dropped into public/bookmakers/<slug>.<ext>, if any (checked once per slug). */
+/**
+ * Official logo dropped into public/bookmakers/<slug>.<ext>, if any. Cached in
+ * production only, so files added while `npm run dev` runs show up on reload.
+ * Tiny files are ignored: they are usually an error page, not an image.
+ */
 function logoFile(slug: string): string | null {
-  if (!found.has(slug)) {
-    const dir = path.join(process.cwd(), "public", "bookmakers");
-    const ext = EXTS.find((e) => existsSync(path.join(dir, `${slug}.${e}`)));
-    found.set(slug, ext ? `/bookmakers/${slug}.${ext}` : null);
-  }
-  return found.get(slug)!;
+  const cache = process.env.NODE_ENV === "production";
+  if (cache && found.has(slug)) return found.get(slug)!;
+  const dir = path.join(process.cwd(), "public", "bookmakers");
+  const ext = EXTS.find((e) => {
+    try {
+      return statSync(path.join(dir, `${slug}.${e}`)).size > 400;
+    } catch {
+      return false;
+    }
+  });
+  const src = ext ? `/bookmakers/${slug}.${ext}` : null;
+  if (cache) found.set(slug, src);
+  return src;
 }
 
 export function BookLogo({ slug, size = "md" }: { slug: string; size?: "sm" | "md" | "lg" }) {
