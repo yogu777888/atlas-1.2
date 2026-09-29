@@ -15,7 +15,12 @@ export type SsGame = {
   season: { year: number; league: { id: number; name: string; country: { code: string; name: string } | null } | null };
   roundName: string | null;
   odds: SsBet[] | null;
+  /** Score after extra time, before penalties (ended games) */
+  homeResult?: number | string | null;
+  awayResult?: number | string | null;
 };
+
+export type SsInjury = { teamId: number | string; player: { id?: number; name?: string | null } | null; reason: string | null };
 
 export type SsBookmakerOdds = { bookmakerId: number; bookmakerName: string; odds: SsBet[] };
 

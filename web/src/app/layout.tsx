@@ -12,7 +12,7 @@ const mono = Geist_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-geis
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: `${site.name} — сравнение коэффициентов букмекеров`, template: `%s · ${site.name}` },
+  title: { default: `${site.name} — прогнозы на футбол по цифрам`, template: `%s · ${site.name}` },
   description: site.description,
   applicationName: site.name,
   openGraph: { type: "website", siteName: site.name, url: site.url, locale: "ru_RU" },

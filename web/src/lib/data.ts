@@ -3,6 +3,7 @@ import { consensus, OUTCOMES, type Match, type Odds1x2 } from "./matches";
 import { mockEvents } from "./odds/mock";
 import { findPariLine, pariLines } from "./pari";
 import { teamRu } from "./teams";
+import { goalMarkets, headToHead, missingPlayers, teamForm, type FormGame, type GoalMarkets, type H2HGame, type Missing } from "./forecast";
 import { sstats } from "./sstats/client";
 import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
 
@@ -70,6 +71,8 @@ async function liveMatches(): Promise<Match[]> {
       id: `ss-${g.id}`,
       sstatsId: g.id,
       league,
+      homeId: Number(g.homeTeam.id),
+      awayId: Number(g.awayTeam.id),
       home: teamRu(g.homeTeam.name),
       away: teamRu(g.awayTeam.name),
       commenceTime: new Date(start).toISOString(),
@@ -144,16 +147,26 @@ export type MatchDetail = {
   bestWorldMargin: number | null;
   /** Rating-based win chances; `draw` is null when the model doesn't price a draw */
   glicko: { home: number; draw: number | null; away: number; homeXg: number | null; awayXg: number | null } | null;
+  goals: GoalMarkets;
+  form: { home: FormGame[]; away: FormGame[] };
+  h2h: H2HGame[];
+  missing: Missing[];
 };
 
 /** Extra data for the match page: per-book world market and Glicko rating forecast. */
 export async function getMatchDetail(m: Match): Promise<MatchDetail> {
+  const none = { goals: { over25: null, btts: null, books: 0 }, form: { home: [], away: [] }, h2h: [], missing: [] };
   if (!m.sstatsId) {
-    return { worldBooks: 0, world: m.fair, bestWorldMargin: null, glicko: null };
+    return { worldBooks: 0, world: m.fair, bestWorldMargin: null, glicko: null, ...(lastSource === "demo" ? demoDetail(m) : none) };
   }
-  const [books, glicko] = await Promise.all([
+  const { homeId, awayId } = m;
+  const [books, glicko, homeForm, awayForm, h2h, missing] = await Promise.all([
     sstats<SsBookmakerOdds[]>(`/Odds/${m.sstatsId}`, {}, 1800).catch(() => [] as SsBookmakerOdds[]),
     sstats<{ glicko: SsGlicko }>(`/Games/glicko/${m.sstatsId}`, {}, 21_600).catch(() => null),
+    homeId ? teamForm(homeId) : Promise.resolve([]),
+    awayId ? teamForm(awayId) : Promise.resolve([]),
+    homeId && awayId ? headToHead(homeId, awayId) : Promise.resolve([]),
+    homeId ? missingPlayers(m.sstatsId, homeId) : Promise.resolve([]),
   ]);
   const prices = books.map((b) => winner(b.odds)).filter((x): x is Odds1x2 => x !== null);
   const margins = prices.map((p) => OUTCOMES.reduce((s, o) => s + 1 / p[o], 0) - 1);
@@ -169,5 +182,26 @@ export async function getMatchDetail(m: Match): Promise<MatchDetail> {
       hw !== null && aw !== null
         ? { home: hw, away: aw, draw: hw + aw < 0.97 ? 1 - hw - aw : null, homeXg: g?.homeXg ?? null, awayXg: g?.awayXg ?? null }
         : null,
+    goals: goalMarkets(books),
+    form: { home: homeForm, away: awayForm },
+    h2h,
+    missing,
+  };
+}
+
+/** Illustrative forecast extras for demo mode (the site is labelled "ДЕМО" then). */
+function demoDetail(m: Match): Pick<MatchDetail, "goals" | "form" | "h2h" | "missing"> {
+  const seed = [...m.id].reduce((s, c) => s + c.charCodeAt(0), 0);
+  const day = 86_400_000;
+  const mk = (k: number, opp: string[]) =>
+    opp.map((o, i) => {
+      const gf = (seed + k + i * 3) % 4, ga = (seed + k * 2 + i) % 3;
+      return { date: new Date(Date.now() - (i + 1) * 7 * day).toISOString(), opponent: o, home: i % 2 === 0, gf, ga, result: (gf > ga ? "W" : gf < ga ? "L" : "D") as "W" | "D" | "L" };
+    });
+  return {
+    goals: { over25: 0.4 + (seed % 25) / 100, btts: 0.38 + (seed % 30) / 100, books: 12 },
+    form: { home: mk(1, ["Ростов", "Рубин", "ЦСКА", "Сочи", "Ахмат"]), away: mk(2, ["Локомотив", "Факел", "Динамо", "Акрон", "Балтика"]) },
+    h2h: [0, 1, 2].map((i) => ({ date: new Date(Date.now() - (i + 1) * 180 * day).toISOString(), home: i % 2 ? m.away : m.home, away: i % 2 ? m.home : m.away, hg: (seed + i) % 3, ag: (seed + i * 2) % 2 })),
+    missing: [{ team: "home", player: "Игрок А. (пример)", reason: "травма" }, { team: "away", player: "Игрок Б. (пример)", reason: "дисквалификация" }],
   };
 }

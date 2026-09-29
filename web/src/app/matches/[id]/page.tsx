@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FlipText } from "@/components/FlipText";
+import { FormColumn, HeadToHead, MissingList, Verdict } from "@/components/ForecastBlocks";
+import { pointsPerGame } from "@/lib/forecast";
 import { LocalTime } from "@/components/LocalTime";
 import { OutboundButton } from "@/components/OutboundButton";
 import { ProbBar } from "@/components/ProbBar";
@@ -21,8 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!m) return { title: "Матч не найден" };
   const chances = m.fair ? ` Шансы: ${m.home} ${pct(m.fair.home)}, ничья ${pct(m.fair.draw)}, ${m.away} ${pct(m.fair.away)}.` : "";
   return {
-    title: `${m.home} — ${m.away}: прогноз, шансы и коэффициенты на ${dayRu(m.commenceTime)}`,
-    description: `${m.league.label}, ${dayRu(m.commenceTime)}.${chances} Коэффициенты букмекера и где они выше справедливых.`,
+    title: `Прогноз на матч ${m.home} — ${m.away} ${dayRu(m.commenceTime)}: шансы, форма, статистика`,
+    description: `${m.league.label}, ${dayRu(m.commenceTime)}.${chances} Форма команд, личные встречи, кто не сыграет и коэффициенты.`,
     alternates: { canonical: `/matches/${m.id}` },
   };
 }
@@ -36,19 +39,31 @@ export default async function MatchPage({ params }: Props) {
 
   return (
     <div className="container-x pt-12">
-      <Link href={`/matches?league=${m.league.key}`} className="text-sm text-muted hover:text-fg">
-        ← {m.league.label}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Прогнозы", href: "/matches" },
+          { label: `${m.home} — ${m.away}`, href: `/matches/${m.id}` },
+        ]}
+      />
 
       <header className="mt-6">
         <p className="text-sm text-subtle">
           {m.league.label} · <LocalTime iso={m.commenceTime} />
         </p>
         <h1 className="mt-2 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-          {m.home} <span className="text-subtle">—</span> {m.away}
+          Прогноз на матч {m.home} <span className="text-subtle">—</span> {m.away}
         </h1>
-        {verdict({ ...m, fair }) && <p className="mt-4 text-lg text-muted">{verdict({ ...m, fair })}</p>}
+        <p className="mt-3 max-w-2xl text-muted">Вывод по цифрам рынка и статистике, а не мнение эксперта. Это оценка шансов, а не гарантия результата.</p>
       </header>
+
+      {fair && (
+        <section className="mt-8" aria-labelledby="verdict">
+          <h2 id="verdict" className="sr-only">
+            Наш вывод
+          </h2>
+          <Verdict items={picks(m, fair, d)} />
+        </section>
+      )}
 
       <div className="mt-10 grid gap-4 lg:grid-cols-2">
         {/* Market chances */}
@@ -109,6 +124,36 @@ export default async function MatchPage({ params }: Props) {
           </div>
         </section>
       </div>
+
+      {(d.form.home.length > 0 || d.form.away.length > 0) && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold tracking-tight">Форма команд</h2>
+          <p className="mt-1 text-sm text-muted">Последние матчи во всех турнирах.</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <FormColumn team={m.home} games={d.form.home} />
+            <FormColumn team={m.away} games={d.form.away} />
+          </div>
+        </section>
+      )}
+
+      {d.h2h.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold tracking-tight">Личные встречи</h2>
+          <div className="mt-5">
+            <HeadToHead games={d.h2h} home={m.home} />
+          </div>
+        </section>
+      )}
+
+      {d.missing.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold tracking-tight">Кто не сыграет</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <MissingList team={m.home} list={d.missing.filter((p) => p.team === "home")} />
+            <MissingList team={m.away} list={d.missing.filter((p) => p.team === "away")} />
+          </div>
+        </section>
+      )}
 
       {d.glicko && (
         <section className="card mt-4 p-6">
@@ -209,6 +254,11 @@ function timeRu(iso: string): string {
  */
 function summary(m: Match, fair: Probs1x2 | null, d: MatchDetail): string[] {
   const out = [`${m.league.label}. Матч начнётся ${dayRu(m.commenceTime)} в ${timeRu(m.commenceTime)} по Москве.`];
+  const hp = pointsPerGame(d.form.home), ap = pointsPerGame(d.form.away);
+  if (hp !== null && ap !== null) {
+    const f = (x: number) => x.toFixed(1).replace(".", ",");
+    out.push(`В последних матчах ${m.home} набирает ${f(hp)} очка за игру, ${m.away} — ${f(ap)}.${Math.abs(hp - ap) >= 0.8 ? ` По форме заметно сильнее ${hp > ap ? m.home : m.away}.` : ""}`);
+  }
   if (!fair) {
     out.push("Мировой рынок по этому матчу ещё не сформировался — шансы появятся, когда букмекеры откроют линию.");
     return out;
@@ -234,4 +284,37 @@ function summary(m: Match, fair: Probs1x2 | null, d: MatchDetail): string[] {
     );
   }
   return out;
+}
+
+/** The three headline calls: result, goals, both teams to score. Wording stays probabilistic. */
+function picks(m: Match, fair: Probs1x2, d: MatchDetail) {
+  const p = (x: number) => pct(x);
+  const max = Math.max(fair.home, fair.draw, fair.away);
+  const fav = fair.home === max ? m.home : fair.away === max ? m.away : null;
+  const items = [
+    max < 0.4 || !fav
+      ? { label: "Исход", value: p(max), text: "Равный матч: у рынка нет явного фаворита." }
+      : { label: "Исход", value: p(max), text: `Фаворит — ${fav}. Такой шанс на победу даёт рынок.` },
+  ];
+  const o = d.goals.over25;
+  if (o !== null) {
+    items.push(
+      o >= 0.55
+        ? { label: "Голы", value: p(o), text: "Скорее больше 2,5 гола: результативный матч." }
+        : o <= 0.45
+          ? { label: "Голы", value: p(1 - o), text: "Скорее меньше 2,5 гола: закрытая игра." }
+          : { label: "Голы", value: "50/50", text: "Больше или меньше 2,5 гола — примерно поровну." },
+    );
+  }
+  const b = d.goals.btts;
+  if (b !== null) {
+    items.push(
+      b >= 0.55
+        ? { label: "Обе забьют", value: p(b), text: "Скорее забьют обе команды." }
+        : b <= 0.45
+          ? { label: "Обе забьют", value: p(1 - b), text: "Скорее хотя бы одна команда останется без гола." }
+          : { label: "Обе забьют", value: "50/50", text: "Забьют ли обе — поровну." },
+    );
+  }
+  return items;
 }

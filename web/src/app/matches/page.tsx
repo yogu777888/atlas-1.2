@@ -13,8 +13,8 @@ type Props = { searchParams: Promise<{ league?: string; value?: string }> };
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const l = getLeague((await searchParams).league);
   return {
-    title: l ? `${l.label}: разбор матчей и коэффициенты` : "Матчи: разбор и коэффициенты",
-    description: `Шансы команд по мировому рынку и коэффициенты легального букмекера${l ? " — " + l.label : ""}. Видно, где коэффициент выше справедливого.`,
+    title: l ? `Прогнозы на ${l.label}: шансы, форма, статистика` : "Прогнозы на футбол: шансы, форма и статистика",
+    description: `Прогнозы на футбол${l ? " — " + l.label : ""}: шансы по мировому рынку без маржи, форма команд, личные встречи и коэффициенты.`,
     alternates: { canonical: l ? `/matches?league=${l.key}` : "/matches" },
   };
 }
@@ -29,10 +29,10 @@ export default async function MatchesPage({ searchParams }: Props) {
   return (
     <div className="container-x pt-14">
       <p className="eyebrow">{dataSource() === "live" ? "Актуальные данные" : "Демо-данные"} · футбол</p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{l ? l.label : valueOnly ? "Выгодные коэффициенты" : "Ближайшие матчи"}</h1>
+      <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{l ? `Прогнозы: ${l.label}` : valueOnly ? "Выгодные коэффициенты" : "Прогнозы на матчи"}</h1>
       <p className="mt-3 max-w-2xl text-muted">
-        Шансы считаем по коэффициентам мировых букмекеров, очищенным от маржи. Рядом — коэффициенты легального букмекера: жёлтым отмечены те,
-        что выше справедливой цены.
+        Откройте матч, чтобы увидеть полный прогноз: шансы по рынку, голы, форму команд, личные встречи и кто не сыграет. В таблице
+        справа коэффициенты легального букмекера, жёлтым отмечены те, что выше справедливой цены.
       </p>
       <div className="mt-8 mb-5">
         <LeagueTabs active={valueOnly ? "value" : l?.key} />

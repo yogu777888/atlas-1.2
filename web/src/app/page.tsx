@@ -60,17 +60,17 @@ export default async function Home() {
               {status} →
             </Link>
             <h1 className="text-gradient text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              Честные шансы
+              Прогнозы на футбол
               <br />
-              на каждый матч.
+              по цифрам.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted">
-              Считаем реальную вероятность исхода по коэффициентам мирового рынка без маржи и показываем, где легальный букмекер
-              платит больше честной цены.
+              Для каждого матча — шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и
+              обещаний выигрыша.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/matches" className="btn-primary h-11 px-6">
-                Смотреть матчи
+                Смотреть прогнозы
               </Link>
               <Link href="/bookmakers" className="btn-ghost h-11 px-6">
                 Рейтинг букмекеров
@@ -101,7 +101,7 @@ export default async function Home() {
 
       {/* Matches */}
       <section className="container-x pt-16">
-        <SectionHeading eyebrow="Ближайшие матчи" title="Шансы и коэффициенты рядом." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты легального букмекера; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
+        <SectionHeading eyebrow="Прогнозы" title="Ближайшие матчи по цифрам." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты легального букмекера; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
         <MatchTable matches={[...matches.filter((m) => m.league.key !== "other"), ...matches.filter((m) => m.league.key === "other")].slice(0, 8)} />
       </section>
 
@@ -228,7 +228,7 @@ function HeroCard({ m }: { m: Match }) {
             </div>
           </div>
         )}
-        <span className="mt-6 inline-block text-sm text-accent">Полный разбор →</span>
+        <span className="mt-6 inline-block text-sm text-accent">Полный прогноз →</span>
       </Link>
     </div>
   );

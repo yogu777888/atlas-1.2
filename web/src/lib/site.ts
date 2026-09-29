@@ -1,8 +1,8 @@
 export const site = {
   name: "tag.bet",
-  tagline: "Честные шансы на каждый матч.",
+  tagline: "Прогнозы на футбол по цифрам.",
   description:
-    "tag.bet показывает реальные шансы команд по мировому рынку, сравнивает их с коэффициентами легальных букмекеров и собирает бонусы с понятными условиями.",
+    "tag.bet — прогнозы на футбол по цифрам: шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и обещаний выигрыша.",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://tag.bet").replace(/\/$/, ""),
   supportEmail: "hello@tag.bet",
   /** Required by Russian advertising law next to gambling content */
@@ -10,7 +10,7 @@ export const site = {
 } as const;
 
 export const nav = [
-  { href: "/matches", label: "Матчи" },
+  { href: "/matches", label: "Прогнозы" },
   { href: "/bookmakers", label: "Букмекеры" },
   { href: "/bonuses", label: "Бонусы" },
   { href: "/articles", label: "Статьи" },

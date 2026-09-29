@@ -9,6 +9,9 @@ export type Match = {
   /** URL id: "ss-<sstats id>" for live data, a slug for demo data */
   id: string;
   sstatsId: number | null;
+  /** sstats team ids, for form and head-to-head (live data only) */
+  homeId?: number;
+  awayId?: number;
   league: League;
   home: string;
   away: string;
