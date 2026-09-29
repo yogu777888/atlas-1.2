@@ -18,7 +18,7 @@ export function Calibration({ bins, className = "" }: { bins: CalibrationBin[]; 
           <text x={L - 5} y={y(t) + 3} textAnchor="end" className="num fill-subtle text-[10px]">
             {t * 100}%
           </text>
-          <text x={x(t)} y={H - 6} textAnchor="middle" className="num fill-subtle text-[10px]">
+          <text x={x(t)} y={H - 6} textAnchor={t === 1 ? "end" : t === 0 ? "start" : "middle"} className="num fill-subtle text-[10px]">
             {t * 100}%
           </text>
         </g>
