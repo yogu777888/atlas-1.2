@@ -1,0 +1,187 @@
+<title>tag.bet стадион</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800&family=Big+Shoulders+Display:wght@700;800;900&display=swap">
+<style>
+/* Layout: floodlit pitch at night. One giant scoreboard is the hero; the rest of the page reads like the board's smaller panels. */
+:root{
+  --night:#0c110e;      /* page: black with a pitch-green cast */
+  --panel:#121a15;      /* scoreboard housing */
+  --cell:#18221b;       /* unlit LED cell */
+  --line:#223027;
+  --chalk:#eef2ea;      /* pitch-line white */
+  --muted:#93a095;
+  --dim:#5c6a60;
+  --led:#ffb020;        /* amber LED: numbers and "above fair" */
+  --led-ghost:rgba(255,176,32,.07);
+  --pitch:#3fae6a;      /* chances */
+  --ink:#1a1200;
+  --text:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --board:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--night);color:var(--chalk);font:16px/1.55 var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+.num{font-family:var(--board);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px}
+.logo{display:inline-flex;align-items:baseline;font-weight:800;font-size:26px;letter-spacing:-.055em;text-decoration:none}
+.sq{display:inline-block;width:.3em;height:.3em;margin:0 .05em 0 .07em;background:var(--led);border-radius:.05em;position:relative}
+.sq::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .02em);height:.04em;background:var(--night)}
+.nav{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.nav a{text-decoration:none}.nav a:hover{color:var(--chalk)}
+@media (max-width:760px){.nav{display:none}}
+
+/* hero copy */
+.hero{padding-block:48px 28px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px 48px;align-items:end}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+h1{margin:0;font-weight:800;font-size:clamp(38px,6vw,68px);line-height:1;letter-spacing:-.04em;text-wrap:balance}
+.lede{margin:0;color:var(--muted);font-size:17px;max-width:46ch;text-wrap:pretty}
+.lede b{color:var(--chalk);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:20px}
+.btn{font:600 15px var(--text);background:var(--led);color:var(--ink);border-radius:10px;padding:13px 22px;text-decoration:none}
+.btn:focus-visible,.link:focus-visible{outline:2px solid var(--chalk);outline-offset:3px}
+.link{font-size:15px;color:var(--muted);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--dim)}
+
+/* the scoreboard */
+.board{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 30px 60px -30px #000}
+.plate{display:inline-flex;align-items:center;gap:8px;background:var(--cell);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:13px;font-weight:600;color:var(--led)}
+.plate i{width:6px;height:6px;border-radius:50%;background:var(--led);animation:blink 1.6s steps(1) infinite}
+@keyframes blink{50%{opacity:.25}}
+.bhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;color:var(--muted);font-size:13px}
+.teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;margin:22px 4px 8px}
+.team{font-weight:800;font-size:clamp(20px,3vw,30px);letter-spacing:-.02em;text-transform:uppercase}
+.team.r{text-align:right}
+.vs{color:var(--dim);font-size:14px}
+.cells{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cell{position:relative;background:var(--cell);border:1px solid var(--line);border-radius:8px;padding:10px 12px 12px;display:grid;justify-items:center;gap:2px;min-width:0}
+.cell small{font-size:12px;color:var(--muted)}
+.big{position:relative;font-family:var(--board);font-weight:800;font-size:clamp(54px,9vw,96px);line-height:.95;color:var(--led)}
+.big::before{content:attr(data-ghost);position:absolute;inset:0;color:var(--led-ghost);z-index:0}
+.big span{position:relative;z-index:1}
+.big.dimmed{color:#d99a2b}
+.pct{font-size:.45em;margin-left:2px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin:14px 2px 18px;background:var(--cell)}
+.bar span{display:block;height:100%}
+.odds{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:8px;align-items:center}
+.odds .lab{font-size:13px;color:var(--muted);padding-right:6px}
+.o{background:var(--cell);border:1px solid var(--line);border-radius:8px;text-align:center;padding:8px 6px;font-family:var(--board);font-weight:700;font-size:28px;line-height:1}
+.o.hot{background:var(--led);color:var(--ink);border-color:var(--led)}
+.o em{display:block;font:500 11px var(--text);font-style:normal;margin-top:4px;opacity:.75}
+.foot{margin-top:14px;font-size:12px;color:var(--dim)}
+.flip{display:inline-block;animation:flip .6s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes flip{from{transform:rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.flip,.plate i{animation:none}}
+
+/* today */
+section{padding-block:56px 0}
+.sh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:18px}
+h2{margin:0;font-weight:800;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.03em}
+.sh a{font-size:14px;color:var(--muted)}
+.rows{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.row{display:grid;grid-template-columns:4.5rem minmax(0,1fr) 11rem 13rem;gap:18px;align-items:center;padding:14px 18px;border-top:1px solid var(--line);text-decoration:none}
+.row:first-child{border-top:0}
+.row:hover{background:#15201a}
+.t{font-family:var(--board);font-weight:700;font-size:22px;color:var(--muted);line-height:1}
+.t small{display:block;font:500 11px var(--text);color:var(--dim);margin-top:3px}
+.m b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m small{color:var(--dim);font-size:12px}
+.ch{display:grid;grid-template-columns:repeat(3,1fr);font-family:var(--board);font-weight:700;font-size:22px;text-align:center;color:var(--pitch)}
+.ch span:nth-child(2){color:var(--muted)}
+.po{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.po span{background:var(--cell);border:1px solid var(--line);border-radius:6px;text-align:center;padding:5px 0;font-family:var(--board);font-weight:700;font-size:19px}
+.po .hot{background:var(--led);border-color:var(--led);color:var(--ink)}
+@media (max-width:760px){
+  .row{grid-template-columns:3.6rem minmax(0,1fr);row-gap:10px}
+  .ch,.po{grid-column:2}
+}
+
+/* how to read */
+.read{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+@media (max-width:760px){.read{grid-template-columns:1fr}}
+.read div{background:var(--panel);padding:22px}
+.read .n{font-family:var(--board);font-weight:800;font-size:56px;line-height:1;color:var(--chalk)}
+.read .n.led{color:var(--led)}
+.read p{margin:8px 0 0;color:var(--muted);font-size:15px;max-width:34ch}
+.note{margin:14px 0 0;color:var(--dim);font-size:13px;max-width:70ch}
+
+/* reading list */
+.list{display:grid;gap:0;border-top:1px solid var(--line)}
+.item{display:grid;grid-template-columns:8rem minmax(0,1fr) auto;gap:20px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line);text-decoration:none}
+.item .k{font-family:var(--board);font-weight:800;font-size:36px;color:var(--led);line-height:1}
+.item b{font-weight:600;font-size:18px}
+.item span{color:var(--muted);font-size:14px}
+.item:hover b{color:var(--led)}
+@media (max-width:620px){.item{grid-template-columns:5.5rem minmax(0,1fr)}.item span{display:none}}
+
+footer{margin-top:64px;border-top:1px solid var(--line);padding-block:22px 40px;color:var(--dim);font-size:12px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#" aria-label="tag.bet">tag<span class="sq"></span>bet</a>
+    <nav class="nav"><a href="#today">Матчи</a><a href="#">Букмекеры</a><a href="#">Бонусы</a><a href="#read">Статьи</a><a href="#">Калькуляторы</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <h1>Сколько на самом деле стоит ставка.</h1>
+    </div>
+    <div>
+      <p class="lede">Переводим коэффициенты десятков букмекеров в понятные проценты. Если <b>легальный букмекер платит больше, чем стоит исход</b>, цифра на табло загорается.</p>
+      <div class="cta"><a class="btn" href="#today">Матчи на неделе</a><a class="link" href="#how">Как читать табло</a></div>
+    </div>
+  </div>
+
+  <div class="board" role="group" aria-label="Табло матча Зенит — Спартак">
+    <div class="bhead"><span class="plate"><i></i>Главный матч недели</span><span>РПЛ · суббота, 19:30 · пример</span></div>
+    <div class="teams"><span class="team">Зенит</span><span class="vs">шанс на исход</span><span class="team r">Спартак</span></div>
+    <div class="cells">
+      <div class="cell"><div class="big num" data-ghost="88"><span class="flip" style="animation-delay:.1s">50</span></div><small>победа Зенита, %</small></div>
+      <div class="cell"><div class="big num dimmed" data-ghost="88"><span class="flip" style="animation-delay:.25s">26</span></div><small>ничья, %</small></div>
+      <div class="cell"><div class="big num" data-ghost="88"><span class="flip" style="animation-delay:.4s">24</span></div><small>победа Спартака, %</small></div>
+    </div>
+    <div class="bar" aria-hidden="true"><span style="width:50%;background:var(--pitch)"></span><span style="width:26%;background:var(--dim)"></span><span style="width:24%;background:#2c7a4b"></span></div>
+    <div class="odds">
+      <span class="lab">PARI платит</span>
+      <div class="o">1.90<em>честно 2.00</em></div>
+      <div class="o">3.75<em>честно 3.85</em></div>
+      <div class="o hot">4.35<em>честно 4.17 · +4%</em></div>
+    </div>
+    <p class="foot">Шансы — среднее по мировому рынку без маржи. Жёлтым горит коэффициент, который выше честного.</p>
+  </div>
+
+  <section id="today">
+    <div class="sh"><h2>На табло на этой неделе</h2><a href="#">Все матчи</a></div>
+    <div class="rows">
+      <a class="row" href="#"><span class="t">19:30<small>сб</small></span><span class="m"><b>Зенит — Спартак</b><small>РПЛ</small></span><span class="ch"><span>50</span><span>26</span><span>24</span></span><span class="po"><span>1.90</span><span>3.75</span><span class="hot">4.35</span></span></a>
+      <a class="row" href="#"><span class="t">22:00<small>сб</small></span><span class="m"><b>Ливерпуль — Манчестер Сити</b><small>АПЛ</small></span><span class="ch"><span>40</span><span>26</span><span>34</span></span><span class="po"><span>2.35</span><span>3.59</span><span>2.76</span></span></a>
+      <a class="row" href="#"><span class="t">17:00<small>вс</small></span><span class="m"><b>Краснодар — Динамо</b><small>РПЛ</small></span><span class="ch"><span>46</span><span>27</span><span>27</span></span><span class="po"><span class="hot">2.25</span><span>3.53</span><span>3.50</span></span></a>
+      <a class="row" href="#"><span class="t">22:00<small>ср</small></span><span class="m"><b>Реал Мадрид — Бавария</b><small>Лига чемпионов</small></span><span class="ch"><span>45</span><span>25</span><span>30</span></span><span class="po"><span>2.17</span><span>3.75</span><span>3.24</span></span></a>
+    </div>
+    <p class="note">Зелёные цифры — шансы в процентах: победа хозяев, ничья, победа гостей. Справа коэффициенты PARI. Пример данных.</p>
+  </section>
+
+  <section id="how">
+    <div class="sh"><h2>Как читать табло</h2></div>
+    <div class="read">
+      <div><span class="n num">4.35</span><p>Столько PARI платит за рубль, если выиграет Спартак.</p></div>
+      <div><span class="n num">4.17</span><p>Столько стоил бы этот исход без комиссии букмекера, по мнению всего рынка.</p></div>
+      <div><span class="n num led">+4%</span><p>Разница в вашу пользу. На сотнях таких ставок она работает, в одной конкретной может и не сыграть.</p></div>
+    </div>
+    <p class="note">18+. Мы не даём прогнозов и не обещаем выигрыш. Показываем цену, а ставить или нет, решаете вы.</p>
+  </section>
+
+  <section id="read">
+    <div class="sh"><h2>Разобраться за пять минут</h2><a href="#">Все статьи</a></div>
+    <div class="list">
+      <a class="item" href="#"><span class="k num">4,2%</span><b>Маржа букмекера: что это и как её посчитать</b><span>5 мин</span></a>
+      <a class="item" href="#"><span class="k num">52,6%</span><b>Как перевести коэффициент в вероятность</b><span>4 мин</span></a>
+      <a class="item" href="#"><span class="k num">13,2%</span><b>Экспресс: почему он выгоден букмекеру</b><span>4 мин</span></a>
+    </div>
+  </section>
+
+  <footer>18+. Азартные игры могут вызывать зависимость. Играйте ответственно. tag.bet не принимает ставки.</footer>
+</div>
