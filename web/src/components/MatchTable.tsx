@@ -17,7 +17,7 @@ export function MatchTable({ matches, empty }: { matches: Match[]; empty?: strin
       <div className="hidden grid-cols-[1fr_12rem_14rem] items-center gap-6 border-b border-line px-5 py-3 text-[11px] tracking-wider text-subtle uppercase md:grid">
         <span>Матч</span>
         <span>Шансы по рынку</span>
-        <span className="text-center">PARI · П1 X П2</span>
+        <span className="text-center">Кэф · П1 X П2</span>
       </div>
       <ul className="divide-y divide-line">
         {ordered.map((m, i) => (

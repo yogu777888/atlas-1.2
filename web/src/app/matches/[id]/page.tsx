@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const chances = m.fair ? ` Шансы: ${m.home} ${pct(m.fair.home)}, ничья ${pct(m.fair.draw)}, ${m.away} ${pct(m.fair.away)}.` : "";
   return {
     title: `${m.home} — ${m.away}: прогноз, шансы и коэффициенты на ${dayRu(m.commenceTime)}`,
-    description: `${m.league.label}, ${dayRu(m.commenceTime)}.${chances} Коэффициенты PARI и где они выше справедливых.`,
+    description: `${m.league.label}, ${dayRu(m.commenceTime)}.${chances} Коэффициенты букмекера и где они выше справедливых.`,
     alternates: { canonical: `/matches/${m.id}` },
   };
 }
@@ -77,7 +77,7 @@ export default async function MatchPage({ params }: Props) {
 
         {/* PARI */}
         <section className="card p-6">
-          <h2 className="font-medium">Коэффициенты PARI</h2>
+          <h2 className="font-medium">Коэффициенты букмекера</h2>
           <p className="mt-1 text-sm text-muted">Легальный букмекер. Жёлтым — коэффициент выше справедливого.</p>
           {m.pari ? (
             <div className="mt-6 grid grid-cols-3 gap-2 text-center">
@@ -102,7 +102,7 @@ export default async function MatchPage({ params }: Props) {
               })}
             </div>
           ) : (
-            <p className="mt-6 text-sm text-subtle">PARI пока не открыл линию на этот матч.</p>
+            <p className="mt-6 text-sm text-subtle">Букмекер пока не открыл линию на этот матч.</p>
           )}
           <div className="mt-6">
             <OutboundButton b={pari} source={`match-${m.id}`} label="Сделать ставку в PARI" className="h-10 w-full" />
@@ -224,13 +224,13 @@ function summary(m: Match, fair: Probs1x2 | null, d: MatchDetail): string[] {
   }
   if (m.pari) {
     const good = OUTCOMES.filter((o) => isValue(m.pari!.odds[o], fair[o]));
-    out.push(`Маржа PARI на исход матча — ${(margin(m.pari.odds) * 100).toFixed(1).replace(".", ",")}%.`);
+    out.push(`Маржа букмекера на исход матча — ${(margin(m.pari.odds) * 100).toFixed(1).replace(".", ",")}%.`);
     out.push(
       good.length
         ? `Выше справедливой цены: ${good.map((o) => `${outcomeLabel(m, o)} по ${odds(m.pari!.odds[o])} (${(edge(m.pari!.odds[o], fair[o]) * 100).toFixed(1).replace(".", ",")}%)`).join(", ")}. Это перевес на длинной дистанции, а не гарантия результата.`
         : OUTCOMES.some((o) => isSuspect(m.pari!.odds[o], fair[o]))
-          ? "Один из коэффициентов PARI сильно расходится с рынком — скорее всего, линия устарела. Проверьте итоговый коэффициент в купоне."
-          : "Все коэффициенты PARI ниже справедливых: явно выгодной ставки на исход здесь нет.",
+          ? "Один из коэффициентов букмекера сильно расходится с рынком — скорее всего, линия устарела. Проверьте итоговый коэффициент в купоне."
+          : "Все коэффициенты легального букмекера ниже справедливых: явно выгодной ставки на исход здесь нет.",
     );
   }
   return out;

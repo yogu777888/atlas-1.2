@@ -47,7 +47,7 @@ export function Features() {
       />
       <Card
         title="Выгодный коэффициент — отмечен"
-        body="Если коэффициент PARI выше справедливого, он отмечен жёлтым флипом."
+        body="Если коэффициент легального букмекера выше справедливого, он отмечен жёлтым флипом."
         visual={
           <div className="grid w-full grid-cols-3 gap-1.5">
             <span className="odds-pill min-w-0">2.05</span>
