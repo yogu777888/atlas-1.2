@@ -53,7 +53,7 @@ export default async function Home() {
         <div className="container-x relative grid items-center gap-12 pt-14 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-20 lg:pb-20">
           <div className="animate-rise">
             <Link href="/matches" className="mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
-              <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-mono text-accent">
+              <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-medium text-accent">
                 <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
                 {dataSource() === "live" ? "LIVE" : "ДЕМО"}
               </span>
@@ -82,7 +82,7 @@ export default async function Home() {
       </section>
 
       {/* Leagues with games this week */}
-      {leagueCounts.length > 0 && (
+      {leagueCounts.length > 1 && (
         <section className="border-y border-line bg-surface/40">
           <div className="container-x flex gap-2 overflow-x-auto py-4 sm:flex-wrap sm:justify-center">
             {leagueCounts.map((l) => (

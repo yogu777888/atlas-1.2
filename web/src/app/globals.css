@@ -66,7 +66,7 @@ body {
   @apply rounded-2xl border border-line bg-surface;
 }
 @utility eyebrow {
-  @apply font-mono text-xs uppercase tracking-[0.18em] text-muted;
+  @apply text-xs font-medium uppercase tracking-[0.16em] text-muted;
 }
 @utility btn {
   @apply inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition
