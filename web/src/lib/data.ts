@@ -2,7 +2,7 @@ import { demoGame, demoPrice, demoSeasonGames, demoUpcoming, poissonChances } fr
 import { goalMarkets, headToHead, missingPlayers, teamForm, toForm, toH2H, type FormGame, type GoalMarkets, type H2HGame, type Missing } from "./forecast";
 import { classifyLeague, CLUB_LEAGUES, otherLeague, type League } from "./leagues";
 import { consensus, matchSlug, OUTCOMES, statusFromCode, winner, type Match, type Odds1x2 } from "./matches";
-import { findPariLine, pariLines, type PariLine } from "./pari";
+import { findPariLine, pariLines, pariOpening, type PariLine } from "./pari";
 import { resultOf, seasonYear } from "./season";
 import { sstats } from "./sstats/client";
 import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
@@ -51,7 +51,7 @@ export function toMatch(g: SsGame, league: League, line?: PariLine | null, demo 
     score: status !== "scheduled" && h !== null && a !== null && !Number.isNaN(h) && !Number.isNaN(a) ? { home: h, away: a } : null,
     market,
     fair: market ? consensus([market]) : null,
-    pari: line?.odds ? { odds: line.odds, url: line.url, updatedAt: line.updatedAt } : null,
+    pari: line?.odds ? { odds: line.odds, url: line.url, updatedAt: line.updatedAt, eventId: line.eventId } : null,
   };
 }
 
@@ -98,7 +98,22 @@ async function liveMatches(): Promise<Match[]> {
     others.sort((a, b) => Number(!!b.pari) - Number(!!a.pari) || a.commenceTime.localeCompare(b.commenceTime));
     out.push(...others.slice(0, OTHER_LIMIT));
   }
+  await withOpening(out);
   return out;
+}
+
+/** Opening prices for the soonest priced matches, so the table can show which way the line moved. */
+const OPENING_LIMIT = 40;
+async function withOpening(list: Match[]) {
+  const picked = list
+    .filter((m) => m.pari?.eventId)
+    .sort((a, b) => a.commenceTime.localeCompare(b.commenceTime))
+    .slice(0, OPENING_LIMIT);
+  await Promise.all(
+    picked.map(async (m) => {
+      m.pari!.open = await pariOpening(m.pari!.eventId!).catch(() => null);
+    }),
+  );
 }
 
 // ------------------------------------------------------------------ demo fallback
@@ -109,7 +124,11 @@ function demoMatches(): Match[] {
   return demoUpcoming(now, now + DAYS_AHEAD * 86_400_000).map((g) => {
     const m = toMatch(g, leagueOf(g), null, true);
     const k = m.market;
-    return k ? { ...m, pari: { odds: { home: demoPrice(k.home, g.id * 3), draw: demoPrice(k.draw, g.id * 3 + 1), away: demoPrice(k.away, g.id * 3 + 2) }, url: null, updatedAt: null } } : m;
+    if (!k) return m;
+    const odds = { home: demoPrice(k.home, g.id * 3), draw: demoPrice(k.draw, g.id * 3 + 1), away: demoPrice(k.away, g.id * 3 + 2) };
+    // The demo line "opened" a few percent away from where it is now
+    const open = { home: demoPrice(odds.home, g.id * 5), draw: demoPrice(odds.draw, g.id * 5 + 1), away: demoPrice(odds.away, g.id * 5 + 2) };
+    return { ...m, pari: { odds, url: null, updatedAt: null, open } };
   });
 }
 

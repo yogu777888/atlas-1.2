@@ -14,7 +14,7 @@ import { findMatch, getMatchDetail, getMatches, type MatchDetail } from "@/lib/d
 import { dayMonth, dayMonthYear, mskDay, mskTime, whenRu } from "@/lib/dates";
 import { pointsPerGame } from "@/lib/forecast";
 import { isClubTop } from "@/lib/leagues";
-import { edge, isSuspect, isValue, margin, odds, OUTCOMES, outcomeLabel, parseMatchRef, pct, plural, probClass, UPSET, verdict, winnerOf, type Match, type Probs1x2 } from "@/lib/matches";
+import { edge, isSuspect, isValue, margin, moved, odds, OUTCOMES, outcomeLabel, parseMatchRef, pct, plural, probClass, UPSET, verdict, winnerOf, type Match, type Probs1x2 } from "@/lib/matches";
 import { paths } from "@/lib/routes";
 import { site } from "@/lib/site";
 import { teamSlug } from "@/lib/teams";
@@ -147,7 +147,7 @@ export default async function MatchPage({ params }: Props) {
 
         <section className="card p-5 sm:p-6">
           <h2 className="font-bold">Коэффициенты легального букмекера</h2>
-          <p className="mt-1 text-sm text-muted">Жёлтым отмечен коэффициент выше честного. Под ним — перевес над честной ценой.</p>
+          <p className="mt-1 text-sm text-muted">Жёлтым отмечен коэффициент выше честного. Под ним — перевес над честной ценой и то, как коэффициент изменился с открытия линии.</p>
           {m.pari ? (
             <div className="mt-5 grid grid-cols-3 gap-1.5 text-center">
               {OUTCOMES.map((o) => {
@@ -161,6 +161,11 @@ export default async function MatchPage({ params }: Props) {
                     <p className="mt-0.5">
                       <span className={`num rounded-[3px] px-1 text-[34px] leading-none font-bold ${good ? "hl" : ""}`}>{odds(price)}</span>
                     </p>
+                    {m.pari!.open && moved(price, m.pari!.open[o]) !== 0 && (
+                      <p className={`num text-xs ${moved(price, m.pari!.open[o]) > 0 ? "text-win" : "text-loss"}`}>
+                        {moved(price, m.pari!.open[o]) > 0 ? "▲" : "▼"} было {odds(m.pari!.open[o])}
+                      </p>
+                    )}
                     {value !== null && (
                       <p className="num mt-1 text-sm text-muted" title={suspect ? "Слишком большой разрыв с рынком: скорее всего, линия устарела" : undefined}>
                         {suspect ? "проверяем" : `${value > 0 ? "+" : "−"}${Math.abs(value * 100).toFixed(1).replace(".", ",")}%`}

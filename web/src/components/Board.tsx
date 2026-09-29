@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { dayHeading, mskDay, mskTime } from "@/lib/dates";
-import { isValue, odds, OUTCOMES, outcomeLabel, plural, probClass, type Match } from "@/lib/matches";
+import { dayHeading, mskDay } from "@/lib/dates";
+import { isValue, moved, odds, OUTCOMES, outcomeLabel, plural, probClass, type Match } from "@/lib/matches";
 import { paths } from "@/lib/routes";
+import { LocalClock, ZoneNote } from "./LocalClock";
 import { Teams } from "./TeamMark";
 
 const n = (k: number) => `${k} ${plural(k, ["матч", "матча", "матчей"])}`;
@@ -36,14 +37,14 @@ export function Board({ matches, empty, showLeague = true }: { matches: Match[];
       {[...days.values()].map((list) => {
         const h = dayHeading(list[0].commenceTime);
         return (
-          <section key={mskDay(list[0].commenceTime)} className="border-t border-line first-of-type:border-t-0" aria-label={`${h.name}, ${h.sub}`}>
+          <section key={mskDay(list[0].commenceTime)} data-lgs={[...new Set(list.map((m) => m.league.key))].join(" ")} className="border-t border-line first-of-type:border-t-0" aria-label={`${h.name}, ${h.sub}`}>
             <div className="flex items-baseline gap-3 px-4 pt-4 pb-1.5">
               <span className="num text-[40px] leading-[0.8] font-bold">{h.num}</span>
               <span className="font-bold">
                 {h.name}
                 <small className="block text-xs font-normal text-muted">{h.sub}</small>
               </span>
-              <span className="ml-auto text-xs text-subtle">{n(list.length)}</span>
+              <span data-count className="ml-auto text-xs text-subtle">{n(list.length)}</span>
             </div>
             {list.map((m) => (
               <Row key={m.id} m={m} i={i++} showLeague={showLeague} hasOdds={hasOdds} />
@@ -74,11 +75,12 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
   return (
     <Link
       href={paths.match(m.slug)}
+      data-lg={m.league.key}
       data-reveal
       style={{ transitionDelay: `${(i % 8) * 60}ms` }}
       className="group grid grid-cols-[2.8rem_minmax(0,1fr)_1rem] items-center gap-x-3.5 gap-y-2 border-t border-[#eef1ec] px-4 py-2.5 transition-colors hover:bg-surface-2 sm:grid-cols-[3.2rem_minmax(0,1fr)_auto_1rem]"
     >
-      <span className="num text-lg font-semibold text-fg-2">{mskTime(m.commenceTime)}</span>
+      <LocalClock iso={m.commenceTime} className="num text-lg font-semibold text-fg-2" />
       <span className="min-w-0">
         <Teams home={m.home} away={m.away} className="font-semibold" />
         {showLeague && <small className="block truncate text-xs text-muted">{m.league.short === m.league.label ? m.league.label : m.league.label.replace(" УЕФА", "")}</small>}
@@ -103,13 +105,23 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
             {OUTCOMES.map((o) => {
               const price = m.pari?.odds[o];
               const good = !!price && !!fair && isValue(price, fair[o]);
+              const move = price ? moved(price, m.pari?.open?.[o]) : 0;
               return (
                 <span
                   key={o}
-                  className={`num rounded-[3px] py-1 text-base sm:text-lg ${good ? "hl font-semibold text-fg" : "font-medium text-fg-2"}`}
+                  className={`num relative rounded-[3px] py-1 text-base sm:text-lg ${good ? "hl font-semibold text-fg" : "font-medium text-fg-2"}`}
                   style={good ? { transitionDelay: "600ms" } : undefined}
                 >
                   {price ? odds(price) : "—"}
+                  {move !== 0 && (
+                    <i
+                      className={`absolute -top-0.5 right-0 text-[9px] leading-none not-italic ${move > 0 ? "text-win" : "text-loss"}`}
+                      title={`При открытии линии: ${odds(m.pari!.open![o])}`}
+                    >
+                      {move > 0 ? "▲" : "▼"}
+                      <span className="sr-only">{move > 0 ? ", вырос" : ", упал"} с {odds(m.pari!.open![o])}</span>
+                    </i>
+                  )}
                   {good && <span className="sr-only"> — выше честной цены</span>}
                 </span>
               );
@@ -138,6 +150,14 @@ export function BoardLegend({ odds: withOdds = true }: { odds?: boolean }) {
           коэффициент выше честной цены
         </span>
       )}
+      {withOdds && (
+        <span className="inline-flex items-center gap-1">
+          <i className="text-[10px] not-italic text-win">▲</i>
+          <i className="text-[10px] not-italic text-loss">▼</i>
+          коэффициент изменился с открытия линии
+        </span>
+      )}
+      <ZoneNote />
     </p>
   );
 }

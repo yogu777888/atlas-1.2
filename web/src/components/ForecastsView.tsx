@@ -5,6 +5,7 @@ import { hasValue } from "@/lib/matches";
 import { paths } from "@/lib/routes";
 import { site } from "@/lib/site";
 import { Board, BoardLegend } from "./Board";
+import { BoardFilter } from "./BoardFilter";
 import { Fine, PageHead, SectionHead, Stats } from "./Page";
 
 /** The week's forecasts: all of them, or only matches with a price above fair. */
@@ -13,7 +14,10 @@ export async function ForecastsView({ valueOnly = false }: { valueOnly?: boolean
   const list = valueOnly ? all.filter(hasValue) : all;
   const main = list.filter((m) => m.league.key !== "other");
   const others = list.filter((m) => m.league.key === "other");
-  const chips = leagues.map((l) => ({ ...l, count: all.filter((m) => m.league.key === l.key).length })).filter((l) => l.count > 0);
+  const shown = main.length ? main : others;
+  const chips = leagues
+    .map((l) => ({ key: l.key, short: l.short, label: `Все прогнозы на ${l.acc}`, href: paths.league(l.slug), count: shown.filter((m) => m.league.key === l.key).length }))
+    .filter((l) => l.count > 0);
   const valueCount = all.filter(hasValue).length;
 
   return (
@@ -38,29 +42,22 @@ export async function ForecastsView({ valueOnly = false }: { valueOnly?: boolean
         }
       />
 
-      <div className="mt-6 mb-3.5 flex flex-wrap items-center justify-between gap-3">
-        <nav aria-label="Турниры" className="flex flex-wrap gap-1.5">
-          <Link href={paths.forecasts} className="chip" aria-current={!valueOnly ? "page" : undefined}>
-            Все
-          </Link>
-          {chips.map((l) => (
-            <Link key={l.key} href={paths.league(l.slug)} className="chip">
-              {l.short}
-              <span className="num text-[13px] opacity-70">{l.count}</span>
-            </Link>
-          ))}
-          <Link href={paths.valueBets} className="chip" aria-current={valueOnly ? "page" : undefined}>
-            <span className="size-2.5 rounded-sm bg-hi ring-1 ring-fg/10" aria-hidden />
-            Выше честной цены
-          </Link>
-        </nav>
-        <BoardLegend odds={list.some((m) => m.pari)} />
+      <div className="mt-6 mb-3 flex flex-wrap gap-1.5">
+        <Link href={paths.forecasts} className="chip" aria-current={!valueOnly ? "page" : undefined}>
+          Все матчи недели
+        </Link>
+        <Link href={paths.valueBets} className="chip" aria-current={valueOnly ? "page" : undefined}>
+          <span className="size-2.5 rounded-sm bg-hi ring-1 ring-fg/10" aria-hidden />
+          Только выше честной цены
+        </Link>
       </div>
 
-      <Board
-        matches={main.length ? main : others}
-        empty={valueOnly ? "Сейчас нет коэффициентов выше честной цены. Загляните позже: линия меняется каждые несколько минут." : undefined}
-      />
+      <BoardFilter chips={chips} legend={<BoardLegend odds={list.some((m) => m.pari)} />}>
+        <Board
+          matches={main.length ? main : others}
+          empty={valueOnly ? "Сейчас нет коэффициентов выше честной цены. Загляните позже: линия меняется каждые несколько минут." : undefined}
+        />
+      </BoardFilter>
 
       {main.length > 0 && others.length > 0 && (
         <section className="mt-12">

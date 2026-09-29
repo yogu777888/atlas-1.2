@@ -30,7 +30,7 @@ export type Match = {
   /** Margin-free probabilities from the world market */
   fair: Probs1x2 | null;
   /** Live PARI prices (legal Russian bookmaker) */
-  pari: { odds: Odds1x2; url: string | null; updatedAt: string | null } | null;
+  pari: { odds: Odds1x2; url: string | null; updatedAt: string | null; eventId?: number; open?: Odds1x2 | null } | null;
 };
 
 /** "zenit-spartak-1632014": teams for people, the id at the end for us. */
@@ -143,4 +143,14 @@ export function plural(n: number, [one, few, many]: [string, string, string]): s
   if (d === 1 && dd !== 11) return one;
   if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return few;
   return many;
+}
+
+/** A price that moved at least this much since the line opened gets an arrow. */
+export const MOVE = 0.03;
+
+/** +1 when the price went up since opening (better for the bettor), −1 when it went down, 0 otherwise. */
+export function moved(now: number, open: number | undefined | null): -1 | 0 | 1 {
+  if (!open) return 0;
+  const r = now / open - 1;
+  return r >= MOVE ? 1 : r <= -MOVE ? -1 : 0;
 }

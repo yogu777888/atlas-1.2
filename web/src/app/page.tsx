@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BankChart } from "@/components/BankChart";
 import { Board, BoardLegend } from "@/components/Board";
+import { BoardFilter } from "@/components/BoardFilter";
 import { BookmakerMini } from "@/components/BookmakerRow";
 import { Calibration } from "@/components/Calibration";
 import { MatchCard } from "@/components/MatchCard";
@@ -54,7 +55,7 @@ export default async function Home() {
   const detail: MatchDetail | null = featured ? await getMatchDetail(featured).catch(() => null) : null;
   const valueCount = matches.filter(hasValue).length;
   const chips = leagues
-    .map((l) => ({ ...l, count: matches.filter((m) => m.league.key === l.key).length }))
+    .map((l) => ({ key: l.key, short: l.short, label: `Все прогнозы на ${l.acc}`, href: paths.league(l.slug), count: board.filter((m) => m.league.key === l.key).length }))
     .filter((l) => l.count > 0);
   const top = bookmakersByRating();
 
@@ -86,29 +87,16 @@ export default async function Home() {
           <h2 id="board-title" className="sr-only">
             Прогнозы на ближайшие матчи
           </h2>
-          <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
-            {chips.length > 1 ? (
-              <nav aria-label="Турниры" className="flex flex-wrap gap-1.5">
-                {chips.map((l) => (
-                  <Link key={l.key} href={paths.league(l.slug)} className="chip">
-                    {l.short}
-                    <span className="num text-[13px] text-subtle">{l.count}</span>
-                  </Link>
-                ))}
-              </nav>
-            ) : (
-              <span />
-            )}
-            <BoardLegend odds={board.some((m) => m.pari)} />
-          </div>
-          <Board
-            matches={board}
-            empty={
-              <>
-                На ближайшую неделю матчей топ-лиг нет. Загляните в <Link href={paths.league("sbornye")} className="font-semibold underline">матчи сборных</Link>.
-              </>
-            }
-          />
+          <BoardFilter chips={chips} legend={<BoardLegend odds={board.some((m) => m.pari)} />}>
+            <Board
+              matches={board}
+              empty={
+                <>
+                  На ближайшую неделю матчей топ-лиг нет. Загляните в <Link href={paths.league("sbornye")} className="font-semibold underline">матчи сборных</Link>.
+                </>
+              }
+            />
+          </BoardFilter>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-subtle">Шансы — среднее по мировому рынку без маржи. Коэффициенты — легального букмекера.</p>
             {matches.length > board.length && (

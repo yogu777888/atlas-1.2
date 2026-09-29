@@ -26,7 +26,7 @@ export async function pariResultOutcomeIds(): Promise<OutcomeIds | null> {
   return null;
 }
 
-export type PariLine = { start: number; home: string; away: string; odds: Odds1x2 | null; url: string | null; updatedAt: string | null };
+export type PariLine = { eventId: number; start: number; home: string; away: string; odds: Odds1x2 | null; url: string | null; updatedAt: string | null };
 
 /** Upcoming PARI football matches with their match-result odds. */
 export async function pariLines(dateFrom: string, dateTo: string): Promise<PariLine[]> {
@@ -45,6 +45,7 @@ export async function pariLines(dateFrom: string, dateTo: string): Promise<PariL
       const d = ids && byId.get(ids.draw);
       const a = ids && byId.get(ids.away);
       out.push({
+        eventId: m.matchInfo.eventId,
         start: Date.parse(m.matchInfo.startDate),
         home: m.matchInfo.homeTeam.name,
         away: m.matchInfo.awayTeam.name,
@@ -87,4 +88,24 @@ export function findPariLine(lines: PariLine[], start: number, home: string, awa
     if (score > bestScore) { best = l; bestScore = score; }
   }
   return bestScore >= 1 ? best : undefined;
+}
+
+type PariOddsUpdate = { createdAt: string; isLive?: boolean; odds: { id: number; value: number; isBlocked?: boolean; isDeleted?: boolean }[] };
+
+/** The first match-result prices PARI put up for an event, from its pre-match odds history. */
+export function openingFrom(history: PariOddsUpdate[], ids: OutcomeIds): Odds1x2 | null {
+  const first: Partial<Record<keyof OutcomeIds, number>> = {};
+  const sorted = [...history].filter((u) => !u.isLive).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  for (const u of sorted)
+    for (const o of u.odds)
+      for (const k of ["home", "draw", "away"] as const)
+        if (first[k] === undefined && Number(o.id) === ids[k] && o.value > 1) first[k] = o.value;
+  return first.home && first.draw && first.away ? { home: first.home, draw: first.draw, away: first.away } : null;
+}
+
+export async function pariOpening(eventId: number): Promise<Odds1x2 | null> {
+  const ids = await pariResultOutcomeIds();
+  if (!ids) return null;
+  const history = await sstats<PariOddsUpdate[]>(`/Pari/odds/history/${eventId}`, { oddsType: "prematch" }, 900);
+  return openingFrom(history, ids);
 }
