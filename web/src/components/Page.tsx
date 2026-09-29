@@ -18,11 +18,11 @@ export function PageHead({
   animate?: boolean;
 }) {
   return (
-    <header className="border-b border-line pt-6 pb-7 sm:pt-8">
+    <header className="border-b border-line pt-5 pb-6 sm:pt-6">
       {crumbs && <Breadcrumbs items={crumbs} />}
       <div className={`grid items-end gap-x-12 gap-y-6 ${aside ? "lg:grid-cols-[minmax(0,1fr)_auto]" : ""} ${crumbs ? "mt-5" : ""}`}>
         <div className="min-w-0">
-          <h1 className="text-[clamp(30px,4.2vw,48px)] leading-[1.04] font-extrabold tracking-[-0.035em] text-balance">
+          <h1 className="text-[clamp(28px,3.6vw,42px)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">
             {animate && typeof title === "string" ? words(title) : title}
           </h1>
           {lead && <div className="fade-up mt-3 max-w-[60ch] text-base text-pretty text-muted [animation-delay:250ms]">{lead}</div>}

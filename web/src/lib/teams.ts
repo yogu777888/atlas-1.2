@@ -90,7 +90,7 @@ const GROUPS = {
     "egypt": "Египет", "senegal": "Сенегал", "nigeria": "Нигерия", "cameroon": "Камерун", "ghana": "Гана", "algeria": "Алжир",
     "tunisia": "Тунис", "ivory coast": "Кот-д'Ивуар", "cote d ivoire": "Кот-д'Ивуар",
     "belize": "Белиз", "st vincent grenadines": "Сент-Винсент и Гренадины", "saint vincent and the grenadines": "Сент-Винсент и Гренадины",
-    "st vincent and the grenadines": "Сент-Винсент и Гренадины", "papua new guinea": "Папуа — Новая Гвинея", "solomon islands": "Соломоновы Острова",
+    "st vincent and the grenadines": "Сент-Винсент и Гренадины", "papua new guinea": "Папуа-Новая Гвинея", "solomon islands": "Соломоновы Острова",
     "fiji": "Фиджи", "new caledonia": "Новая Каледония", "new zealand": "Новая Зеландия", "tahiti": "Таити", "vanuatu": "Вануату",
     "el salvador": "Сальвадор", "guatemala": "Гватемала", "nicaragua": "Никарагуа", "haiti": "Гаити", "cuba": "Куба",
     "trinidad and tobago": "Тринидад и Тобаго", "curacao": "Кюрасао", "suriname": "Суринам", "dominican republic": "Доминиканская Республика",
