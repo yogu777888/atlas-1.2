@@ -8,7 +8,7 @@ export function FlipText({ text, delay = 0 }: { text: string; delay?: number }) 
     <span className="inline-flex [perspective:400px]" aria-label={text}>
       {[...text].map((ch, i) => (
         <span key={i} aria-hidden className="inline-block origin-top animate-flip" style={{ animationDelay: `${delay + i * 70}ms` }}>
-          {ch}
+          {ch === " " ? "\u00A0" : ch}
         </span>
       ))}
     </span>

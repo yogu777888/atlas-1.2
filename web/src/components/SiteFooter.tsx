@@ -5,7 +5,7 @@ import { Logo } from "./Logo";
 const columns = [
   { title: "Сервис", links: [{ href: "/matches", label: "Прогнозы" }, { href: "/matches?league=rpl", label: "РПЛ" }, { href: "/matches?league=ucl", label: "Лига чемпионов" }, { href: "/bonuses", label: "Бонусы" }] },
   { title: "Букмекеры", links: [{ href: "/bookmakers", label: "Рейтинг" }, { href: "/bookmakers/fonbet", label: "Фонбет" }, { href: "/bookmakers/pari", label: "PARI" }, { href: "/bookmakers/winline", label: "Winline" }] },
-  { title: "Полезное", links: [{ href: "/articles", label: "Статьи" }, { href: "/tools/marzha", label: "Калькулятор маржи" }, { href: "/tools/veroyatnost", label: "Конвертер коэффициентов" }, { href: "/tools/ekspress", label: "Калькулятор экспресса" }] },
+  { title: "Полезное", links: [{ href: "/chto-esli", label: "А что, если" }, { href: "/articles", label: "Статьи" }, { href: "/tools/marzha", label: "Калькулятор маржи" }, { href: "/tools/veroyatnost", label: "Конвертер коэффициентов" }, { href: "/tools/ekspress", label: "Калькулятор экспресса" }] },
   { title: "О сайте", links: [{ href: "/about", label: "О редакции" }, { href: "/methodology", label: "Как мы считаем" }, { href: "/responsible-gambling", label: "Ответственная игра" }, { href: "/disclosure", label: "Как мы зарабатываем" }, { href: "/privacy", label: "Конфиденциальность" }, { href: "/terms", label: "Условия использования" }] },
 ];
 

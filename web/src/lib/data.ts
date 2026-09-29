@@ -20,7 +20,7 @@ function moscowDate(plusDays = 0): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Moscow" }).format(d);
 }
 
-const winner = (bets: { marketId: number; odds: { name: string; value: number }[] }[] | null | undefined): Odds1x2 | null => {
+export const winner = (bets: { marketId: number; odds: { name: string; value: number }[] }[] | null | undefined): Odds1x2 | null => {
   const m = bets?.find((b) => b.marketId === 1);
   if (!m) return null;
   const get = (n: string) => m.odds.find((o) => o.name === n)?.value;

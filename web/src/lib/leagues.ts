@@ -61,3 +61,6 @@ export function classifyLeague(l: { id: number; name: string; country: { code: s
 
 /** Club competitions (everything we cover except national teams). */
 export const isClubTop = (key: string) => key !== "other" && key !== "intl";
+
+/** Primary sstats id of one of our leagues (club leagues only have one). */
+export const leagueSourceId = (key: string) => RULES.find((r) => r.key === key)?.ids[0];
