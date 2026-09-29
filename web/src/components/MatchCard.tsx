@@ -6,6 +6,7 @@ import { paths } from "@/lib/routes";
 import { FlipText } from "./FlipText";
 import { FormPills } from "./ForecastBlocks";
 import { FlipMark } from "./Logo";
+import { TeamMark } from "./TeamMark";
 
 /** A match in a card: the three chances as scoreboard tiles, goal markets, form and the way in. */
 export function MatchCard({ m, d, kicker = "Матч дня" }: { m: Match; d?: MatchDetail | null; kicker?: string }) {
@@ -61,7 +62,10 @@ export function MatchCard({ m, d, kicker = "Матч дня" }: { m: Match; d?: 
           ].map((f) =>
             f.games.length ? (
               <div key={f.team} className="flex items-center justify-between gap-3">
-                <span className="truncate">{f.team}</span>
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <TeamMark name={f.team} size={14} />
+                  <span className="truncate">{f.team}</span>
+                </span>
                 <FormPills games={f.games} />
               </div>
             ) : null,

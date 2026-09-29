@@ -5,6 +5,7 @@ import { paths } from "@/lib/routes";
 import { resultOf } from "@/lib/season";
 import type { SsGame } from "@/lib/sstats/types";
 import { teamRu } from "@/lib/teams";
+import { Teams } from "./TeamMark";
 
 /**
  * Recent results with the chance the market gave to what actually happened,
@@ -30,9 +31,7 @@ export function Results({ games, limit = 8 }: { games: SsGame[]; limit?: number 
             <Link href={paths.match(matchSlug(home, away, g.id))} className="group grid grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 transition-colors hover:bg-surface-2">
               <span className="text-xs text-subtle">{shortDay(iso).replace(/^[а-я]{2}, /, "")}</span>
               <span className="min-w-0">
-                <b className="block truncate font-semibold">
-                  {home} — {away}
-                </b>
+                <Teams home={home} away={away} size={14} className="font-semibold" />
                 {chance !== null && (
                   <small className="block truncate text-xs text-muted">
                     {won === "draw" ? "ничья" : `победа: ${won === "home" ? home : away}`}, рынок давал {Math.round(chance * 100)}%

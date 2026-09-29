@@ -6,6 +6,7 @@ import { MotionRoot } from "@/components/MotionRoot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/lib/site";
+import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
 
 const sans = Onest({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-onest" });

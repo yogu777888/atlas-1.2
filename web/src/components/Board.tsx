@@ -2,6 +2,7 @@ import Link from "next/link";
 import { dayHeading, mskDay, mskTime } from "@/lib/dates";
 import { isValue, odds, OUTCOMES, outcomeLabel, plural, probClass, type Match } from "@/lib/matches";
 import { paths } from "@/lib/routes";
+import { Teams } from "./TeamMark";
 
 const n = (k: number) => `${k} ${plural(k, ["матч", "матча", "матчей"])}`;
 
@@ -79,9 +80,7 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
     >
       <span className="num text-lg font-semibold text-fg-2">{mskTime(m.commenceTime)}</span>
       <span className="min-w-0">
-        <b className="block truncate font-semibold">
-          {m.home} — {m.away}
-        </b>
+        <Teams home={m.home} away={m.away} className="font-semibold" />
         {showLeague && <small className="block truncate text-xs text-muted">{m.league.short === m.league.label ? m.league.label : m.league.label.replace(" УЕФА", "")}</small>}
       </span>
       <span className="col-span-3 flex gap-2.5 sm:col-span-1 sm:gap-3.5">

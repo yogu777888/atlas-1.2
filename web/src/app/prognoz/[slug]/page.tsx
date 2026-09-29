@@ -7,6 +7,7 @@ import { FormColumn, HeadToHead, MissingList, Verdict } from "@/components/Forec
 import { OutboundButton } from "@/components/OutboundButton";
 import { Fine, SectionHead } from "@/components/Page";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { TeamMark } from "@/components/TeamMark";
 import { getArticle } from "@/content/articles";
 import { getBookmaker } from "@/lib/bookmakers";
 import { findMatch, getMatchDetail, getMatches, type MatchDetail } from "@/lib/data";
@@ -101,6 +102,7 @@ export default async function MatchPage({ params }: Props) {
           <p className="mt-3 flex flex-wrap gap-1.5">
             {[m.home, m.away].map((t) => (
               <Link key={t} href={paths.team(teamSlug(t))} className="chip">
+                <TeamMark name={t} size={14} />
                 {t}: форма и матчи
               </Link>
             ))}

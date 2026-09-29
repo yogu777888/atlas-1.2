@@ -6,6 +6,7 @@ import { FormColumn } from "@/components/ForecastBlocks";
 import { MatchCard } from "@/components/MatchCard";
 import { Fine, PageHead, SectionHead, Stats } from "@/components/Page";
 import { Standings } from "@/components/Standings";
+import { TeamMark } from "@/components/TeamMark";
 import { getMatchDetail, getMatches, teamRecent, toMatch } from "@/lib/data";
 import { dayMonth, mskTime, shortDay } from "@/lib/dates";
 import { getLeague } from "@/lib/leagues";
@@ -77,7 +78,12 @@ export default async function TeamPage({ params }: Props) {
           { label: "Команды", href: paths.teams },
           { label: team.name, href: paths.team(slug) },
         ]}
-        title={team.name}
+        title={
+          <span className="inline-flex items-center gap-3">
+            <TeamMark name={team.name} size={34} />
+            {team.name}
+          </span>
+        }
         lead={leadParts.filter(Boolean).join(" ")}
         aside={
           row && row.played > 0 ? (

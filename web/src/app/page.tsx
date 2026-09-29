@@ -60,10 +60,10 @@ export default async function Home() {
 
   return (
     <div className="container-x">
-      <header className="grid items-end gap-x-12 gap-y-6 border-b border-line pt-9 pb-7 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <header className="grid items-end gap-x-12 gap-y-5 border-b border-line pt-7 pb-5 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div>
-          <h1 className="text-[clamp(34px,4.6vw,54px)] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">{words("Прогнозы на футбол по цифрам")}</h1>
-          <p className="fade-up mt-3 max-w-[54ch] text-base text-pretty text-muted [animation-delay:300ms]">
+          <h1 className="text-[clamp(28px,3.4vw,40px)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">{words("Прогнозы на футбол по цифрам")}</h1>
+          <p className="fade-up mt-2 max-w-[62ch] text-[15px] text-pretty text-muted [animation-delay:300ms]">
             Шансы на каждый матч РПЛ, топ-лиг Европы и Лиги чемпионов. Считаем их по коэффициентам мировых букмекеров без маржи и отмечаем,
             где легальный букмекер платит больше честной цены.
           </p>
@@ -81,7 +81,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <div className="grid items-start gap-10 pt-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-start gap-10 pt-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section aria-labelledby="board-title">
           <h2 id="board-title" className="sr-only">
             Прогнозы на ближайшие матчи
