@@ -14,7 +14,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-3 py-1.5 text-sm text-muted transition hover:bg-white/5 hover:text-fg"
+              className="nav-link rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-fg"
             >
               {item.label}
             </Link>

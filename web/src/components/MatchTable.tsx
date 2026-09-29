@@ -21,7 +21,7 @@ export function MatchTable({ matches, empty }: { matches: Match[]; empty?: strin
       </div>
       <ul className="divide-y divide-line">
         {ordered.map((m, i) => (
-          <li key={m.id}>
+          <li key={m.id} data-reveal style={{ transitionDelay: `${Math.min(i, 8) * 50}ms` }}>
             {i === firstOther && firstOther > 0 && (
               <p className="border-b border-line bg-surface-2/60 px-5 py-2 text-xs tracking-wider text-subtle uppercase">Другие турниры</p>
             )}
@@ -47,7 +47,7 @@ function Row({ m }: { m: Match }) {
         </p>
       </div>
       <div>{m.fair ? <ProbBar p={m.fair} compact /> : <span className="text-xs text-subtle">нет данных</span>}</div>
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-3 gap-1.5 [perspective:400px]">
         {OUTCOMES.map((o) => {
           const price = m.pari?.odds[o];
           const value = price && m.fair ? edge(price, m.fair[o]) : null;
@@ -55,7 +55,7 @@ function Row({ m }: { m: Match }) {
           return (
             <span
               key={o}
-              className={`odds-pill min-w-0 ${good ? "odds-pill-best" : ""}`}
+              className={`odds-pill flip-hover min-w-0 ${good ? "odds-pill-best" : ""}`}
               title={value !== null ? `${outcomeShort[o]}: ${value > 0 ? "выше" : "ниже"} справедливой цены на ${Math.abs(value * 100).toFixed(1)}%` : undefined}
             >
               {good && <FlipMark className="mr-1 size-2" />}

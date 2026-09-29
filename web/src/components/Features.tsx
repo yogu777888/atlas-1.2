@@ -83,7 +83,7 @@ export function Features() {
           </div>
         }
       />
-      <div className="card flex flex-col justify-between bg-gradient-to-br from-accent/10 to-transparent p-7">
+      <div data-reveal className="card flex flex-col justify-between bg-gradient-to-br from-accent/10 to-transparent p-7">
         <p className="text-sm text-muted">Ответственная игра</p>
         <p className="mt-6 text-sm leading-relaxed">Лимиты, паузы и честные слова о рисках. Мы за то, чтобы ставить с умом, а не больше.</p>
         <Link href="/responsible-gambling" className="mt-4 text-sm text-accent hover:underline">
@@ -103,7 +103,7 @@ export function Features() {
           </div>
         }
       />
-      <Link href="/tools" className="card group flex flex-col justify-between p-7 transition hover:border-line-strong">
+      <Link href="/tools" data-reveal className="card group flex flex-col justify-between p-7 transition hover:border-line-strong">
         <div className="flex items-baseline justify-between">
           <p className="text-sm text-muted">Калькуляторы</p>
           <p className="text-3xl font-extrabold tracking-[-0.04em] tabular-nums">4,2%</p>
@@ -117,7 +117,7 @@ export function Features() {
 
 function Card({ title, body, visual, wide = false }: { title: string; body: string; visual: React.ReactNode; wide?: boolean }) {
   return (
-    <div className={`card flex flex-col gap-6 p-7 ${wide ? "md:col-span-2 lg:flex-row lg:items-center lg:gap-10" : ""}`}>
+    <div data-reveal className={`card flex flex-col gap-6 p-7 ${wide ? "md:col-span-2 lg:flex-row lg:items-center lg:gap-10" : ""}`}>
       <div className={`flex min-h-12 items-center rounded-xl border border-line bg-surface-2/60 p-4 ${wide ? "lg:order-2 lg:w-[46%] lg:shrink-0" : ""}`}>{visual}</div>
       <div className="min-w-0 flex-1">
         <h3 className="text-xl font-semibold tracking-tight text-balance">{title}</h3>

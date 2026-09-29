@@ -5,7 +5,7 @@ import { Cover } from "./Cover";
 
 export function ArticleCard({ a }: { a: Article }) {
   return (
-    <Link href={`/articles/${a.slug}`} className="group flex flex-col gap-4">
+    <Link href={`/articles/${a.slug}`} data-reveal className="group flex flex-col gap-4">
       <div className="h-44 transition group-hover:-translate-y-0.5">
         <Cover figure={a.cover.figure} caption={a.cover.caption} visual={<ArticleVisual slug={a.slug} />} />
       </div>

@@ -4,7 +4,7 @@ import { pct, type Probs1x2 } from "@/lib/matches";
 export function ProbBar({ p, compact = false }: { p: Probs1x2; compact?: boolean }) {
   return (
     <div className="min-w-0">
-      <div className={`flex overflow-hidden rounded-full bg-surface-2 ${compact ? "h-1.5" : "h-2.5"}`} aria-hidden>
+      <div className={`bar-grow flex overflow-hidden rounded-full bg-surface-2 ${compact ? "h-1.5" : "h-2.5"}`} aria-hidden>
         <span className="bg-fg/80" style={{ width: pct(p.home, 1) }} />
         <span className="bg-muted/60" style={{ width: pct(p.draw, 1) }} />
         <span className="bg-violet" style={{ width: pct(p.away, 1) }} />

@@ -51,24 +51,27 @@ export default async function Home() {
         <div className="bg-grid absolute inset-0" aria-hidden />
         <div className="absolute top-[-20%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[120px]" aria-hidden />
         <div className="container-x relative grid items-center gap-12 pt-14 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-20 lg:pb-20">
-          <div className="animate-rise">
-            <Link href="/matches" className="mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
+          <div>
+            <Link href="/matches" className="fade-up mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
               <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-medium text-accent">
                 <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
                 {dataSource() === "live" ? "LIVE" : "ДЕМО"}
               </span>
               {status} →
             </Link>
-            <h1 className="text-gradient text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              Прогнозы на футбол
-              <br />
-              по цифрам.
+            <h1 className="text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
+              <span className="line-reveal">
+                <span>Прогнозы на футбол</span>
+              </span>
+              <span className="line-reveal">
+                <span className="text-fg/75">по цифрам.</span>
+              </span>
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted">
+            <p className="fade-up mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted [animation-delay:350ms]">
               Для каждого матча — шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и
               обещаний выигрыша.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="fade-up mt-9 flex flex-wrap gap-3 [animation-delay:500ms]">
               <Link href="/matches" className="btn-primary h-11 px-6">
                 Смотреть прогнозы
               </Link>
@@ -193,7 +196,7 @@ function EmptyHero() {
 
 function HeroCard({ m }: { m: Match }) {
   return (
-    <div className="animate-rise [animation-delay:150ms]">
+    <div className="fade-up [animation-delay:200ms]">
       <Link href={`/matches/${m.id}`} className="card relative block p-6 shadow-2xl shadow-black/60 transition hover:border-line-strong">
         <div className="flex items-center justify-between text-xs text-subtle">
           <span>{m.league.label}</span>

@@ -28,7 +28,7 @@ export function FormPills({ games }: { games: FormGame[] }) {
   return (
     <span className="inline-flex gap-1" aria-label={`Последние матчи: ${games.map((g) => RESULT[g.result].t).join(", ")}`}>
       {games.map((g, i) => (
-        <span key={i} className={`grid size-6 place-items-center rounded-md text-xs font-bold ${RESULT[g.result].c}`} aria-hidden>
+        <span key={i} className={`grid size-6 animate-flip place-items-center rounded-md text-xs font-bold ${RESULT[g.result].c}`} style={{ animationDelay: `${300 + i * 90}ms` }} aria-hidden>
           {RESULT[g.result].t}
         </span>
       ))}

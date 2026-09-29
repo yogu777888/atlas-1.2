@@ -7,7 +7,7 @@ import { FlipMark } from "./Logo";
 export function Cover({ figure, caption, size = "md", visual }: { figure: string; caption: string; size?: "md" | "lg"; visual?: React.ReactNode }) {
   const lg = size === "lg";
   return (
-    <div className={`relative flex h-full flex-col justify-between gap-4 overflow-hidden rounded-2xl border border-line bg-surface-2 ${lg ? "min-h-56 p-8 sm:p-10" : "min-h-44 p-6"}`}>
+    <div className={`glow relative flex h-full flex-col justify-between gap-4 overflow-hidden rounded-2xl border border-line bg-surface-2 ${lg ? "min-h-56 p-8 sm:p-10" : "min-h-44 p-6"}`}>
       <div className="bg-grid absolute inset-0 opacity-70 [mask-image:none]" aria-hidden />
       {visual ? (
         <div className="relative self-end">{visual}</div>
