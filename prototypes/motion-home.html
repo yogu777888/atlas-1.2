@@ -1,0 +1,333 @@
+<title>tag.bet в движении</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800&display=swap">
+<style>
+/* Layout: the current tag.bet home, used as a stage for one motion system: scoreboard flips, count-ups, staggered reveals, drawn charts and a view-transition into a match */
+:root{
+  --bg:#0b0b09; --surface:#121210; --surface2:#1a1915; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+  --fg:#f4f1e6; --muted:#9a978a; --subtle:#66645a; --accent:#ffc629; --ink:#161300; --pitch:#3fae6a; --danger:#ff5c5c; --away:#6f9cff;
+  --font:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --out:cubic-bezier(.2,.8,.2,1);      /* for things arriving */
+  --spring:cubic-bezier(.34,1.56,.64,1); /* for things being pressed or flipped */
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--font);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+.num{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(11,11,9,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:inline-flex;align-items:baseline;font-weight:800;font-size:25px;letter-spacing:-.055em;perspective:300px}
+.sq{display:inline-block;width:.3em;height:.3em;margin:0 .05em 0 .07em;background:var(--accent);border-radius:.05em;position:relative;transform-origin:center}
+.sq::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .02em);height:.04em;background:var(--bg)}
+.logo:hover .sq,.sq.intro{animation:tile .6s var(--spring)}
+@keyframes tile{0%{transform:rotateX(0)}45%{transform:rotateX(-90deg)}100%{transform:rotateX(0)}}
+nav.links{display:flex;gap:4px;font-size:14px;color:var(--muted)}
+nav.links a{position:relative;padding:6px 12px;border-radius:999px;transition:color .2s}
+nav.links a::after{content:"";position:absolute;left:12px;right:12px;bottom:2px;height:1.5px;background:var(--fg);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--out)}
+nav.links a:hover{color:var(--fg)}nav.links a:hover::after{transform:scaleX(1)}
+@media (max-width:760px){nav.links{display:none}}
+.pill{display:inline-flex;align-items:center;height:34px;padding:0 16px;border-radius:999px;background:var(--accent);color:var(--ink);font-weight:600;font-size:13px;transition:transform .25s var(--spring),filter .2s}
+.pill:hover{filter:brightness(1.08);transform:translateY(-1px)}.pill:active{transform:scale(.96)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center;padding-block:64px 72px}
+@media (max-width:900px){.hero{grid-template-columns:1fr;gap:36px;padding-block:40px 48px}}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px}
+.live b{display:inline-flex;align-items:center;gap:6px;background:rgba(255,198,41,.1);color:var(--accent);border-radius:999px;padding:2px 8px;font-weight:600}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3;transform:scale(.7)}}
+h1{margin:22px 0 0;font-weight:800;font-size:clamp(42px,6.4vw,76px);line-height:1.02;letter-spacing:-.045em}
+.line{display:block;overflow:hidden;padding-bottom:.06em}
+.line>span{display:block;animation:rise 1s var(--out) both}
+.line:nth-child(2)>span{animation-delay:.12s;color:#c9c5b8}
+@keyframes rise{from{transform:translateY(105%)}to{transform:none}}
+.lede{margin:22px 0 0;max-width:34em;color:var(--muted);font-size:18px;animation:fade .9s var(--out) .35s both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;animation:fade .9s var(--out) .5s both}
+.btn{display:inline-flex;align-items:center;height:46px;padding:0 24px;border-radius:999px;font-weight:600;transition:transform .3s var(--spring),background .2s,border-color .2s}
+.btn.primary{background:var(--accent);color:var(--ink)}
+.btn.ghost{border:1px solid var(--line2)}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:scale(.96)}
+.btn.ghost:hover{background:rgba(255,255,255,.04)}
+
+/* hero card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.match{padding:24px;box-shadow:0 40px 80px -40px #000;animation:cardIn 1s var(--out) .2s both;transition:border-color .3s,transform .5s var(--out)}
+.match:hover{border-color:var(--line2);transform:translateY(-3px)}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--subtle)}
+.teams{margin:8px 0 2px;font-size:22px;font-weight:600;letter-spacing:-.02em}
+.teams span{color:var(--subtle)}
+.fav{margin:0;color:var(--muted);font-size:14px}
+.lbl{margin:22px 0 8px;font-size:12px;color:var(--subtle)}
+.prob{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--surface2)}
+.prob span{height:100%;transform-origin:left;transform:scaleX(0);animation:grow 1.1s var(--out) forwards}
+@keyframes grow{to{transform:scaleX(1)}}
+.probn{display:flex;justify-content:space-between;margin-top:6px;font-size:12px}
+.odds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.o{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px;text-align:center;transition:transform .35s var(--spring),border-color .2s}
+.o:hover{transform:translateY(-2px)}
+.o small{display:block;font-size:11px;color:var(--subtle)}
+.o b{display:inline-flex;font-size:20px;font-weight:600;perspective:300px}
+.o.hot{border-color:rgba(255,198,41,.45);background:rgba(255,198,41,.1)}
+.o.hot b{color:var(--accent)}
+.ch{display:inline-block;transform-origin:top;animation:flap .5s var(--spring) both}
+@keyframes flap{from{transform:rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+.more{display:inline-block;margin-top:20px;color:var(--accent);font-size:14px}
+.more span{display:inline-block;transition:transform .3s var(--spring)}
+.more:hover span{transform:translateX(4px)}
+
+/* sections */
+section.s{padding-block:72px 0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h2{margin:10px 0 0;font-weight:800;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.035em}
+.sub{margin:10px 0 24px;color:var(--muted);max-width:40em}
+
+/* reveal on scroll: starts dim and lowered, never hidden */
+.rv{transition:opacity .8s var(--out),transform .8s var(--out)}
+.js .rv:not(.in){opacity:.25;transform:translateY(28px)}
+
+/* table */
+.table{overflow:hidden}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 12rem 13.5rem;gap:20px;align-items:center;padding:16px 20px;border-top:1px solid var(--line);cursor:pointer;transition:background .25s}
+.row:first-child{border-top:0}
+.row:hover{background:rgba(255,255,255,.025)}
+@media (max-width:760px){.row{grid-template-columns:1fr;gap:10px}}
+.row small{display:block;font-size:12px;color:var(--subtle)}
+.row .t{font-weight:500}
+.mini{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--surface2)}
+.mini span{height:100%;transform:scaleX(0);transform-origin:left;transition:transform 1s var(--out)}
+.row.in .mini span{transform:scaleX(1)}
+.minin{display:flex;justify-content:space-between;font-size:11px;margin-top:4px;color:var(--muted)}
+.pills{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;perspective:300px}
+.pills span{text-align:center;border:1px solid var(--line);background:var(--surface2);border-radius:9px;padding:6px 0;font-weight:500;transition:transform .45s var(--spring),border-color .2s}
+.pills span:hover{transform:rotateX(360deg)}
+.pills .hot{border-color:rgba(255,198,41,.45);background:rgba(255,198,41,.1);color:var(--accent)}
+
+/* what-if teaser */
+.whatif{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:24px;align-items:center;padding:28px}
+@media (max-width:820px){.whatif{grid-template-columns:1fr}}
+.big{font-weight:800;font-size:clamp(52px,7vw,76px);letter-spacing:-.045em;line-height:1;color:var(--danger)}
+.chart path.l{fill:none;stroke:var(--danger);stroke-width:2.5;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s var(--out)}
+.chart path.a{fill:var(--danger);opacity:0;transition:opacity 1s ease .9s}
+.chart.in path.l{stroke-dashoffset:0}.chart.in path.a{opacity:.12}
+.chart circle{fill:var(--danger);transform:scale(0);transform-origin:center;transform-box:fill-box;transition:transform .5s var(--spring) 1.7s}
+.chart.in circle{transform:scale(1)}
+
+/* article cards */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media (max-width:820px){.cards{grid-template-columns:1fr}}
+.art{display:block}
+.cover{position:relative;height:150px;border-radius:16px;border:1px solid var(--line);background:var(--surface2);padding:20px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;transition:transform .5s var(--out),border-color .3s}
+.cover b{font-size:36px;font-weight:800;letter-spacing:-.04em}
+.cover small{color:var(--muted);font-size:12px}
+.cover::before{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,50%),rgba(255,198,41,.1),transparent 45%);opacity:0;transition:opacity .3s}
+.art:hover .cover{transform:translateY(-4px);border-color:var(--line2)}
+.art:hover .cover::before{opacity:1}
+.art h3{margin:14px 4px 0;font-size:17px;font-weight:600;letter-spacing:-.01em;transition:color .2s}
+.art:hover h3{color:var(--accent)}
+
+/* match overlay (view transition target) */
+.overlay{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:20px;background:rgba(11,11,9,.8);backdrop-filter:blur(6px)}
+.sheet{width:min(720px,100%);max-height:90vh;overflow:auto;padding:28px}
+.sheet h3{margin:6px 0 0;font-size:28px;font-weight:800;letter-spacing:-.03em}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+@media (max-width:560px){.tiles{grid-template-columns:1fr}}
+.tile{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface2)}
+.tile small{color:var(--subtle);font-size:12px}.tile b{display:flex;font-size:34px;font-weight:800;letter-spacing:-.04em;perspective:300px}
+.tile p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.form{display:flex;gap:5px;margin-top:10px}
+.form span{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--bg);animation:flap .45s var(--spring) both}
+.close{margin-top:22px;border:1px solid var(--line2);background:transparent;border-radius:999px;height:40px;padding:0 18px;cursor:pointer;transition:transform .3s var(--spring)}
+.close:active{transform:scale(.95)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+::view-transition-group(match){animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+
+footer{margin-top:96px;border-top:1px solid var(--line);padding-block:24px 48px;color:var(--subtle);font-size:12px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .prob span,.mini span{transform:none!important}
+  .js .rv:not(.in){opacity:1;transform:none}
+  .chart path.l{stroke-dashoffset:0}.chart path.a{opacity:.12}.chart circle{transform:none}
+}
+</style>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="#" aria-label="tag.bet">tag<span class="sq intro"></span>bet</a>
+    <nav class="links"><a href="#matches">Прогнозы</a><a href="#">Букмекеры</a><a href="#">Бонусы</a><a href="#arts">Статьи</a><a href="#">Калькуляторы</a></nav>
+    <a class="pill" href="#matches">Выгодные кэфы</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <span class="live"><b><i></i>LIVE</b>24 матча топ-лиг на неделе →</span>
+      <h1><span class="line"><span>Прогнозы на футбол</span></span><span class="line"><span>по цифрам.</span></span></h1>
+      <p class="lede">Для каждого матча — шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и обещаний выигрыша.</p>
+      <div class="ctas"><a class="btn primary" href="#matches">Смотреть прогнозы</a><a class="btn ghost" href="#">Рейтинг букмекеров</a></div>
+    </div>
+
+    <article class="card match" id="hero">
+      <div class="meta"><span>Российская Премьер-лига</span><span>Сб, 19:30</span></div>
+      <p class="teams">Зенит <span>—</span> Спартак</p>
+      <p class="fav">Фаворит — Зенит: шанс победы <b class="num" data-count="50">50</b>%.</p>
+      <p class="lbl">Шансы по мировому рынку</p>
+      <div class="prob"><span style="width:50%;background:#e6e2d5;animation-delay:.6s"></span><span style="width:26%;background:#5d5b52;animation-delay:.75s"></span><span style="width:24%;background:var(--away);animation-delay:.9s"></span></div>
+      <div class="probn num"><span data-count="50">50%</span><span data-count="26">26%</span><span style="color:var(--away)" data-count="24">24%</span></div>
+      <p class="lbl">Коэффициенты букмекера</p>
+      <div class="odds">
+        <div class="o"><small>Зенит</small><b class="num" data-flip="1.90" data-delay="1000">1.90</b></div>
+        <div class="o"><small>Ничья</small><b class="num" data-flip="3.75" data-delay="1180">3.75</b></div>
+        <div class="o hot"><small>Спартак</small><b class="num" data-flip="4.35" data-delay="1360">4.35</b></div>
+      </div>
+      <a class="more" href="#" data-open="0">Полный прогноз <span>→</span></a>
+    </article>
+  </div>
+
+  <section class="s" id="matches">
+    <p class="eyebrow">Прогнозы</p>
+    <h2>Ближайшие матчи по цифрам.</h2>
+    <p class="sub">Нажмите на матч — карточка перетечёт в прогноз.</p>
+    <div class="card table" id="rows"></div>
+  </section>
+
+  <section class="s">
+    <p class="eyebrow">А что, если</p>
+    <h2>Весь сезон по 100 ₽ на Спартак.</h2>
+    <div class="card whatif rv" id="wi">
+      <div>
+        <p style="margin:0;color:var(--muted)">Итог сезона 2025/26</p>
+        <p class="big num" data-count="-468" data-suffix=" ₽">−468 ₽</p>
+        <p style="margin:10px 0 0;color:var(--muted);font-size:14px">9 выигранных ставок из 28 · доходность −16,7%</p>
+      </div>
+      <svg class="chart" id="chart" viewBox="0 0 600 170" role="img" aria-label="Банк по ходу сезона уходит в минус">
+        <line x1="0" x2="600" y1="60" y2="60" stroke="rgba(255,255,255,.14)" stroke-dasharray="4 5"/>
+        <path class="a" d="M0 60 L40 18 L90 45 L130 58 L160 40 L200 70 L240 55 L280 95 L320 72 L360 110 L400 96 L440 120 L480 108 L520 140 L560 132 L600 158 L600 60 Z"/>
+        <path class="l" pathLength="1" d="M0 60 L40 18 L90 45 L130 58 L160 40 L200 70 L240 55 L280 95 L320 72 L360 110 L400 96 L440 120 L480 108 L520 140 L560 132 L600 158"/>
+        <circle cx="600" cy="158" r="5"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="s" id="arts">
+    <p class="eyebrow">Разобраться</p>
+    <h2>Как букмекер считает коэффициенты.</h2>
+    <div class="cards" style="margin-top:24px">
+      <a class="art rv" href="#"><div class="cover"><b class="num">4,2%</b><small>маржа в линии 1.90 · 3.60 · 4.20</small></div><h3>Маржа букмекера: что это и как её посчитать</h3></a>
+      <a class="art rv" href="#"><div class="cover"><b class="num">+4,0%</b><small>перевес ставки по 2.06 при шансе 50,5%</small></div><h3>Валуйная ставка: когда коэффициент выше шансов</h3></a>
+      <a class="art rv" href="#"><div class="cover"><b class="num">13,2%</b><small>маржа экспресса из трёх событий</small></div><h3>Экспресс: почему он выгоден букмекеру</h3></a>
+    </div>
+  </section>
+
+  <footer>Прототип анимаций. Данные — пример. 18+. Азартные игры могут вызывать зависимость.</footer>
+</main>
+
+<script>
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.documentElement.classList.add("js");
+
+// Scoreboard flip: split a value into characters that drop in one by one
+function flip(el, text, delay = 0) {
+  if (reduce) { el.textContent = text; return; }
+  el.innerHTML = [...text].map((c, i) => `<span class="ch" style="animation-delay:${delay + i * 70}ms">${c === " " ? "&nbsp;" : c}</span>`).join("");
+}
+document.querySelectorAll("[data-flip]").forEach((el) => flip(el, el.dataset.flip, +el.dataset.delay || 0));
+
+// Count-up for numbers, eased
+function countUp(el, to, dur = 1100, suffix = "") {
+  const fmt = (v) => (v < 0 ? "−" : "") + Math.abs(Math.round(v)).toLocaleString("ru-RU") + suffix;
+  if (reduce) { el.textContent = fmt(to); return; }
+  const t0 = performance.now();
+  const step = (t) => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(to * e); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+document.querySelectorAll("#hero [data-count]").forEach((el) => {
+  const pctSign = el.textContent.includes("%") ? "%" : "";
+  setTimeout(() => countUp(el, +el.dataset.count, 1100, pctSign), 550);
+});
+
+// Match rows
+const matches = [
+  { t: "Зенит — Спартак", l: "РПЛ · сб 19:30", p: [50, 26, 24], o: ["1.90", "3.75", "4.35"], hot: 2 },
+  { t: "Ливерпуль — Манчестер Сити", l: "АПЛ · сб 22:00", p: [40, 26, 34], o: ["2.35", "3.59", "2.76"], hot: -1 },
+  { t: "Краснодар — Динамо", l: "РПЛ · вс 17:00", p: [46, 27, 27], o: ["2.25", "3.53", "3.50"], hot: 0 },
+  { t: "Реал Мадрид — Бавария", l: "ЛЧ · ср 22:00", p: [45, 25, 30], o: ["2.17", "3.75", "3.24"], hot: -1 },
+  { t: "Интер — Ювентус", l: "Серия А · вс 21:45", p: [44, 29, 27], o: ["2.20", "3.30", "3.60"], hot: -1 },
+];
+document.getElementById("rows").innerHTML = matches.map((m, i) => `
+  <div class="row rv" data-open="${i}" tabindex="0" role="button" aria-label="Открыть прогноз ${m.t}" style="transition-delay:${i * 70}ms">
+    <div><small>${m.l}</small><span class="t">${m.t}</span></div>
+    <div><div class="mini"><span style="width:${m.p[0]}%;background:#e6e2d5"></span><span style="width:${m.p[1]}%;background:#5d5b52;transition-delay:.15s"></span><span style="width:${m.p[2]}%;background:var(--away);transition-delay:.3s"></span></div>
+    <div class="minin num"><span>${m.p[0]}%</span><span>${m.p[1]}%</span><span style="color:var(--away)">${m.p[2]}%</span></div></div>
+    <div class="pills num">${m.o.map((o, k) => `<span class="${k === m.hot ? "hot" : ""}">${o}</span>`).join("")}</div>
+  </div>`).join("");
+
+// Reveal on scroll (elements start dim, never invisible)
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in");
+  if (e.target.id === "wi") {
+    document.getElementById("chart").classList.add("in");
+    const big = e.target.querySelector("[data-count]");
+    countUp(big, +big.dataset.count, 1500, big.dataset.suffix);
+  }
+  io.unobserve(e.target);
+}), { threshold: 0.2 });
+document.querySelectorAll(".rv").forEach((el) => io.observe(el));
+
+// Cursor-following glow on article covers
+document.querySelectorAll(".cover").forEach((c) => c.addEventListener("pointermove", (e) => {
+  const r = c.getBoundingClientRect();
+  c.style.setProperty("--mx", `${e.clientX - r.left}px`); c.style.setProperty("--my", `${e.clientY - r.top}px`);
+}));
+
+// Match → forecast, as a view transition where the browser supports it
+function openMatch(i, source) {
+  const m = matches[i];
+  const res = ["В", "В", "Н", "П", "В"], col = { В: "var(--pitch)", Н: "#8a877c", П: "var(--danger)" };
+  const vt = document.startViewTransition && !reduce;
+  // Only one element may carry the transition name at a time: the source card, then the sheet.
+  if (vt && source) source.style.viewTransitionName = "match";
+  const show = () => {
+    if (source) source.style.viewTransitionName = "";
+    const o = document.createElement("div");
+    o.className = "overlay";
+    o.innerHTML = `<div class="card sheet" role="dialog" aria-modal="true" aria-label="Прогноз ${m.t}">
+      <small style="color:var(--subtle)">${m.l}</small><h3>Прогноз на матч ${m.t}</h3>
+      <div class="tiles">
+        <div class="tile"><small>Исход</small><b class="num" data-f="${m.p[0]}%"></b><p>Фаворит по рынку</p></div>
+        <div class="tile"><small>Голы</small><b class="num" data-f="59%"></b><p>Скорее больше 2,5</p></div>
+        <div class="tile"><small>Обе забьют</small><b class="num" data-f="50/50"></b><p>Поровну</p></div>
+      </div>
+      <p class="lbl">Форма хозяев, последние 5</p>
+      <div class="form">${res.map((r, k) => `<span style="background:${col[r]};animation-delay:${400 + k * 90}ms">${r}</span>`).join("")}</div>
+      <button class="close" type="button">Закрыть</button></div>`;
+    document.body.appendChild(o);
+    o.querySelector(".sheet").style.viewTransitionName = vt ? "match" : "";
+    o.querySelectorAll("[data-f]").forEach((b, k) => flip(b, b.dataset.f, 150 + k * 180));
+    const close = () => {
+      const go = () => { o.remove(); if (vt && source) source.style.viewTransitionName = "match"; };
+      if (!vt) return go();
+      document.startViewTransition(go).finished.finally(() => { if (source) source.style.viewTransitionName = ""; source?.focus?.(); });
+    };
+    o.querySelector(".close").addEventListener("click", close);
+    o.addEventListener("click", (e) => { if (e.target === o) close(); });
+    o.querySelector(".close").focus();
+  };
+  vt ? document.startViewTransition(show) : show();
+}
+document.addEventListener("click", (e) => { const t = e.target.closest("[data-open]"); if (t) { e.preventDefault(); openMatch(+t.dataset.open, t.closest(".row, .match")); } });
+document.addEventListener("keydown", (e) => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".row")) { e.preventDefault(); openMatch(+e.target.dataset.open, e.target); }
+  if (e.key === "Escape") document.querySelector(".overlay .close")?.click();
+});
+</script>
