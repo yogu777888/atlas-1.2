@@ -143,11 +143,9 @@ body {
 .js [data-reveal]:not(.in) .draw-fill { animation-play-state: paused; }
 @keyframes bar-grow { from { transform: scaleX(0); } }
 
-/* Headline lines slide up from behind a mask */
-.line-reveal { display: block; overflow: hidden; padding-bottom: 0.06em; }
-.line-reveal > span { display: block; animation: line-up 1s var(--ease-out) both; }
-.line-reveal:nth-child(2) > span { animation-delay: 0.12s; }
-@keyframes line-up { from { transform: translateY(105%); } }
+/* Headline words rise softly into place, one after another (no hard mask edge) */
+.word-rise { display: inline-block; animation: word-rise 0.8s var(--ease-out) both; }
+@keyframes word-rise { from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); } }
 
 .fade-up { animation: rise 0.9s var(--ease-out) both; }
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { ArticleCard } from "@/components/ArticleCard";
 import { BonusCard } from "@/components/BonusCard";
 import { BookmakerRow } from "@/components/BookmakerRow";
@@ -60,12 +61,8 @@ export default async function Home() {
               {status} →
             </Link>
             <h1 className="text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              <span className="line-reveal">
-                <span>Прогнозы на футбол</span>
-              </span>
-              <span className="line-reveal">
-                <span className="text-fg/75">по цифрам.</span>
-              </span>
+              <span className="block">{words("Прогнозы на футбол", 0)}</span>
+              <span className="block text-fg/75">{words("по цифрам.", 3)}</span>
             </h1>
             <p className="fade-up mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted [animation-delay:350ms]">
               Для каждого матча — шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и
@@ -246,4 +243,15 @@ function pickHero(matches: Match[]): Match | undefined {
   const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
   const score = (m: Match) => (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0);
   return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
+}
+
+/** Splits a headline into words that rise in one after another. */
+function words(text: string, offset: number) {
+  return text.split(" ").map((w, i) => (
+    <Fragment key={i}>
+      <span className="word-rise" style={{ animationDelay: `${(offset + i) * 70}ms` }}>
+        {w}
+      </span>{" "}
+    </Fragment>
+  ));
 }
