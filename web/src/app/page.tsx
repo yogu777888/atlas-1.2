@@ -3,6 +3,9 @@ import Link from "next/link";
 import { BankChart } from "@/components/BankChart";
 import { Board, BoardLegend } from "@/components/Board";
 import { BoardFilter } from "@/components/BoardFilter";
+import { Standings } from "@/components/Standings";
+import { TeamMark } from "@/components/TeamMark";
+import { getSeason, standings } from "@/lib/season";
 import { BookmakerMini } from "@/components/BookmakerRow";
 import { Calibration } from "@/components/Calibration";
 import { MatchCard } from "@/components/MatchCard";
@@ -58,6 +61,8 @@ export default async function Home() {
     .map((l) => ({ key: l.key, short: l.short, label: `Все прогнозы на ${l.acc}`, href: paths.league(l.slug), count: board.filter((m) => m.league.key === l.key).length }))
     .filter((l) => l.count > 0);
   const top = bookmakersByRating();
+  const popular = matches.filter((m) => POPULAR.includes(m.home) || POPULAR.includes(m.away)).slice(0, 5);
+  const rplTable = popular.length ? [] : await getSeason("rpl").then((s) => standings(s.games)).catch(() => []);
 
   return (
     <div className="container-x">
@@ -129,13 +134,32 @@ export default async function Home() {
       <section className="pt-16">
         <SectionHead title="Ваша команда" sub="Прогноз на следующий матч, форма и что было бы, если ставить на неё весь сезон." href={paths.teams} cta="Все команды" />
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <nav aria-label="Популярные команды" className="flex flex-wrap gap-1.5">
-            {POPULAR.map((t) => (
-              <Link key={t} href={paths.team(teamSlug(t))} className="chip px-3.5 py-2 hover:-translate-y-0.5">
-                {t}
-              </Link>
-            ))}
-          </nav>
+          <div className="space-y-6">
+            <nav aria-label="Популярные команды" className="flex flex-wrap gap-1.5">
+              {POPULAR.map((t) => (
+                <Link key={t} href={paths.team(teamSlug(t))} className="chip px-3.5 py-2 hover:-translate-y-0.5">
+                  <TeamMark name={t} size={16} />
+                  {t}
+                </Link>
+              ))}
+            </nav>
+            {popular.length > 0 ? (
+              <div>
+                <p className="mb-2 text-sm font-semibold text-fg-2">Ближайшие матчи этих команд</p>
+                <Board matches={popular} />
+              </div>
+            ) : (
+              rplTable.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-semibold text-fg-2">Топ-лиги на паузе. Верх таблицы РПЛ сейчас такой:</p>
+                  <Standings rows={rplTable} limit={6} />
+                  <Link href={paths.league("rpl")} className="link-more mt-3">
+                    Таблица и прогнозы на РПЛ <span aria-hidden>→</span>
+                  </Link>
+                </div>
+              )
+            )}
+          </div>
           {fact && <WhatIfCard fact={fact} />}
         </div>
       </section>
