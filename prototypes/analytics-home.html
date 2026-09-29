@@ -1,0 +1,390 @@
+<title>tag.bet аналитика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Fira+Sans+Extra+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: a data desk, not a landing page. A modest masthead, then the day's forecasts as a table that is the hero; colour means probability, yellow means "above fair price", like a highlighter on a printout. */
+:root{
+  --paper:#f3f5f0;   /* chalk-white page with a pitch-green cast */
+  --sheet:#ffffff;
+  --ink:#111512;
+  --ink2:#2f3631;
+  --muted:#626a64;
+  --faint:#8b938d;
+  --line:#dde2da;
+  --line2:#c7cfc4;
+  --p1:#e9f2eb; --p2:#cfe5d6; --p3:#a3cfb1; --p4:#56a676; --p5:#1c7442;  /* probability, low → high */
+  --hi:#ffd84a;      /* highlighter: price above fair */
+  --loss:#c4402e;
+  --text:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --num:"Fira Sans Extra Condensed","Roboto Condensed","Arial Narrow",sans-serif;
+  --out:cubic-bezier(.2,.8,.2,1);
+  --c:3.1rem;        /* width of one number cell */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+.n{font-family:var(--num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+
+/* header: logo and sections on the left, the date and age mark on the right */
+.top{border-bottom:1px solid var(--line);background:var(--paper)}
+.bar{display:flex;align-items:center;gap:32px;height:60px}
+.logo{display:inline-flex;align-items:baseline;font-weight:800;font-size:24px;letter-spacing:-.055em;perspective:300px}
+.sq{display:inline-block;width:.3em;height:.3em;margin:0 .05em 0 .07em;background:var(--hi);border-radius:.05em;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.sq::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .02em);height:.04em;background:var(--ink)}
+.logo:hover .sq{animation:tile .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes tile{45%{transform:rotateX(-90deg)}}
+.nav{display:flex;gap:4px;font-size:14px;color:var(--muted)}
+.nav a{padding:6px 10px;border-radius:6px;transition:color .2s,background .2s}
+.nav a:hover{color:var(--ink);background:rgba(17,21,18,.04)}
+.nav a[aria-current]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--ink);border-radius:0}
+.right{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.age{font-weight:700;font-size:11px;border:1.5px solid var(--ink2);color:var(--ink2);border-radius:4px;padding:1px 5px}
+@media (max-width:860px){.nav{display:none}.bar{gap:16px}}
+.mnav{display:none;gap:4px;overflow-x:auto;padding-bottom:10px;font-size:14px;color:var(--muted)}
+.mnav a{padding:4px 10px;white-space:nowrap}.mnav a[aria-current]{color:var(--ink);font-weight:600}
+@media (max-width:860px){.mnav{display:flex}}
+
+/* masthead */
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 48px;align-items:end;padding-block:36px 28px;border-bottom:1px solid var(--line)}
+@media (max-width:860px){.mast{grid-template-columns:1fr;padding-block:24px 20px}}
+h1{margin:0;font-weight:800;font-size:clamp(32px,4.4vw,52px);line-height:1.02;letter-spacing:-.04em;text-wrap:balance}
+.word{display:inline-block;animation:wr .8s var(--out) both}
+@keyframes wr{from{opacity:0;transform:translateY(.35em);filter:blur(8px)}}
+.dek{margin:12px 0 0;max-width:46ch;color:var(--muted);font-size:16px;animation:fade .8s var(--out) .3s both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.status{display:flex;gap:28px;margin:0;animation:fade .8s var(--out) .45s both}
+.status div{display:grid;gap:2px}
+.status dt{font-size:12px;color:var(--muted)}
+.status dd{margin:0;font-family:var(--num);font-weight:700;font-size:34px;line-height:1}
+.status dd small{font:500 13px var(--text);color:var(--muted);margin-left:4px}
+.live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--p4);margin-right:6px;vertical-align:middle;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+/* main grid */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;padding-block:28px 0;align-items:start}
+@media (max-width:1040px){.layout{grid-template-columns:1fr}}
+
+/* board */
+.tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.seg{display:inline-flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;background:var(--sheet)}
+.seg button{font:500 13px var(--text);color:var(--muted);background:none;border:0;border-left:1px solid var(--line);padding:7px 12px;cursor:pointer;transition:background .2s,color .2s}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.legend{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:34px;height:10px;border-radius:2px;vertical-align:middle;margin-right:6px;background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4),var(--p5))}
+.legend b{font-weight:500;background:var(--hi);padding:0 5px;border-radius:2px;color:var(--ink);margin-right:6px}
+
+.board{background:var(--sheet);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.cols,.row{display:grid;grid-template-columns:3.2rem minmax(0,1fr) auto 1rem;gap:14px;align-items:center;padding-inline:16px}
+.cols{padding-block:8px;font-size:11px;color:var(--faint);border-bottom:1px solid var(--line);background:#fafbf8}
+.cells{display:flex;gap:14px}
+.g{display:grid;grid-auto-flow:column;grid-auto-columns:var(--c);gap:3px;text-align:center}
+.cols .g span{white-space:nowrap}
+.day{border-top:1px solid var(--line)}
+.day:first-of-type{border-top:0}
+.dayhead{display:flex;align-items:baseline;gap:12px;padding:16px 16px 6px}
+.dnum{font-family:var(--num);font-weight:700;font-size:40px;line-height:.8}
+.dname{font-weight:700;font-size:16px}
+.dname small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.dcount{margin-left:auto;font-size:12px;color:var(--faint)}
+.row{padding-block:9px;border-top:1px solid #eef1ec;cursor:pointer;transition:background .2s,opacity .6s var(--out),transform .6s var(--out)}
+.row:hover{background:#f8faf6}
+.time{font-family:var(--num);font-weight:600;font-size:18px;color:var(--ink2)}
+.match b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.match small{font-size:12px;color:var(--muted)}
+.h{font-family:var(--num);font-weight:600;font-size:18px;border-radius:5px;padding:5px 0;transition:background-color .6s var(--out),color .6s var(--out)}
+.h.l1{background:var(--p1)}.h.l2{background:var(--p2)}.h.l3{background:var(--p3)}.h.l4{background:var(--p4);color:#fff}.h.l5{background:var(--p5);color:#fff}
+.o{font-family:var(--num);font-weight:500;font-size:18px;padding:5px 0;border-radius:3px;color:var(--ink2);
+  background-image:linear-gradient(var(--hi),var(--hi));background-repeat:no-repeat;background-position:0 55%;background-size:0 0;transition:background-size .7s var(--out)}
+.o.hi{background-size:100% 78%;color:var(--ink);font-weight:600}
+.go{color:var(--faint);transition:transform .3s var(--out),color .2s}
+.row:hover .go{transform:translateX(3px);color:var(--ink)}
+@media (max-width:560px){
+  :root{--c:2.45rem}
+  .cols{display:none}
+  .row{grid-template-columns:2.8rem minmax(0,1fr) 1rem;row-gap:8px}
+  .cells{grid-column:1/-1;gap:10px}
+  .go{grid-row:1;grid-column:3}
+  .h,.o{font-size:16px}
+}
+
+/* reveal: rows start dim and lowered, cells uncoloured, highlighter not yet drawn */
+.js .row:not(.in){opacity:.3;transform:translateY(12px)}
+.js .row:not(.in) .h{background:transparent;color:var(--muted)}
+.js .row:not(.in) .o.hi{background-size:0 78%}
+
+/* aside */
+aside{display:grid;gap:20px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:20px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink2)}
+.kicker .sq{font-size:22px;margin:0}
+.fm h3{margin:10px 0 0;font-size:22px;font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.fm .meta{font-size:12px;color:var(--muted);margin-top:4px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:16px;text-align:center}
+.trio div{border-radius:8px;padding:8px 0 6px}
+.trio b{display:block;font-family:var(--num);font-weight:700;font-size:38px;line-height:1;perspective:300px}
+.trio small{font-size:11px}
+.ch{display:inline-block;transform-origin:top;animation:flap .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes flap{from{transform:rotateX(-90deg);opacity:0}}
+.calls{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:6px;font-size:14px}
+.calls li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.calls li span:last-child{font-family:var(--num);font-weight:600;font-size:17px}
+.form{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-size:13px}
+.pills{display:flex;gap:3px}
+.pills i{width:20px;height:20px;border-radius:4px;display:grid;place-items:center;font:700 11px var(--text);font-style:normal;color:#fff;animation:flap .45s cubic-bezier(.34,1.56,.64,1) both}
+.fw{background:var(--p5)}.fd{background:#9aa29c}.fl{background:var(--loss)}
+.more{display:inline-flex;gap:6px;margin-top:16px;font-weight:600;font-size:14px;border-bottom:2px solid var(--hi)}
+.more span{transition:transform .3s var(--out)}.more:hover span{transform:translateX(3px)}
+.books{margin:12px 0 0;padding:0;list-style:none}
+.books li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.books li:first-child{border-top:0}
+.mono{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
+.books b{display:block;font-weight:600;font-size:14px}
+.books small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rate{font-family:var(--num);font-weight:700;font-size:20px}
+.fine{font-size:11px;color:var(--faint);margin:10px 0 0}
+
+/* sections */
+section.s{padding-block:56px 0}
+.sh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px;margin-bottom:18px}
+h2{margin:0;font-weight:800;font-size:clamp(24px,2.8vw,32px);letter-spacing:-.03em}
+.sh p{margin:0;color:var(--muted);max-width:52ch}
+.sh a{font-size:14px;font-weight:600;border-bottom:2px solid var(--hi)}
+
+/* your team */
+.teams{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
+@media (max-width:900px){.teams{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips a{border:1px solid var(--line2);background:var(--sheet);border-radius:8px;padding:8px 12px;font-weight:500;transition:border-color .2s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+.chips a:hover{border-color:var(--ink);transform:translateY(-2px)}
+.fact .big{font-family:var(--num);font-weight:700;font-size:56px;line-height:1;color:var(--loss);margin-top:6px}
+.fact p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.spark path{fill:none;stroke:var(--loss);stroke-width:2.2;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s var(--out)}
+.in .spark path,.spark.in path{stroke-dashoffset:0}
+
+/* trust */
+.trust{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:900px){.trust{grid-template-columns:1fr}}
+.trust>div{background:var(--sheet);padding:22px}
+.trust h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.trust p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.cal{display:block;width:100%;max-width:340px;height:auto;margin-top:12px}
+.cal .dot{fill:var(--p5);transform:scale(0);transform-box:fill-box;transform-origin:center;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.in .cal .dot{transform:scale(1)}
+.cal text{font:500 10px var(--num);fill:var(--faint)}
+
+/* reading */
+.reads{border-top:1px solid var(--line)}
+.read{display:grid;grid-template-columns:7.5rem minmax(0,1fr) auto;gap:18px;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line)}
+.read .k{font-family:var(--num);font-weight:700;font-size:34px;line-height:1}
+.read b{font-weight:600;font-size:17px;transition:box-shadow .3s var(--out)}
+.read:hover b{box-shadow:inset 0 -.45em 0 var(--hi)}
+.read span{font-size:13px;color:var(--muted)}
+@media (max-width:560px){.read{grid-template-columns:5rem minmax(0,1fr)}.read span{display:none}}
+
+footer{margin-top:72px;border-top:1px solid var(--line);padding-block:24px 48px;color:var(--faint);font-size:12px}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .row:not(.in){opacity:1;transform:none}
+  .js .row:not(.in) .h.l1{background:var(--p1)} .js .row:not(.in) .h.l2{background:var(--p2)} .js .row:not(.in) .h.l3{background:var(--p3)}
+  .js .row:not(.in) .h.l4{background:var(--p4);color:#fff} .js .row:not(.in) .h.l5{background:var(--p5);color:#fff}
+  .js .row:not(.in) .o.hi{background-size:100% 78%}
+  .spark path{stroke-dashoffset:0}.cal .dot{transform:none}
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="#" aria-label="tag.bet">tag<span class="sq"></span>bet</a>
+      <nav class="nav" aria-label="Разделы"><a href="#" aria-current="page">Прогнозы</a><a href="#teams">Команды</a><a href="#">Букмекеры</a><a href="#">Бонусы</a><a href="#reads">Статьи</a></nav>
+      <div class="right"><span>вт, 29 сентября</span><span class="age" title="Только для совершеннолетних">18+</span></div>
+    </div>
+    <nav class="mnav" aria-label="Разделы"><a href="#" aria-current="page">Прогнозы</a><a href="#teams">Команды</a><a href="#">Букмекеры</a><a href="#">Бонусы</a><a href="#reads">Статьи</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="mast">
+    <div>
+      <h1><span class="word" style="animation-delay:0ms">Прогнозы</span> <span class="word" style="animation-delay:70ms">на</span> <span class="word" style="animation-delay:140ms">футбол</span> <span class="word" style="animation-delay:210ms">по</span> <span class="word" style="animation-delay:280ms">цифрам</span></h1>
+      <p class="dek">Шансы по мировому рынку, форма и составы для каждого матча. Без экспертов и обещаний выигрыша.</p>
+    </div>
+    <dl class="status">
+      <div><dt>Прогнозов на неделе</dt><dd id="st-n">8</dd></div>
+      <div><dt>Кэф выше честного</dt><dd id="st-v">4</dd></div>
+      <div><dt><span class="live"></span>Обновлено</dt><dd>2<small>мин назад</small></dd></div>
+    </dl>
+  </section>
+
+  <div class="layout">
+    <div>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="Турнир">
+          <button type="button" aria-pressed="true" data-f="all">Все</button><button type="button" aria-pressed="false" data-f="РПЛ">РПЛ</button><button type="button" aria-pressed="false" data-f="АПЛ">АПЛ</button><button type="button" aria-pressed="false" data-f="Лига чемпионов">ЛЧ</button><button type="button" aria-pressed="false" data-f="Кубок России">Кубок</button>
+        </div>
+        <div class="legend"><span><i></i>цвет — шанс исхода</span><span><b>2.25</b>выше честной цены</span></div>
+      </div>
+      <div class="board" id="board">
+        <div class="cols" aria-hidden="true"><span>Время</span><span>Матч</span>
+          <span class="cells"><span class="g"><span>П1</span><span>X</span><span>П2</span></span><span class="g"><span>ТБ 2,5</span></span><span class="g"><span>кэф П1</span><span>X</span><span>П2</span></span></span><span></span></div>
+        <div id="days"></div>
+      </div>
+      <p class="fine">Пример данных для прототипа. Шансы — среднее по мировому рынку без маржи, кэф — легального букмекера.</p>
+    </div>
+
+    <aside>
+      <article class="card fm">
+        <span class="kicker"><span class="sq"></span>Матч дня</span>
+        <h3>Арсенал — Интер</h3>
+        <p class="meta">Лига чемпионов · сегодня, 22:00</p>
+        <div class="trio">
+          <div class="l4" style="background:var(--p4);color:#fff"><b class="n" data-flip="52">52</b><small>Арсенал</small></div>
+          <div style="background:var(--p2)"><b class="n" data-flip="25">25</b><small>ничья</small></div>
+          <div style="background:var(--p2)"><b class="n" data-flip="23">23</b><small>Интер</small></div>
+        </div>
+        <ul class="calls">
+          <li><span>Голы</span><span>поровну</span></li>
+          <li><span>Обе забьют</span><span>54%</span></li>
+          <li><span>Кэф на Интер</span><span style="background:var(--hi);padding:0 6px;border-radius:3px">4.60</span></li>
+        </ul>
+        <div class="form"><span>Арсенал</span><span class="pills"><i class="fw" style="animation-delay:.5s">В</i><i class="fw" style="animation-delay:.58s">В</i><i class="fd" style="animation-delay:.66s">Н</i><i class="fw" style="animation-delay:.74s">В</i><i class="fl" style="animation-delay:.82s">П</i></span></div>
+        <div class="form"><span>Интер</span><span class="pills"><i class="fw" style="animation-delay:.6s">В</i><i class="fd" style="animation-delay:.68s">Н</i><i class="fw" style="animation-delay:.76s">В</i><i class="fw" style="animation-delay:.84s">В</i><i class="fw" style="animation-delay:.92s">В</i></span></div>
+        <a class="more" href="#">Полный прогноз <span>→</span></a>
+      </article>
+
+      <article class="card">
+        <span class="kicker">Где ставить</span>
+        <ul class="books">
+          <li><span class="mono" style="background:#e4002b">Ф</span><span><b>Фонбет</b><small>Фрибет новым игрокам</small></span><span class="rate">4.7</span></li>
+          <li><span class="mono" style="background:#ff6600">W</span><span><b>Winline</b><small>Фрибет за регистрацию</small></span><span class="rate">4.6</span></li>
+          <li><span class="mono" style="background:#111512">P</span><span><b>PARI</b><small>Бонус на первый депозит</small></span><span class="rate">4.5</span></li>
+        </ul>
+        <p class="fine">Только букмекеры с лицензией ФНС России. Оценки — пример.</p>
+        <a class="more" href="#">Весь рейтинг <span>→</span></a>
+      </article>
+    </aside>
+  </div>
+
+  <section class="s" id="teams">
+    <div class="sh"><h2>Ваша команда</h2><p>Следующий матч с прогнозом, форма и сколько бы вы потеряли, ставя на неё весь сезон.</p></div>
+    <div class="teams">
+      <div class="chips">
+        <a href="#">Зенит</a><a href="#">Спартак</a><a href="#">ЦСКА</a><a href="#">Краснодар</a><a href="#">Локомотив</a><a href="#">Динамо</a><a href="#">Ростов</a><a href="#">Рубин</a><a href="#">Реал Мадрид</a><a href="#">Барселона</a><a href="#">Ливерпуль</a><a href="#">Манчестер Сити</a><a href="#">Бавария</a><a href="#">Интер</a>
+      </div>
+      <div class="card fact" data-rv>
+        <span class="kicker">А что, если · сезон 2025/26</span>
+        <p style="margin-top:10px;color:var(--ink)">100 ₽ на победу Локомотива в каждом матче:</p>
+        <div class="big n">−1 240 ₽</div>
+        <svg class="spark" viewBox="0 0 300 60" role="img" aria-label="Банк по ходу сезона уходит в минус" style="width:100%;height:auto;margin-top:10px">
+          <line x1="0" x2="300" y1="14" y2="14" stroke="#c7cfc4" stroke-dasharray="3 4"/>
+          <path pathLength="1" d="M0 14 L20 6 L40 18 L60 12 L80 26 L100 20 L120 30 L140 27 L160 38 L180 33 L200 42 L220 40 L240 49 L260 45 L280 55 L300 52"/>
+        </svg>
+        <p>Пример. На сайте — по реальным коэффициентам и результатам.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="s">
+    <div class="sh"><h2>Почему нам можно верить</h2><a href="#">Как мы считаем</a></div>
+    <div class="trust" data-rv>
+      <div>
+        <h3>Проверяем себя публично</h3>
+        <p>Когда рынок давал исходу 60%, он сбывался в 59% случаев. Чем ближе точки к линии, тем честнее шансы.</p>
+        <svg class="cal" viewBox="0 0 220 150" role="img" aria-label="Сравнение обещанных и сбывшихся вероятностей: точки лежат у диагонали">
+          <line x1="24" y1="130" x2="210" y2="130" stroke="#dde2da"/><line x1="24" y1="130" x2="24" y2="8" stroke="#dde2da"/>
+          <line x1="24" y1="130" x2="210" y2="8" stroke="#c7cfc4" stroke-dasharray="3 3"/>
+          <text x="24" y="145">0%</text><text x="192" y="145">100%</text><text x="0" y="12">100%</text>
+          <g id="dots"></g>
+        </svg>
+      </div>
+      <div><h3>Цифры рынка, а не мнение</h3><p>Шансы — среднее по десяткам букмекеров, которые рискуют деньгами, с убранной комиссией. Никаких «экспертов» и «инсайдов».</p></div>
+      <div><h3>Только легальные букмекеры</h3><p>У всех, о ком мы пишем, есть лицензия ФНС России. Партнёрские ссылки помечены как реклама и не влияют на расчёты.</p></div>
+    </div>
+    <p class="fine">График — пример. Настоящая статистика точности появится после запуска.</p>
+  </section>
+
+  <section class="s" id="reads">
+    <div class="sh"><h2>Разобраться за пять минут</h2><a href="#">Все статьи</a></div>
+    <div class="reads">
+      <a class="read" href="#"><span class="k n">4,2%</span><b>Маржа букмекера: что это и как её посчитать</b><span>5 мин</span></a>
+      <a class="read" href="#"><span class="k n">52,6%</span><b>Как перевести коэффициент в вероятность</b><span>4 мин</span></a>
+      <a class="read" href="#"><span class="k n">13,2%</span><b>Экспресс: почему он выгоден букмекеру</b><span>4 мин</span></a>
+    </div>
+  </section>
+
+  <footer><div class="foot"><span>Прототип направления «Аналитика». Данные — пример.</span><span>18+. Азартные игры могут вызывать зависимость. Играйте ответственно.</span></div></footer>
+</main>
+
+<script>
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.documentElement.classList.add("js");
+
+const days = [
+  { num: "29", name: "Сегодня", sub: "вторник, 29 сентября", rows: [
+    { t: "19:00", m: "Реал Мадрид — Бавария", l: "Лига чемпионов", p: [45, 25, 30], o25: 58, k: [2.17, 3.75, 3.24] },
+    { t: "22:00", m: "Арсенал — Интер", l: "Лига чемпионов", p: [52, 25, 23], o25: 51, k: [1.84, 3.79, 4.60] },
+    { t: "22:00", m: "ПСЖ — Бенфика", l: "Лига чемпионов", p: [68, 18, 14], o25: 62, k: [1.42, 4.90, 7.80] } ] },
+  { num: "30", name: "Завтра", sub: "среда, 30 сентября", rows: [
+    { t: "19:30", m: "Спартак — Ростов", l: "Кубок России", p: [56, 24, 20], o25: 49, k: [1.72, 3.80, 4.60] },
+    { t: "22:00", m: "Ливерпуль — Атлетико", l: "Лига чемпионов", p: [55, 25, 20], o25: 47, k: [1.78, 3.70, 4.95] } ] },
+  { num: "3", name: "Суббота", sub: "3 октября", rows: [
+    { t: "14:30", m: "Манчестер Сити — Арсенал", l: "АПЛ", p: [48, 26, 26], o25: 57, k: [2.02, 3.60, 3.70] },
+    { t: "17:00", m: "Краснодар — Динамо", l: "РПЛ", p: [46, 27, 27], o25: 48, k: [2.25, 3.53, 3.50] },
+    { t: "19:30", m: "Зенит — Спартак", l: "РПЛ", p: [50, 26, 24], o25: 55, k: [1.90, 3.75, 4.35] } ] },
+];
+const lvl = (p) => (p >= 65 ? 5 : p >= 50 ? 4 : p >= 35 ? 3 : p >= 20 ? 2 : 1);
+// Above fair: price × chance > 1, capped at +12% so a stale line isn't sold as value
+const isValue = (k, p) => { const e = k * p / 100 - 1; return e > 0 && e <= 0.12; };
+const plural = (n, a) => a[n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : 2];
+
+function render(filter) {
+  let i = 0;
+  document.getElementById("days").innerHTML = days.map((d) => {
+    const rows = d.rows.filter((r) => filter === "all" || r.l === filter);
+    if (!rows.length) return "";
+    return `<div class="day"><div class="dayhead"><span class="dnum">${d.num}</span><span class="dname">${d.name}<small>${d.sub}</small></span><span class="dcount">${rows.length} ${plural(rows.length, ["матч", "матча", "матчей"])}</span></div>
+      ${rows.map((r) => `<a class="row" href="#" data-rv style="--i:${i++}">
+        <span class="time">${r.t}</span>
+        <span class="match"><b>${r.m}</b><small>${r.l}</small></span>
+        <span class="cells">
+          <span class="g">${r.p.map((p, j) => `<span class="h l${lvl(p)}" style="transition-delay:${120 + j * 90}ms">${p}</span>`).join("")}</span>
+          <span class="g"><span class="h l${lvl(r.o25)}" style="transition-delay:390ms">${r.o25}</span></span>
+          <span class="g">${r.k.map((k, j) => { const v = isValue(k, r.p[j]); return `<span class="o${v ? " hi" : ""}"${v ? ` aria-label="${k.toFixed(2)}, выше честной цены" style="transition-delay:600ms"` : ""}>${k.toFixed(2)}</span>`; }).join("")}</span>
+        </span>
+        <span class="go" aria-hidden="true">→</span></a>`).join("")}</div>`;
+  }).join("") || `<p style="padding:24px 16px;margin:0;color:var(--muted)">На этой неделе матчей этого турнира нет.</p>`;
+  watch();
+}
+
+// Reveal rows and cards as they scroll in; nothing is ever fully hidden
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  const el = e.target;
+  setTimeout(() => el.classList.add("in"), el.classList.contains("row") ? (+getComputedStyle(el).getPropertyValue("--i") % 8) * 60 : 0);
+  io.unobserve(el);
+}), { threshold: 0.15 });
+function watch() { document.querySelectorAll("[data-rv]:not(.in)").forEach((el) => (reduce ? el.classList.add("in") : io.observe(el))); }
+render("all");
+
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  render(b.dataset.f);
+}));
+
+// Scoreboard flip on the match of the day
+document.querySelectorAll("[data-flip]").forEach((el, k) => {
+  if (reduce) return;
+  el.innerHTML = [...el.dataset.flip].map((c, j) => `<span class="ch" style="animation-delay:${300 + k * 160 + j * 70}ms">${c}</span>`).join("");
+});
+
+// Calibration dots (example numbers)
+const cal = [[10, 9], [20, 21], [30, 31], [40, 38], [50, 51], [60, 59], [70, 72], [80, 79], [90, 88]];
+document.getElementById("dots").innerHTML = cal.map(([x, y], j) =>
+  `<circle class="dot" cx="${24 + x * 1.86}" cy="${130 - y * 1.22}" r="4.5" style="transition-delay:${j * 70}ms"/>`).join("");
+</script>
