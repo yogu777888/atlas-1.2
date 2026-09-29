@@ -1,6 +1,6 @@
 export const site = {
   name: "tag.bet",
-  tagline: "Разбор матча за 30 секунд.",
+  tagline: "Честные шансы на каждый матч.",
   description:
     "tag.bet показывает реальные шансы команд по мировому рынку, сравнивает их с коэффициентами легальных букмекеров и собирает бонусы с понятными условиями.",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://tag.bet").replace(/\/$/, ""),

@@ -52,6 +52,25 @@ const RU: Record<string, string> = {
   "young boys": "Янг Бойз", "slavia praha": "Славия", "sparta praha": "Спарта Прага", "fc copenhagen": "Копенгаген",
   "copenhagen": "Копенгаген", "bodo glimt": "Будё-Глимт", "qarabag": "Карабах", "union st gilloise": "Юнион Сент-Жиллуаз",
   "kairat almaty": "Кайрат", "kairat": "Кайрат",
+  // Сборные
+  "russia": "Россия", "england": "Англия", "france": "Франция", "germany": "Германия", "spain": "Испания", "italy": "Италия",
+  "portugal": "Португалия", "netherlands": "Нидерланды", "belgium": "Бельгия", "croatia": "Хорватия", "serbia": "Сербия",
+  "switzerland": "Швейцария", "austria": "Австрия", "denmark": "Дания", "sweden": "Швеция", "norway": "Норвегия",
+  "poland": "Польша", "czech republic": "Чехия", "czechia": "Чехия", "slovakia": "Словакия", "hungary": "Венгрия",
+  "romania": "Румыния", "bulgaria": "Болгария", "greece": "Греция", "turkey": "Турция", "turkiye": "Турция",
+  "ukraine": "Украина", "belarus": "Беларусь", "georgia": "Грузия", "armenia": "Армения", "azerbaijan": "Азербайджан",
+  "kazakhstan": "Казахстан", "uzbekistan": "Узбекистан", "scotland": "Шотландия", "wales": "Уэльс", "ireland": "Ирландия",
+  "republic of ireland": "Ирландия", "northern ireland": "Северная Ирландия", "iceland": "Исландия", "finland": "Финляндия",
+  "slovenia": "Словения", "bosnia and herzegovina": "Босния и Герцеговина", "north macedonia": "Северная Македония",
+  "montenegro": "Черногория", "albania": "Албания", "israel": "Израиль", "cyprus": "Кипр", "latvia": "Латвия",
+  "lithuania": "Литва", "estonia": "Эстония", "moldova": "Молдова", "luxembourg": "Люксембург", "malta": "Мальта",
+  "brazil": "Бразилия", "argentina": "Аргентина", "uruguay": "Уругвай", "colombia": "Колумбия", "chile": "Чили",
+  "peru": "Перу", "ecuador": "Эквадор", "paraguay": "Парагвай", "bolivia": "Боливия", "venezuela": "Венесуэла",
+  "mexico": "Мексика", "usa": "США", "united states": "США", "canada": "Канада", "jamaica": "Ямайка", "honduras": "Гондурас",
+  "costa rica": "Коста-Рика", "panama": "Панама", "japan": "Япония", "south korea": "Южная Корея", "korea republic": "Южная Корея",
+  "australia": "Австралия", "iran": "Иран", "saudi arabia": "Саудовская Аравия", "qatar": "Катар", "morocco": "Марокко",
+  "egypt": "Египет", "senegal": "Сенегал", "nigeria": "Нигерия", "cameroon": "Камерун", "ghana": "Гана", "algeria": "Алжир",
+  "tunisia": "Тунис", "ivory coast": "Кот-д'Ивуар",
 };
 
 function key(name: string): string {

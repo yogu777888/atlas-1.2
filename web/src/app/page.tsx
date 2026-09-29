@@ -11,7 +11,7 @@ import { ProbBar } from "@/components/ProbBar";
 import { SectionHeading } from "@/components/SectionHeading";
 import { BONUS_TERMS, bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatches } from "@/lib/data";
-import { leagues } from "@/lib/leagues";
+import { isClubTop, leagues, otherLeague } from "@/lib/leagues";
 import { hasValue, isValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
 import { articles } from "@/content/articles";
 import { site } from "@/lib/site";
@@ -30,8 +30,19 @@ export default async function Home() {
   const matches = await getMatches();
   const top = bookmakersByRating();
   const hero = pickHero(matches);
-  const topCount = matches.filter((m) => m.league.key !== "other").length;
-  const otherCount = matches.length - topCount;
+  const clubCount = matches.filter((m) => isClubTop(m.league.key)).length;
+  const intlCount = matches.filter((m) => m.league.key === "intl").length;
+  const otherCount = matches.filter((m) => m.league.key === "other").length;
+  const n = (k: number) => `${k} ${plural(k, ["матч", "матча", "матчей"])}`;
+  // Honest status line: says so when the top leagues are paused for an international break
+  const status = clubCount
+    ? `${n(clubCount)} топ-лиг на неделе${intlCount + otherCount ? ` · ещё ${intlCount + otherCount} в других турнирах` : ""}`
+    : intlCount
+      ? `Топ-лиги на паузе · ${n(intlCount)} сборных`
+      : `Топ-лиги на паузе · ${n(otherCount)} других турниров`;
+  const leagueCounts = [...leagues, otherLeague]
+    .map((l) => ({ ...l, count: matches.filter((m) => m.league.key === l.key).length }))
+    .filter((l) => l.count > 0);
 
   return (
     <>
@@ -39,26 +50,23 @@ export default async function Home() {
       <section className="relative overflow-hidden">
         <div className="bg-grid absolute inset-0" aria-hidden />
         <div className="absolute top-[-20%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[120px]" aria-hidden />
-        <div className="container-x relative grid items-center gap-14 pt-20 pb-24 lg:grid-cols-[1.1fr_1fr] lg:pt-28">
+        <div className="container-x relative grid items-center gap-12 pt-14 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-20 lg:pb-20">
           <div className="animate-rise">
             <Link href="/matches" className="mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
               <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-mono text-accent">
                 <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
                 {dataSource() === "live" ? "LIVE" : "ДЕМО"}
               </span>
-              {topCount
-                ? `${topCount} ${plural(topCount, ["матч", "матча", "матчей"])} топ-лиг на неделе${otherCount ? ` · ещё ${otherCount} в других турнирах` : ""}`
-                : `${matches.length} ${plural(matches.length, ["матч", "матча", "матчей"])} на неделе`}{" "}
-              →
+              {status} →
             </Link>
             <h1 className="text-gradient text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              Разбор матча
+              Честные шансы
               <br />
-              за 30 секунд.
+              на каждый матч.
             </h1>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted">
-              Реальные шансы команд по мировому рынку и коэффициенты легального букмекера рядом. Сразу видно, где коэффициент
-              выгоднее справедливого.
+              Считаем реальную вероятность исхода по коэффициентам мирового рынка без маржи и показываем, где легальный букмекер
+              платит больше честной цены.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/matches" className="btn-primary h-11 px-6">
@@ -73,19 +81,26 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Leagues strip */}
-      <section className="border-y border-line bg-surface/40">
-        <div className="container-x flex flex-wrap items-center justify-center gap-x-6 gap-y-3 py-5">
-          {leagues.map((l) => (
-            <Link key={l.key} href={`/matches?league=${l.key}`} className="text-sm text-subtle transition hover:text-fg">
-              {l.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Leagues with games this week */}
+      {leagueCounts.length > 0 && (
+        <section className="border-y border-line bg-surface/40">
+          <div className="container-x flex gap-2 overflow-x-auto py-4 sm:flex-wrap sm:justify-center">
+            {leagueCounts.map((l) => (
+              <Link
+                key={l.key}
+                href={`/matches?league=${l.key}`}
+                className="flex shrink-0 items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm text-muted transition hover:border-line-strong hover:text-fg"
+              >
+                {l.short}
+                <span className="rounded-full bg-surface-2 px-1.5 text-xs text-subtle tabular-nums">{l.count}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Matches */}
-      <section className="container-x pt-24">
+      <section className="container-x pt-16">
         <SectionHeading eyebrow="Ближайшие матчи" title="Шансы и коэффициенты рядом." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты PARI; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
         <MatchTable matches={[...matches.filter((m) => m.league.key !== "other"), ...matches.filter((m) => m.league.key === "other")].slice(0, 8)} />
       </section>
@@ -226,6 +241,6 @@ function HeroCard({ m }: { m: Match }) {
 function pickHero(matches: Match[]): Match | undefined {
   const soon = Date.now() + 30 * 60_000;
   const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
-  const score = (m: Match) => (m.league.key !== "other" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0);
+  const score = (m: Match) => (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0);
   return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
 }
