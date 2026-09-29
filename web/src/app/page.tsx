@@ -262,6 +262,9 @@ function WhatIfCard({ fact }: { fact: NonNullable<Awaited<ReturnType<typeof what
 function pickFeatured(matches: Match[]): Match | undefined {
   const soon = Date.now() + 30 * 60_000;
   const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
-  const score = (m: Match) => (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0) + (POPULAR.includes(m.home) || POPULAR.includes(m.away) ? 2 : 0);
+  // Teams we have Russian names for are the ones readers know; "Belize — St. Vincent" is never the match of the day
+  const known = (m: Match) => /[а-яё]/i.test(m.home) && /[а-яё]/i.test(m.away);
+  const score = (m: Match) =>
+    (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (known(m) ? 4 : -6) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0) + (POPULAR.includes(m.home) || POPULAR.includes(m.away) ? 2 : 0);
   return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
 }
