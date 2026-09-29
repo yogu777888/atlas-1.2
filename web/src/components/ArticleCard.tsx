@@ -1,19 +1,22 @@
 import Link from "next/link";
 import type { Article } from "@/content/articles";
+import { paths } from "@/lib/routes";
 import { ArticleVisual } from "./ArticleVisuals";
 import { Cover } from "./Cover";
 
 export function ArticleCard({ a }: { a: Article }) {
   return (
-    <Link href={`/articles/${a.slug}`} data-reveal className="group flex flex-col gap-4">
+    <Link href={paths.article(a.slug)} data-reveal className="group flex flex-col gap-4">
       <div className="h-44 transition group-hover:-translate-y-0.5">
         <Cover figure={a.cover.figure} caption={a.cover.caption} visual={<ArticleVisual slug={a.slug} />} />
       </div>
-      <div className="space-y-1.5 px-1">
+      <div className="space-y-1.5 px-0.5">
         <p className="text-xs text-subtle">
           {a.category} · {a.minutes} мин
         </p>
-        <h3 className="text-lg leading-snug font-semibold tracking-tight text-balance group-hover:text-accent">{a.title}</h3>
+        <h3 className="text-lg leading-snug font-bold tracking-tight text-balance">
+          <span className="transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.4em_0_var(--color-hi)]">{a.title}</span>
+        </h3>
         <p className="text-sm leading-relaxed text-pretty text-muted">{a.description}</p>
       </div>
     </Link>

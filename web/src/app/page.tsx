@@ -1,257 +1,260 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Fragment } from "react";
-import { ArticleCard } from "@/components/ArticleCard";
-import { BonusCard } from "@/components/BonusCard";
-import { BookmakerRow } from "@/components/BookmakerRow";
-import { Features } from "@/components/Features";
-import { LocalTime } from "@/components/LocalTime";
-import { FlipText } from "@/components/FlipText";
-import { FlipMark } from "@/components/Logo";
-import { MatchTable } from "@/components/MatchTable";
-import { ProbBar } from "@/components/ProbBar";
-import { SectionHeading } from "@/components/SectionHeading";
-import { BONUS_TERMS, bookmakersByRating } from "@/lib/bookmakers";
-import { dataSource, getMatches } from "@/lib/data";
-import { isClubTop, leagues, otherLeague } from "@/lib/leagues";
-import { hasValue, isValue, odds, OUTCOMES, outcomeLabel, plural, verdict, type Match } from "@/lib/matches";
+import { BankChart } from "@/components/BankChart";
+import { Board, BoardLegend } from "@/components/Board";
+import { BookmakerMini } from "@/components/BookmakerRow";
+import { Calibration } from "@/components/Calibration";
+import { MatchCard } from "@/components/MatchCard";
+import { Faq, SectionHead, Stats, words } from "@/components/Page";
 import { articles } from "@/content/articles";
-import { site } from "@/lib/site";
+import { bookmakersByRating } from "@/lib/bookmakers";
+import { dataSource, getMatchDetail, getMatches, type MatchDetail } from "@/lib/data";
+import { mskTime } from "@/lib/dates";
+import { marketCheck, whatIfFact } from "@/lib/insights";
+import { getLeague, isClubTop, leagues } from "@/lib/leagues";
+import { hasValue, plural, type Match } from "@/lib/matches";
+import { paths } from "@/lib/routes";
+import { POPULAR, teamSlug } from "@/lib/teams";
 import { tools } from "@/lib/tools";
 
 export const revalidate = 300;
 
+export const metadata: Metadata = {
+  title: { absolute: "Прогнозы на футбол по цифрам: шансы на матчи недели · tag.bet" },
+  description:
+    "Прогнозы на футбол на неделю: шансы на матчи РПЛ, АПЛ, Лиги чемпионов и других топ-лиг по коэффициентам мировых букмекеров, форма команд и составы.",
+  alternates: { canonical: "/" },
+};
+
+const BOARD_ROWS = 14;
+
 const faqs = [
-  { q: "Откуда берутся шансы?", a: "Из коэффициентов крупных мировых букмекеров. Мы убираем из них маржу и усредняем — получается оценка рынка, которая обычно точнее любого эксперта." },
-  { q: "Что значит жёлтый коэффициент?", a: "Коэффициент букмекера выше справедливого: на длинной дистанции такие ставки выгоднее средних. Это не гарантия выигрыша в конкретном матче." },
-  { q: "tag.bet — это букмекер?", a: "Нет. Мы не принимаем ставки и не храним деньги. Мы разбираем матчи и рассказываем о легальных букмекерах." },
-  { q: "Как tag.bet зарабатывает?", a: "Некоторые букмекеры платят нам за привлечённых клиентов. Такие ссылки помечены как реклама. На расчёт шансов это не влияет." },
+  {
+    q: "Откуда берутся шансы?",
+    a: "Из коэффициентов крупных мировых букмекеров. Мы переводим их в вероятности, убираем маржу и берём среднее. Букмекеры рискуют своими деньгами, поэтому их общая оценка обычно точнее мнения любого отдельного человека.",
+  },
+  {
+    q: "Что значит коэффициент на жёлтом фоне?",
+    a: "Легальный букмекер платит за этот исход больше, чем следует из шансов рынка. На длинной дистанции такие ставки выгоднее остальных, но отдельная ставка всё равно может проиграть.",
+  },
+  { q: "Как часто обновляются прогнозы?", a: "Список матчей и коэффициенты обновляются каждые пять минут. Перед ставкой проверьте коэффициент в купоне букмекера: он мог измениться." },
+  { q: "tag.bet — это букмекер?", a: "Нет. Мы не принимаем ставки и не храним деньги игроков. Мы считаем шансы на матчи и рассказываем о легальных букмекерах." },
+  {
+    q: "Как tag.bet зарабатывает?",
+    a: "Некоторые букмекеры платят нам за новых клиентов, которые пришли по нашей ссылке. Такие ссылки помечены как реклама. На шансы и оценки это не влияет.",
+  },
 ];
 
 export default async function Home() {
-  const matches = await getMatches();
-  const top = bookmakersByRating();
-  const hero = pickHero(matches);
-  const clubCount = matches.filter((m) => isClubTop(m.league.key)).length;
-  const intlCount = matches.filter((m) => m.league.key === "intl").length;
-  const otherCount = matches.filter((m) => m.league.key === "other").length;
-  const n = (k: number) => `${k} ${plural(k, ["матч", "матча", "матчей"])}`;
-  // Honest status line: says so when the top leagues are paused for an international break
-  const status = clubCount
-    ? `${n(clubCount)} топ-лиг на неделе${intlCount + otherCount ? ` · ещё ${intlCount + otherCount} в других турнирах` : ""}`
-    : intlCount
-      ? `Топ-лиги на паузе · ${n(intlCount)} сборных`
-      : `Топ-лиги на паузе · ${n(otherCount)} других турниров`;
-  const leagueCounts = [...leagues, otherLeague]
+  const [matches, fact, check] = await Promise.all([getMatches(), whatIfFact().catch(() => null), marketCheck().catch(() => null)]);
+  const live = dataSource() === "live";
+  const main = matches.filter((m) => m.league.key !== "other");
+  const board = (main.length ? main : matches).slice(0, BOARD_ROWS);
+  const featured = pickFeatured(main.length ? main : matches);
+  const detail: MatchDetail | null = featured ? await getMatchDetail(featured).catch(() => null) : null;
+  const valueCount = matches.filter(hasValue).length;
+  const chips = leagues
     .map((l) => ({ ...l, count: matches.filter((m) => m.league.key === l.key).length }))
     .filter((l) => l.count > 0);
+  const top = bookmakersByRating();
 
   return (
-    <>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="bg-grid absolute inset-0" aria-hidden />
-        <div className="absolute top-[-20%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[120px]" aria-hidden />
-        <div className="container-x relative grid items-center gap-12 pt-14 pb-16 lg:grid-cols-[1.1fr_1fr] lg:pt-20 lg:pb-20">
-          <div>
-            <Link href="/matches" className="fade-up mb-7 inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 py-1 pr-3 pl-1.5 text-xs text-muted backdrop-blur hover:text-fg">
-              <span className="flex items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-medium text-accent">
-                <span className="size-1.5 animate-pulse-dot rounded-full bg-accent" />
-                {dataSource() === "live" ? "LIVE" : "ДЕМО"}
-              </span>
-              {status} →
-            </Link>
-            <h1 className="text-5xl leading-[1.02] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
-              <span className="block">{words("Прогнозы на футбол", 0)}</span>
-              <span className="block text-fg/75">{words("по цифрам.", 3)}</span>
-            </h1>
-            <p className="fade-up mt-6 max-w-lg text-lg leading-relaxed text-pretty text-muted [animation-delay:350ms]">
-              Для каждого матча — шансы по мировому рынку, форма команд, личные встречи и кто не сыграет. Без «экспертов» и
-              обещаний выигрыша.
-            </p>
-            <div className="fade-up mt-9 flex flex-wrap gap-3 [animation-delay:500ms]">
-              <Link href="/matches" className="btn-primary h-11 px-6">
-                Смотреть прогнозы
-              </Link>
-              <Link href="/bookmakers" className="btn-ghost h-11 px-6">
-                Рейтинг букмекеров
-              </Link>
-            </div>
-          </div>
-          {hero ? <HeroCard m={hero} /> : <EmptyHero />}
+    <div className="container-x">
+      <header className="grid items-end gap-x-12 gap-y-6 border-b border-line pt-9 pb-7 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div>
+          <h1 className="text-[clamp(34px,4.6vw,54px)] leading-[1.02] font-extrabold tracking-[-0.04em] text-balance">{words("Прогнозы на футбол по цифрам")}</h1>
+          <p className="fade-up mt-3 max-w-[54ch] text-base text-pretty text-muted [animation-delay:300ms]">
+            Шансы на каждый матч РПЛ, топ-лиг Европы и Лиги чемпионов. Считаем их по коэффициентам мировых букмекеров без маржи и отмечаем,
+            где легальный букмекер платит больше честной цены.
+          </p>
         </div>
-      </section>
+        <div className="fade-up [animation-delay:450ms]">
+          <Stats
+            items={[
+              { label: "Матчей на неделе", value: matches.length },
+              { label: "Выше честной цены", value: valueCount },
+              live
+                ? { label: <><span className="mr-1.5 inline-block size-[7px] animate-pulse-dot rounded-full bg-p4 align-middle" />Обновлено</>, value: mskTime(new Date().toISOString()), unit: "мск" }
+                : { label: "Данные", value: "демо" },
+            ]}
+          />
+        </div>
+      </header>
 
-      {/* Leagues with games this week */}
-      {leagueCounts.length > 1 && (
-        <section className="border-y border-line bg-surface/40">
-          <div className="container-x flex gap-2 overflow-x-auto py-4 sm:flex-wrap sm:justify-center">
-            {leagueCounts.map((l) => (
-              <Link
-                key={l.key}
-                href={`/matches?league=${l.key}`}
-                className="flex shrink-0 items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm text-muted transition hover:border-line-strong hover:text-fg"
-              >
-                {l.short}
-                <span className="rounded-full bg-surface-2 px-1.5 text-xs text-subtle tabular-nums">{l.count}</span>
+      <div className="grid items-start gap-10 pt-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section aria-labelledby="board-title">
+          <h2 id="board-title" className="sr-only">
+            Прогнозы на ближайшие матчи
+          </h2>
+          <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
+            {chips.length > 1 ? (
+              <nav aria-label="Турниры" className="flex flex-wrap gap-1.5">
+                {chips.map((l) => (
+                  <Link key={l.key} href={paths.league(l.slug)} className="chip">
+                    {l.short}
+                    <span className="num text-[13px] text-subtle">{l.count}</span>
+                  </Link>
+                ))}
+              </nav>
+            ) : (
+              <span />
+            )}
+            <BoardLegend odds={board.some((m) => m.pari)} />
+          </div>
+          <Board
+            matches={board}
+            empty={
+              <>
+                На ближайшую неделю матчей топ-лиг нет. Загляните в <Link href={paths.league("sbornye")} className="font-semibold underline">матчи сборных</Link>.
+              </>
+            }
+          />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-subtle">Шансы — среднее по мировому рынку без маржи. Коэффициенты — легального букмекера.</p>
+            {matches.length > board.length && (
+              <Link href={paths.forecasts} className="link-more">
+                Все прогнозы на неделю <span aria-hidden>→</span>
               </Link>
-            ))}
+            )}
           </div>
         </section>
-      )}
 
-      {/* Matches */}
-      <section className="container-x pt-16">
-        <SectionHeading eyebrow="Прогнозы" title="Ближайшие матчи по цифрам." sub="Полоска — вероятности П1 / X / П2 по мировому рынку. Справа коэффициенты легального букмекера; жёлтые выше справедливых." href="/matches" cta="Все матчи" />
-        <MatchTable matches={[...matches.filter((m) => m.league.key !== "other"), ...matches.filter((m) => m.league.key === "other")].slice(0, 8)} />
-      </section>
+        <aside className="grid gap-5 lg:sticky lg:top-20">
+          {featured && (
+            <div className="hidden sm:block">
+              <MatchCard m={featured} d={detail} />
+            </div>
+          )}
+          <article className="card p-5">
+            <span className="kicker">Где ставить</span>
+            <div className="mt-2">
+              <BookmakerMini list={top.slice(0, 3)} />
+            </div>
+            <p className="mt-2 text-[11px] text-subtle">Только букмекеры с лицензией ФНС России.</p>
+            <Link href={paths.bookmakers} className="link-more mt-3">
+              Весь рейтинг <span aria-hidden>→</span>
+            </Link>
+          </article>
+        </aside>
+      </div>
 
-      {/* Features */}
-      <section className="container-x pt-28">
-        <SectionHeading eyebrow="Зачем tag.bet" title="Ставить — ваше решение. Понимать шансы — наша работа." />
-        <Features />
-      </section>
-
-      {/* Bookmakers */}
-      <section className="container-x pt-28">
-        <SectionHeading eyebrow="Рейтинг" title="Лучшие легальные букмекеры" sub="Оцениваем коэффициенты, скорость выплат, линию и удобство." href="/bookmakers" cta="Весь рейтинг" />
-        <div className="card divide-y divide-line overflow-hidden">
-          {top.slice(0, 5).map((b, i) => (
-            <BookmakerRow key={b.slug} b={b} rank={i + 1} source="home-rank" />
-          ))}
+      <section className="pt-16">
+        <SectionHead title="Ваша команда" sub="Прогноз на следующий матч, форма и что было бы, если ставить на неё весь сезон." href={paths.teams} cta="Все команды" />
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <nav aria-label="Популярные команды" className="flex flex-wrap gap-1.5">
+            {POPULAR.map((t) => (
+              <Link key={t} href={paths.team(teamSlug(t))} className="chip px-3.5 py-2 hover:-translate-y-0.5">
+                {t}
+              </Link>
+            ))}
+          </nav>
+          {fact && <WhatIfCard fact={fact} />}
         </div>
       </section>
 
-      {/* Bonuses */}
-      <section className="container-x pt-28">
-        <SectionHeading eyebrow="Бонусы" title="Предложения для новых игроков" href="/bonuses" cta="Все бонусы" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {top.slice(0, 3).map((b) => (
-            <BonusCard key={b.slug} b={b} source="home-bonus" />
-          ))}
+      <section className="pt-16">
+        <SectionHead title="Насколько точны эти шансы" href={paths.method} cta="Как мы считаем" />
+        <div data-reveal className="grid gap-px overflow-hidden rounded-[10px] border border-line bg-line md:grid-cols-[1.3fr_1fr_1fr]">
+          <div className="bg-surface p-5">
+            <h3 className="font-bold">Проверяем рынок на прошлом сезоне</h3>
+            {check ? (
+              <>
+                <p className="mt-1.5 text-sm text-muted">
+                  {check.near60
+                    ? `Исходы, которым рынок давал ${Math.round(check.near60.from * 100)}–${Math.round(check.near60.to * 100)}%, сбылись в ${Math.round(check.near60.actual * 100)}% случаев. `
+                    : ""}
+                  Каждая точка — группа исходов из {check.games.toLocaleString("ru-RU")} {plural(check.games, ["матча", "матчей", "матчей"])} сезона {check.season}. Чем ближе точки к диагонали, тем честнее шансы.
+                </p>
+                <Calibration bins={check.bins} className="mt-3 max-w-[340px]" />
+                {check.demo && <p className="mt-1 text-[11px] text-subtle">Демо-данные: график посчитан на модельном сезоне.</p>}
+              </>
+            ) : (
+              <p className="mt-1.5 text-sm text-muted">График появится, когда загрузятся результаты прошлого сезона.</p>
+            )}
+          </div>
+          <div className="bg-surface p-5">
+            <h3 className="font-bold">Шансы считает рынок</h3>
+            <p className="mt-1.5 text-sm text-muted">
+              Мы берём коэффициенты десятков букмекеров, убираем из них маржу и усредняем. Эксперты и «инсайды» в расчёте не участвуют, поэтому шансы
+              одинаково считаются для любого матча.
+            </p>
+          </div>
+          <div className="bg-surface p-5">
+            <h3 className="font-bold">Только легальные букмекеры</h3>
+            <p className="mt-1.5 text-sm text-muted">
+              У всех, о ком мы пишем, есть лицензия ФНС России. Партнёрские ссылки помечены как реклама, а коэффициенты и шансы от них не зависят.
+            </p>
+          </div>
         </div>
-        <p className="mt-4 text-xs text-subtle">{BONUS_TERMS}</p>
       </section>
 
-      {/* Learn */}
-      <section className="container-x pt-28">
-        <SectionHeading eyebrow="Разобраться" title="Как букмекер считает коэффициенты." sub="Короткие статьи с формулами и примерами — и калькуляторы, чтобы проверить на своих цифрах." href="/articles" cta="Все статьи" />
-        <div className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {["marzha-bukmekera", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
+      <section className="pt-16">
+        <SectionHead title="Разобраться за пять минут" href={paths.articles} cta="Все статьи" />
+        <div className="border-t border-line">
+          {["marzha-bukmekera", "koefficient-v-veroyatnost", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
             const a = articles.find((x) => x.slug === slug)!;
-            return <ArticleCard key={slug} a={a} />;
+            return (
+              <Link key={slug} href={paths.article(slug)} data-reveal className="group grid grid-cols-[5rem_minmax(0,1fr)] items-baseline gap-4 border-b border-line py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:gap-5">
+                <span className="num text-[28px] leading-none font-bold sm:text-[34px]">{a.cover.figure}</span>
+                <span className="min-w-0">
+                  <b className="text-[17px] font-semibold transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.45em_0_var(--color-hi)]">{a.title}</b>
+                  <small className="mt-0.5 block text-sm text-muted">{a.description}</small>
+                </span>
+                <span className="hidden text-[13px] text-subtle sm:block">{a.minutes} мин</span>
+              </Link>
+            );
           })}
         </div>
-        <div className="mt-10 flex flex-wrap items-center gap-2">
-          <span className="mr-2 text-sm text-subtle">Калькуляторы:</span>
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-sm text-muted">Калькуляторы:</span>
           {tools.map((t) => (
-            <Link key={t.slug} href={`/tools/${t.slug}`} className="rounded-full border border-line px-4 py-2 text-sm text-muted transition hover:border-line-strong hover:text-fg">
+            <Link key={t.slug} href={paths.tool(t.slug)} className="chip">
               {t.short}
             </Link>
           ))}
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="container-x pt-28">
-        <SectionHeading eyebrow="Вопросы" title="Частые вопросы" />
-        <div className="grid gap-3 md:grid-cols-2">
-          {faqs.map((f) => (
-            <details key={f.q} className="card group p-5 open:border-line-strong">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
-                {f.q}
-                <span className="text-subtle transition group-open:rotate-45">+</span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{f.a}</p>
-            </details>
-          ))}
-        </div>
-        <p className="mt-8 text-xs text-subtle">{site.warning}</p>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-            }),
-          }}
-        />
-      </section>
-    </>
-  );
-}
-
-function EmptyHero() {
-  return (
-    <div className="card flex animate-rise flex-col items-center justify-center gap-4 p-10 text-center [animation-delay:150ms]">
-      <FlipMark className="size-16" />
-      <p className="text-lg font-semibold tracking-tight">Линия на ближайшие дни ещё не открыта</p>
-      <p className="max-w-xs text-sm text-muted">Как только букмекеры выставят коэффициенты на матчи топ-лиг, разбор появится здесь.</p>
+      <div className="pt-16">
+        <Faq items={faqs} />
+      </div>
     </div>
   );
 }
 
-function HeroCard({ m }: { m: Match }) {
+function WhatIfCard({ fact }: { fact: NonNullable<Awaited<ReturnType<typeof whatIfFact>>> }) {
+  const { ledger: l, team } = fact;
+  const rub = `${l.profit > 0 ? "+" : l.profit < 0 ? "−" : ""}${Math.abs(l.profit).toLocaleString("ru-RU")} ₽`;
+  const league = getLeague(fact.league);
   return (
-    <div className="fade-up [animation-delay:200ms]">
-      <Link href={`/matches/${m.id}`} className="card relative block p-6 shadow-2xl shadow-black/60 transition hover:border-line-strong">
-        <div className="flex items-center justify-between text-xs text-subtle">
-          <span>{m.league.label}</span>
-          <LocalTime iso={m.commenceTime} />
-        </div>
-        <p className="mt-2 text-xl font-semibold tracking-tight">
-          {m.home} <span className="text-subtle">—</span> {m.away}
-        </p>
-        {verdict(m) && <p className="mt-1 text-sm text-muted">{verdict(m)}</p>}
-        {m.fair && (
-          <div className="mt-6">
-            <p className="mb-2 text-xs text-subtle">Шансы по мировому рынку</p>
-            <ProbBar p={m.fair} />
-          </div>
-        )}
-        {m.pari && (
-          <div className="mt-6">
-            <p className="mb-2 text-xs text-subtle">Коэффициенты букмекера</p>
-            <div className="grid grid-cols-3 gap-2">
-              {OUTCOMES.map((o, i) => {
-                const price = m.pari!.odds[o];
-                const good = m.fair ? isValue(price, m.fair[o]) : false;
-                return (
-                  <div key={o} className={`rounded-xl border p-2.5 text-center ${good ? "border-accent/40 bg-accent/10" : "border-line bg-surface-2"}`}>
-                    <p className="truncate text-[11px] text-subtle">{outcomeLabel(m, o)}</p>
-                    <p className={`text-lg font-semibold tabular-nums ${good ? "text-accent" : ""}`}>
-                      <FlipText text={odds(price)} delay={700 + i * 180} />
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        <span className="mt-6 inline-block text-sm text-accent">Полный прогноз →</span>
-      </Link>
-    </div>
+    <article className="card p-5">
+      <span className="kicker">
+        А что, если · {league?.short} {fact.season}
+      </span>
+      <p className="mt-2.5">
+        100 ₽ на победу команды {team.name} в каждом матче сезона, {l.steps.length} {plural(l.steps.length, ["матч", "матча", "матчей"])}:
+      </p>
+      <p className={`num mt-1 text-[56px] leading-none font-bold ${l.profit >= 0 ? "text-win" : "text-loss"}`}>{rub}</p>
+      <div className="mt-3">
+        <BankChart steps={l.steps} compact />
+      </div>
+      <p className="mt-2 text-sm text-muted">
+        Посчитано по коэффициентам закрытия линии и реальным результатам{fact.demo ? " (сейчас демо-данные)" : ""}.{" "}
+        <Link href={`${paths.whatIf}?league=${fact.league}&season=${fact.year}&team=${team.id}`} className="font-semibold text-fg underline decoration-hi decoration-2 underline-offset-4">
+          Посчитать для своей команды
+        </Link>
+      </p>
+    </article>
   );
 }
 
 /**
- * The showcase match: top leagues first, then one PARI prices above fair, then any
- * with market chances. Skips kick-offs in the next 30 minutes so it isn't stale on arrival.
+ * The match of the day: club top leagues first, then national teams, then one
+ * with a price above fair. Skips kick-offs in the next 30 minutes.
  */
-function pickHero(matches: Match[]): Match | undefined {
+function pickFeatured(matches: Match[]): Match | undefined {
   const soon = Date.now() + 30 * 60_000;
   const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
-  const score = (m: Match) => (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0);
+  const score = (m: Match) => (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0) + (POPULAR.includes(m.home) || POPULAR.includes(m.away) ? 2 : 0);
   return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
-}
-
-/** Splits a headline into words that rise in one after another. */
-function words(text: string, offset: number) {
-  return text.split(" ").map((w, i) => (
-    <Fragment key={i}>
-      <span className="word-rise" style={{ animationDelay: `${(offset + i) * 70}ms` }}>
-        {w}
-      </span>{" "}
-    </Fragment>
-  ));
 }

@@ -48,12 +48,12 @@ export function OddsConverter() {
       {FIELDS.map((f) => (
         <label key={f.key} className="min-w-0 space-y-1.5">
           <span className="flex items-baseline justify-between gap-2 text-xs">
-            <span className="text-fg">{f.label}</span>
+            <span className="font-medium text-fg">{f.label}</span>
             <span className="text-subtle">{f.hint}</span>
           </span>
           <input
             id={`odds-${f.key}`}
-            className={`field ${bad === f.key ? "border-danger/70" : ""} ${f.key === "dec" ? "text-accent" : ""}`}
+            className={`field ${bad === f.key ? "border-loss" : ""}`}
             inputMode={f.key === "frac" || f.key === "us" ? "text" : "decimal"}
             value={vals[f.key]}
             onChange={(e) => edit(f.key, e.target.value)}
@@ -62,8 +62,8 @@ export function OddsConverter() {
         </label>
       ))}
       <p className="text-sm text-muted sm:col-span-2">
-        Меняйте любое поле — остальные пересчитаются. Дробный вводите как <b className="text-fg">9/10</b>, американский как{" "}
-        <b className="text-fg">−111</b> или <b className="text-fg">+150</b>.
+        Меняйте любое поле, остальные пересчитаются сами. Дробный коэффициент вводите как <b className="text-fg">9/10</b>, американский как{" "}
+        <b className="text-fg">−111</b> или <b className="text-fg">+150</b>
       </p>
     </div>
   );

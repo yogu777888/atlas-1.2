@@ -23,7 +23,7 @@ export function ExpressCalc() {
       <div className="space-y-2">
         {legs.map((v, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="w-16 shrink-0 text-xs text-subtle">Событие {i + 1}</span>
+            <span className="w-16 shrink-0 text-xs text-muted">Событие {i + 1}</span>
             <input
               id={`leg-${i}`}
               className="field h-11"
@@ -36,7 +36,7 @@ export function ExpressCalc() {
               type="button"
               onClick={() => setLegs((l) => l.filter((_, j) => j !== i))}
               disabled={legs.length <= 2}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border border-line text-muted transition hover:text-fg disabled:opacity-30"
+              className="grid size-11 shrink-0 place-items-center rounded-lg border border-line-strong bg-surface text-muted transition hover:border-fg hover:text-fg disabled:opacity-30"
               aria-label={`Убрать событие ${i + 1}`}
             >
               ×
@@ -55,39 +55,39 @@ export function ExpressCalc() {
 
       <div className="grid grid-cols-2 gap-3">
         <label className="min-w-0 space-y-1.5">
-          <span className="text-xs text-subtle">Ставка, ₽</span>
+          <span className="text-xs text-muted">Ставка, ₽</span>
           <input id="stake" className="field" inputMode="decimal" value={stake} onChange={(e) => setStake(e.target.value)} />
         </label>
         <label className="min-w-0 space-y-1.5">
-          <span className="text-xs text-subtle">Маржа в каждом событии, %</span>
+          <span className="text-xs text-muted">Маржа в каждом событии, %</span>
           <input id="leg-margin" className="field" inputMode="decimal" value={legMargin} onChange={(e) => setLegMargin(e.target.value)} />
         </label>
       </div>
 
-      <div className="rounded-2xl border border-line bg-surface-2 p-5">
+      <div className="rounded-[10px] bg-surface-2 p-5 ring-1 ring-line">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs text-subtle">Итоговый коэффициент</p>
-            <p className="text-5xl font-extrabold tracking-[-0.04em] text-accent tabular-nums">{n >= 2 ? ru(total) : "—"}</p>
+            <p className="text-xs text-muted">Итоговый коэффициент</p>
+            <p className="num mt-1 text-[56px] leading-none font-bold">{n >= 2 ? ru(total) : "—"}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-subtle">Выплата при выигрыше</p>
-            <p className="text-2xl font-semibold tabular-nums">{n >= 2 && s ? `${ru(total * s, 0)} ₽` : "—"}</p>
+            <p className="text-xs text-muted">Выплата при выигрыше</p>
+            <p className="num text-3xl font-bold">{n >= 2 && s ? `${ru(total * s, 0)} ₽` : "—"}</p>
           </div>
         </div>
         {n >= 2 && (
-          <dl className="mt-6 grid grid-cols-3 gap-2 border-t border-line pt-5 text-sm">
+          <dl className="mt-5 grid grid-cols-3 gap-2 border-t border-line pt-4 text-sm">
             <div className="min-w-0">
-              <dt className="text-xs text-subtle">Шанс по коэф.</dt>
-              <dd className="text-lg font-semibold tabular-nums">{ru(100 / total, 1)}%</dd>
+              <dt className="text-xs text-muted">Шанс по коэффициенту</dt>
+              <dd className="num text-2xl font-bold">{ru(100 / total, 1)}%</dd>
             </div>
             <div className="min-w-0">
-              <dt className="text-xs text-subtle">Маржа экспресса</dt>
-              <dd className="text-lg font-semibold tabular-nums">{ru(accMargin * 100, 1)}%</dd>
+              <dt className="text-xs text-muted">Маржа экспресса</dt>
+              <dd className="num text-2xl font-bold">{ru(accMargin * 100, 1)}%</dd>
             </div>
             <div className="min-w-0">
-              <dt className="text-xs text-subtle">Возврат в среднем</dt>
-              <dd className="text-lg font-semibold tabular-nums">{s ? `${ru(s * expReturn, 0)} ₽` : "—"}</dd>
+              <dt className="text-xs text-muted">Средний возврат</dt>
+              <dd className="num text-2xl font-bold">{s ? `${ru(s * expReturn, 0)} ₽` : "—"}</dd>
             </div>
           </dl>
         )}

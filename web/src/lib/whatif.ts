@@ -1,10 +1,10 @@
 /**
  * "What if you had bet on your team": replays a finished season with the
  * closing 1X2 odds sstats stores for every game. Pure functions take plain
- * games so they can be tested; `seasonGames` does the (cached) fetching.
+ * games so they can be tested; `getSeason` in season.ts does the fetching.
  */
-import { winner } from "./data";
-import { sstats } from "./sstats/client";
+import { winner } from "./matches";
+import { resultOf, seasonLabel, seasonYear } from "./season";
 import type { SsGame } from "./sstats/types";
 import { teamRu } from "./teams";
 
@@ -30,9 +30,10 @@ export type Ledger = { steps: Step[]; profit: number; staked: number; wins: numb
 export function toPlayed(games: SsGame[]): Played[] {
   const out: Played[] = [];
   for (const g of games) {
-    const hg = Number(g.homeResult), ag = Number(g.awayResult);
+    const r = resultOf(g);
     const odds = winner(g.odds);
-    if (g.homeResult == null || g.awayResult == null || Number.isNaN(hg) || Number.isNaN(ag) || !odds) continue;
+    if (!r || !odds) continue;
+    const hg = r.home, ag = r.away;
     out.push({
       id: g.id,
       date: g.dateUtc ? new Date(g.dateUtc * 1000).toISOString() : g.date ?? "",
@@ -88,33 +89,8 @@ export function leagueTable(games: Played[]): TeamRow[] {
     .sort((a, b) => b.profit - a.profit);
 }
 
-/** Seasons offered on the page; sstats keys a season by the year it starts. */
-export const SEASONS = [
-  { year: 2025, label: "2025/26" },
-  { year: 2026, label: "2026/27" },
-] as const;
-
-export async function seasonGames(leagueId: number, year: number): Promise<Played[]> {
-  const games = await sstats<SsGame[]>("/Games/list", { LeagueId: leagueId, Year: year, Ended: true, Limit: 1000 }, 43_200);
-  return toPlayed(games);
-}
-
-/** A made-up but plausible season for demo mode (no API access). */
-export function demoSeason(): Played[] {
-  const teams = ["Зенит", "Краснодар", "Спартак", "Локомотив", "ЦСКА", "Динамо", "Ростов", "Рубин"];
-  const strength = [0.8, 0.7, 0.62, 0.6, 0.58, 0.5, 0.42, 0.38];
-  const out: Played[] = [];
-  let id = 1, seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-  for (let round = 0; round < 2; round++)
-    for (let h = 0; h < teams.length; h++)
-      for (let a = 0; a < teams.length; a++) {
-        if (h === a) continue;
-        const ph = Math.min(0.75, Math.max(0.15, 0.45 + (strength[h] - strength[a]) * 0.8)), pd = 0.26, pa = 1 - ph - pd;
-        const r = rnd(), m = 1.06;
-        const res = r < ph ? [2, 1] : r < ph + pd ? [1, 1] : [0, 1];
-        out.push({ id: id++, date: new Date(Date.UTC(2025, 7, 1 + id)).toISOString(), homeId: h + 1, awayId: a + 1, home: teams[h], away: teams[a], hg: res[0], ag: res[1],
-          odds: { home: +(1 / (ph * m)).toFixed(2), draw: +(1 / (pd * m)).toFixed(2), away: +(1 / (pa * m)).toFixed(2) } });
-      }
-  return out;
+/** Seasons offered on the page: the current one and the one before. */
+export function seasons(now = Date.now()) {
+  const y = seasonYear(now);
+  return [y, y - 1].map((year) => ({ year, label: seasonLabel(year) }));
 }

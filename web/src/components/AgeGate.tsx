@@ -27,26 +27,24 @@ export function AgeGate() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="age-title">
-      <div className="card w-full max-w-sm animate-rise p-6 shadow-2xl shadow-black">
-        <FlipMark className="mb-5 size-10" />
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-fg/40 p-4 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="age-title">
+      <div className="card w-full max-w-sm animate-rise p-6 shadow-2xl shadow-fg/20">
+        <FlipMark className="mb-5 size-9" />
         {denied ? (
           <>
-            <h2 id="age-title" className="text-xl font-semibold">Возвращайтесь, когда исполнится 18</h2>
-            <p className="mt-2 text-sm text-muted">Сайт предназначен только для совершеннолетних.</p>
+            <h2 id="age-title" className="text-xl font-bold tracking-tight">Возвращайтесь, когда исполнится 18</h2>
+            <p className="mt-2 text-sm text-muted">Сайт рассказывает о ставках на спорт, поэтому открыт только совершеннолетним.</p>
           </>
         ) : (
           <>
-            <h2 id="age-title" className="text-xl font-semibold">Вам исполнилось 18 лет?</h2>
-            <p className="mt-2 text-sm text-muted">
-              На сайте есть информация о ставках на спорт. Она предназначена только для совершеннолетних.
-            </p>
+            <h2 id="age-title" className="text-xl font-bold tracking-tight">Вам уже есть 18 лет?</h2>
+            <p className="mt-2 text-sm text-muted">На сайте есть информация о ставках на спорт. По закону её можно показывать только совершеннолетним.</p>
             <div className="mt-6 grid grid-cols-2 gap-2">
               <button className="btn-ghost" onClick={() => setDenied(true)}>
                 Нет
               </button>
               <button className="btn-primary" onClick={confirm} autoFocus>
-                Да, мне 18+
+                Да, мне есть 18
               </button>
             </div>
           </>

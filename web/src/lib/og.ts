@@ -11,4 +11,5 @@ export async function ogFonts() {
   ];
 }
 
-export const OG = { bg: "#0b0b09", tile: "#1a1915", line: "#26251f", fg: "#f4f1e6", muted: "#9a978a", accent: "#ffc629" } as const;
+/** The site's palette for share cards: paper, white sheets, ink, the highlighter and the probability greens. */
+export const OG = { bg: "#f3f5f0", sheet: "#ffffff", line: "#dde2da", fg: "#111512", muted: "#5b635d", hi: "#ffd84a", p2: "#cfe5d6", p3: "#a3cfb1", p4: "#2e8555" } as const;

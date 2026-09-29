@@ -8,13 +8,13 @@ const TILE = { x: 1533, y: 470, w: 250, h: 250, r: 38, line: 19 };
 
 /**
  * The flip: a yellow split-flap tile from a scoreboard. It is the dot in the
- * wordmark, the favicon, and the marker for odds priced above fair.
+ * wordmark, the favicon, and the colour of prices above fair.
  */
 export function FlipMark({ className = "size-3" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={`origin-center ${className}`} aria-hidden="true">
-      <rect width="32" height="32" rx="6" fill="var(--color-accent)" />
-      <rect y="15.2" width="32" height="1.6" fill="var(--color-bg)" />
+      <rect x="0.5" y="0.5" width="31" height="31" rx="6" fill="var(--color-hi)" stroke="rgb(17 21 18 / 0.12)" />
+      <rect y="15.2" width="32" height="1.6" fill="var(--color-fg)" />
     </svg>
   );
 }
@@ -22,11 +22,11 @@ export function FlipMark({ className = "size-3" }: { className?: string }) {
 /** "tag", the flip, "bet". The flip turns over when the logo link is hovered. */
 export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
   return (
-    <svg viewBox="0 0 3309 970" className={`${size === "lg" ? "h-10" : "h-[26px]"} w-auto`} role="img" aria-label="tag.bet">
+    <svg viewBox="0 0 3309 970" className={`${size === "lg" ? "h-10" : "h-[25px]"} w-auto text-fg`} role="img" aria-label="tag.bet">
       <path d={WORD} fill="currentColor" />
       <g className="origin-center [transform-box:fill-box] group-hover/logo:animate-flip-once">
-        <rect x={TILE.x} y={TILE.y} width={TILE.w} height={TILE.h} rx={TILE.r} fill="var(--color-accent)" />
-        <rect x={TILE.x} y={TILE.y + TILE.h / 2 - TILE.line / 2} width={TILE.w} height={TILE.line} fill="var(--color-bg)" />
+        <rect x={TILE.x} y={TILE.y} width={TILE.w} height={TILE.h} rx={TILE.r} fill="var(--color-hi)" stroke="rgb(17 21 18 / 0.14)" strokeWidth="8" />
+        <rect x={TILE.x} y={TILE.y + TILE.h / 2 - TILE.line / 2} width={TILE.w} height={TILE.line} fill="var(--color-fg)" />
       </g>
     </svg>
   );

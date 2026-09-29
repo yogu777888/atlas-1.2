@@ -1,5 +1,6 @@
 import { after, NextResponse, type NextRequest } from "next/server";
 import { adInfo, getBookmaker } from "@/lib/bookmakers";
+import { paths } from "@/lib/routes";
 
 /**
  * Partner click tracker: /go/<bookmaker>?src=<placement>
@@ -11,10 +12,10 @@ import { adInfo, getBookmaker } from "@/lib/bookmakers";
 export async function GET(req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
   const bookmaker = getBookmaker(slug);
-  if (!bookmaker) return NextResponse.redirect(new URL("/bookmakers", req.url));
+  if (!bookmaker) return NextResponse.redirect(new URL(paths.bookmakers, req.url));
 
   const ad = adInfo(bookmaker);
-  if (!ad) return NextResponse.redirect(new URL(`/bookmakers/${bookmaker.slug}`, req.url));
+  if (!ad) return NextResponse.redirect(new URL(paths.bookmaker(bookmaker.slug), req.url));
 
   const source = (req.nextUrl.searchParams.get("src") ?? "direct").replace(/[^\w-]/g, "").slice(0, 48) || "direct";
   const clickId = crypto.randomUUID().replace(/-/g, "").slice(0, 16);

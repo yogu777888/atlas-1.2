@@ -1,12 +1,14 @@
-import { classifyLeague, getLeague, leagues } from "./leagues";
-import { consensus, OUTCOMES, type Match, type Odds1x2 } from "./matches";
-import { mockEvents } from "./odds/mock";
-import { findPariLine, pariLines } from "./pari";
-import { teamRu } from "./teams";
-import { goalMarkets, headToHead, missingPlayers, teamForm, type FormGame, type GoalMarkets, type H2HGame, type Missing } from "./forecast";
+import { demoGame, demoPrice, demoSeasonGames, demoUpcoming, poissonChances } from "./demo";
+import { goalMarkets, headToHead, missingPlayers, teamForm, toForm, toH2H, type FormGame, type GoalMarkets, type H2HGame, type Missing } from "./forecast";
+import { classifyLeague, CLUB_LEAGUES, otherLeague, type League } from "./leagues";
+import { consensus, matchSlug, OUTCOMES, statusFromCode, winner, type Match, type Odds1x2 } from "./matches";
+import { findPariLine, pariLines, type PariLine } from "./pari";
+import { resultOf, seasonYear } from "./season";
 import { sstats } from "./sstats/client";
 import type { SsBookmakerOdds, SsGame, SsGlicko } from "./sstats/types";
+import { teamRu } from "./teams";
 
+export { winner };
 export type DataSource = "live" | "demo";
 
 const DAYS_AHEAD = 7;
@@ -20,13 +22,38 @@ function moscowDate(plusDays = 0): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Moscow" }).format(d);
 }
 
-export const winner = (bets: { marketId: number; odds: { name: string; value: number }[] }[] | null | undefined): Odds1x2 | null => {
-  const m = bets?.find((b) => b.marketId === 1);
-  if (!m) return null;
-  const get = (n: string) => m.odds.find((o) => o.name === n)?.value;
-  const h = get("Home"), d = get("Draw"), a = get("Away");
-  return h && d && a && h > 1 && d > 1 && a > 1 ? { home: h, draw: d, away: a } : null;
-};
+const num = (x: unknown) => (x === null || x === undefined || x === "" ? null : Number(x));
+
+/** Our league for a game: one we cover, or "other" labelled with its own name. */
+function leagueOf(g: SsGame): League {
+  const l = g.season?.league ?? null;
+  return classifyLeague(l) ?? (l ? { ...otherLeague, label: `${l.name}${l.country ? ` (${l.country.name})` : ""}`, short: l.name } : otherLeague);
+}
+
+/** One sstats game as a tag.bet match. */
+export function toMatch(g: SsGame, league: League, line?: PariLine | null, demo = false): Match {
+  const start = (g.dateUtc ?? 0) * 1000;
+  const home = teamRu(g.homeTeam.name), away = teamRu(g.awayTeam.name);
+  const market = winner(g.odds);
+  const status = statusFromCode(g.status, start);
+  const h = num(g.homeResult), a = num(g.awayResult);
+  return {
+    id: `${demo ? "demo" : "ss"}-${g.id}`,
+    slug: matchSlug(home, away, g.id),
+    sstatsId: g.id,
+    league,
+    homeId: Number(g.homeTeam.id),
+    awayId: Number(g.awayTeam.id),
+    home,
+    away,
+    commenceTime: new Date(start).toISOString(),
+    status,
+    score: status !== "scheduled" && h !== null && a !== null && !Number.isNaN(h) && !Number.isNaN(a) ? { home: h, away: a } : null,
+    market,
+    fair: market ? consensus([market]) : null,
+    pari: line?.odds ? { odds: line.odds, url: line.url, updatedAt: line.updatedAt } : null,
+  };
+}
 
 // ------------------------------------------------------------------ live (sstats.net + PARI)
 
@@ -46,7 +73,7 @@ async function liveMatches(): Promise<Match[]> {
   const from = moscowDate(0), to = moscowDate(DAYS_AHEAD);
   const games = await upcomingGames(from, to);
 
-  let lines: Awaited<ReturnType<typeof pariLines>> = [];
+  let lines: PariLine[] = [];
   try {
     lines = await pariLines(from, to);
   } catch (err) {
@@ -57,29 +84,14 @@ async function liveMatches(): Promise<Match[]> {
   const out: Match[] = [];
   const others: Match[] = [];
   for (const g of games) {
-    const l = g.season?.league ?? null;
-    const top = classifyLeague(l);
-    if (!g.dateUtc || !l) continue;
-    // Outside the top leagues keep only games with a priced market, labelled with their own league name
+    const top = classifyLeague(g.season?.league ?? null);
+    if (!g.dateUtc || !g.season?.league) continue;
+    // Outside the top leagues keep only games with a priced market
     if (!top && !winner(g.odds)) continue;
-    const league = top ?? { key: "other", label: `${l.name}${l.country ? ` (${l.country.name})` : ""}`, short: l.name };
     const start = g.dateUtc * 1000;
     if (start < now) continue;
-    const market = winner(g.odds);
     const line = findPariLine(lines, start, g.homeTeam.name, g.awayTeam.name);
-    (top ? out : others).push({
-      id: `ss-${g.id}`,
-      sstatsId: g.id,
-      league,
-      homeId: Number(g.homeTeam.id),
-      awayId: Number(g.awayTeam.id),
-      home: teamRu(g.homeTeam.name),
-      away: teamRu(g.awayTeam.name),
-      commenceTime: new Date(start).toISOString(),
-      market,
-      fair: market ? consensus([market]) : null,
-      pari: line?.odds ? { odds: line.odds, url: line.url, updatedAt: line.updatedAt } : null,
-    });
+    (top ? out : others).push(toMatch(g, top ?? leagueOf(g), line));
   }
   if (out.length < MIN_TOP_MATCHES) {
     // Prefer games PARI prices, then the soonest ones
@@ -91,28 +103,14 @@ async function liveMatches(): Promise<Match[]> {
 
 // ------------------------------------------------------------------ demo fallback
 
-const DEMO_LEAGUE: Record<string, string> = { "РПЛ": "rpl", "АПЛ": "epl", "Лига чемпионов": "ucl" };
-
+/** Next week's demo fixtures, with a bookmaker line that sometimes beats the fair price. */
 function demoMatches(): Match[] {
-  return mockEvents()
-    .filter((e) => e.sport === "soccer" && e.outcomes.length === 3)
-    .map((e) => {
-      const books = e.books.map((b) => b.prices).filter((p): p is Odds1x2 => OUTCOMES.every((o) => !!p[o])) as Odds1x2[];
-      const avg = (o: keyof Odds1x2) => books.reduce((s, b) => s + b[o], 0) / books.length;
-      const market = books.length ? { home: avg("home"), draw: avg("draw"), away: avg("away") } : null;
-      const pariBook = e.books.find((b) => b.bookmaker === "pari")?.prices;
-      return {
-        id: e.id,
-        sstatsId: null,
-        league: getLeague(DEMO_LEAGUE[e.league] ?? "rpl") ?? leagues[0],
-        home: e.home,
-        away: e.away,
-        commenceTime: e.commenceTime,
-        market,
-        fair: consensus(books),
-        pari: pariBook && OUTCOMES.every((o) => pariBook[o]) ? { odds: pariBook as Odds1x2, url: null, updatedAt: null } : null,
-      };
-    });
+  const now = Date.now();
+  return demoUpcoming(now, now + DAYS_AHEAD * 86_400_000).map((g) => {
+    const m = toMatch(g, leagueOf(g), null, true);
+    const k = m.market;
+    return k ? { ...m, pari: { odds: { home: demoPrice(k.home, g.id * 3), draw: demoPrice(k.draw, g.id * 3 + 1), away: demoPrice(k.away, g.id * 3 + 2) }, url: null, updatedAt: null } } : m;
+  });
 }
 
 // ------------------------------------------------------------------ public API
@@ -120,13 +118,14 @@ function demoMatches(): Match[] {
 let lastSource: DataSource = "demo";
 export const dataSource = () => lastSource;
 
+/** Upcoming matches for the next week, soonest first. */
 export async function getMatches(leagueKey?: string): Promise<Match[]> {
   let all: Match[];
   try {
     all = await liveMatches();
     lastSource = "live";
   } catch (err) {
-    console.error("[data] sstats unavailable, serving demo data", err);
+    console.error("[data] sstats unavailable, serving demo data", (err as Error).message);
     all = demoMatches();
     lastSource = "demo";
   }
@@ -136,8 +135,36 @@ export async function getMatches(leagueKey?: string): Promise<Match[]> {
     .sort((a, b) => a.commenceTime.localeCompare(b.commenceTime));
 }
 
-export async function getMatch(id: string): Promise<Match | null> {
-  return (await getMatches()).find((m) => m.id === id) ?? null;
+/**
+ * A match by its sstats id, whether it is upcoming, being played or over, so a
+ * forecast page keeps working after kick-off. Null when there is no such game;
+ * throws when the API is down, so a cached page is kept rather than replaced by a 404.
+ */
+export async function findMatch(id: number): Promise<Match | null> {
+  const upcoming = await getMatches();
+  const hit = upcoming.find((m) => m.sstatsId === id);
+  if (hit) return hit;
+  if (lastSource === "demo") {
+    const g = demoGame(id);
+    return g ? toMatch(g, leagueOf(g), null, true) : null;
+  }
+  try {
+    const { game } = await sstats<{ game: SsGame }>(`/Games/${id}`, {}, 300);
+    return game ? toMatch(game, leagueOf(game)) : null;
+  } catch (err) {
+    if (/HTTP 40[04]|ERROR|NotFound/i.test((err as Error).message)) return null;
+    throw err;
+  }
+}
+
+/** A team's latest results: all competitions from the API, or the demo season's games. */
+export async function teamRecent(teamId: number, season: { games: SsGame[]; demo: boolean }, limit = 6): Promise<FormGame[]> {
+  if (!season.demo) return teamForm(teamId, limit);
+  const games = season.games
+    .filter((g) => resultOf(g) && (Number(g.homeTeam.id) === teamId || Number(g.awayTeam.id) === teamId))
+    .sort((a, b) => (b.dateUtc ?? 0) - (a.dateUtc ?? 0))
+    .slice(0, limit);
+  return toForm(games, teamId);
 }
 
 export type MatchDetail = {
@@ -153,12 +180,11 @@ export type MatchDetail = {
   missing: Missing[];
 };
 
-/** Extra data for the match page: per-book world market and Glicko rating forecast. */
+/** Extra data for the match page: per-book world market, goal markets, form, head-to-head, absences, rating forecast. */
 export async function getMatchDetail(m: Match): Promise<MatchDetail> {
-  const none = { goals: { over25: null, btts: null, books: 0 }, form: { home: [], away: [] }, h2h: [], missing: [] };
-  if (!m.sstatsId) {
-    return { worldBooks: 0, world: m.fair, bestWorldMargin: null, glicko: null, ...(lastSource === "demo" ? demoDetail(m) : none) };
-  }
+  if (m.id.startsWith("demo-")) return demoDetail(m);
+  const none = { worldBooks: 0, world: m.fair, bestWorldMargin: null, glicko: null, goals: { over25: null, btts: null, books: 0 }, form: { home: [], away: [] }, h2h: [], missing: [] };
+  if (!m.sstatsId) return none;
   const { homeId, awayId } = m;
   const [books, glicko, homeForm, awayForm, h2h, missing] = await Promise.all([
     sstats<SsBookmakerOdds[]>(`/Odds/${m.sstatsId}`, {}, 1800).catch(() => [] as SsBookmakerOdds[]),
@@ -174,6 +200,8 @@ export async function getMatchDetail(m: Match): Promise<MatchDetail> {
   // Probabilities may come as 0..1 or as percents
   const asProb = (x: number | null | undefined) => (x === null || x === undefined ? null : x > 1 ? x / 100 : x);
   const hw = asProb(g?.homeWinProbability), aw = asProb(g?.awayWinProbability);
+  // After kick-off the team's latest game is this one; the form shown is what came before it
+  const before = (f: FormGame[]) => f.filter((x) => x.date < m.commenceTime);
   return {
     worldBooks: prices.length,
     world: consensus(prices) ?? m.fair,
@@ -183,25 +211,34 @@ export async function getMatchDetail(m: Match): Promise<MatchDetail> {
         ? { home: hw, away: aw, draw: hw + aw < 0.97 ? 1 - hw - aw : null, homeXg: g?.homeXg ?? null, awayXg: g?.awayXg ?? null }
         : null,
     goals: goalMarkets(books),
-    form: { home: homeForm, away: awayForm },
-    h2h,
+    form: { home: before(homeForm), away: before(awayForm) },
+    h2h: h2h.filter((x) => x.date < m.commenceTime),
     missing,
   };
 }
 
-/** Illustrative forecast extras for demo mode (the site is labelled "ДЕМО" then). */
-function demoDetail(m: Match): Pick<MatchDetail, "goals" | "form" | "h2h" | "missing"> {
-  const seed = [...m.id].reduce((s, c) => s + c.charCodeAt(0), 0);
-  const day = 86_400_000;
-  const mk = (k: number, opp: string[]) =>
-    opp.map((o, i) => {
-      const gf = (seed + k + i * 3) % 4, ga = (seed + k * 2 + i) % 3;
-      return { date: new Date(Date.now() - (i + 1) * 7 * day).toISOString(), opponent: o, home: i % 2 === 0, gf, ga, result: (gf > ga ? "W" : gf < ga ? "L" : "D") as "W" | "D" | "L" };
-    });
+/** Demo extras from the demo season itself, so form and head-to-head agree with the tables. */
+function demoDetail(m: Match): MatchDetail {
+  const g = m.sstatsId ? demoGame(m.sstatsId) : null;
+  const start = Date.parse(m.commenceTime);
+  const year = seasonYear(start);
+  const key = CLUB_LEAGUES.find((k) => k === m.league.key);
+  const games = key ? [...demoSeasonGames(key, year - 1), ...demoSeasonGames(key, year)] : [];
+  const past = games.filter((x) => resultOf(x) && (x.dateUtc ?? 0) * 1000 < start).sort((a, b) => (b.dateUtc ?? 0) - (a.dateUtc ?? 0));
+  const of = (id?: number) => past.filter((x) => Number(x.homeTeam.id) === id || Number(x.awayTeam.id) === id).slice(0, 5);
+  const both = past.filter((x) => [Number(x.homeTeam.id), Number(x.awayTeam.id)].sort().join() === [m.homeId, m.awayId].sort().join()).slice(0, 5);
+  const c = g ? poissonChances(g.xg[0], g.xg[1]) : null;
   return {
-    goals: { over25: 0.4 + (seed % 25) / 100, btts: 0.38 + (seed % 30) / 100, books: 12 },
-    form: { home: mk(1, ["Ростов", "Рубин", "ЦСКА", "Сочи", "Ахмат"]), away: mk(2, ["Локомотив", "Факел", "Динамо", "Акрон", "Балтика"]) },
-    h2h: [0, 1, 2].map((i) => ({ date: new Date(Date.now() - (i + 1) * 180 * day).toISOString(), home: i % 2 ? m.away : m.home, away: i % 2 ? m.home : m.away, hg: (seed + i) % 3, ag: (seed + i * 2) % 2 })),
-    missing: [{ team: "home", player: "Игрок А. (пример)", reason: "травма" }, { team: "away", player: "Игрок Б. (пример)", reason: "дисквалификация" }],
+    worldBooks: 0,
+    world: m.fair,
+    bestWorldMargin: null,
+    glicko: null,
+    goals: { over25: c?.over25 ?? null, btts: c?.btts ?? null, books: c ? 1 : 0 },
+    form: { home: m.homeId ? toForm(of(m.homeId), m.homeId) : [], away: m.awayId ? toForm(of(m.awayId), m.awayId) : [] },
+    h2h: toH2H(both),
+    missing: [
+      { team: "home", player: "Игрок А. (пример)", reason: "травма" },
+      { team: "away", player: "Игрок Б. (пример)", reason: "дисквалификация" },
+    ],
   };
 }

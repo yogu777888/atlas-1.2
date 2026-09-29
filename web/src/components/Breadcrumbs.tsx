@@ -6,17 +6,17 @@ export function Breadcrumbs({ items }: { items: { label: string; href: string }[
   const trail = [{ label: "Главная", href: "/" }, ...items];
   return (
     <>
-      <nav aria-label="Навигация" className="text-sm text-subtle">
-        <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <nav aria-label="Навигация" className="text-[13px] text-subtle">
+        <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
           {trail.map((t, i) => (
-            <li key={t.href} className="flex items-center gap-2">
+            <li key={t.href} className="flex min-w-0 items-center gap-1.5">
               {i > 0 && <span aria-hidden>/</span>}
               {i < trail.length - 1 ? (
-                <Link href={t.href} className="hover:text-fg">
+                <Link href={t.href} className="transition-colors hover:text-fg">
                   {t.label}
                 </Link>
               ) : (
-                <span className="text-muted" aria-current="page">
+                <span className="truncate text-muted" aria-current="page">
                   {t.label}
                 </span>
               )}

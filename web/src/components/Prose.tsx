@@ -1,11 +1,13 @@
-export function Prose({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
+import { PageHead } from "./Page";
+
+/** Plain text page: service and legal documents. */
+export function Prose({ title, crumb, href, lead, children }: { title: string; crumb: string; href: string; lead?: string; children: React.ReactNode }) {
   return (
-    <article className="container-x max-w-3xl pt-14">
-      <p className="eyebrow">{eyebrow}</p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
-      <div className="mt-10 space-y-5 leading-relaxed text-muted [&_a]:text-fg [&_a]:underline [&_h2]:pt-4 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-fg [&_li]:ml-5 [&_li]:list-disc [&_ul]:space-y-2">
+    <div className="container-x">
+      <PageHead crumbs={[{ label: crumb, href }]} title={title} lead={lead} />
+      <article className="mt-8 max-w-[68ch] space-y-4 leading-relaxed text-fg-2 prose-links [&_h2]:pt-4 [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:tracking-tight [&_h2]:text-fg [&_li]:ml-5 [&_li]:list-disc [&_ul]:space-y-2">
         {children}
-      </div>
-    </article>
+      </article>
+    </div>
   );
 }

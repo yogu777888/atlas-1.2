@@ -57,7 +57,10 @@ export type Bookmaker = {
 };
 
 /** Shown once under bonus lists and on reviews when an offer has no terms of its own */
-export const BONUS_TERMS = "18+. Для новых игроков. Размер бонуса, сроки и условия отыгрыша — на сайте букмекера.";
+export const BONUS_TERMS = "18+. Только для новых игроков. Сумму, срок и условия отыгрыша смотрите на сайте букмекера.";
+
+/** Typical match-result margin as text: "≈5,5%" */
+export const marginText = (b: Pick<Bookmaker, "avgMargin">) => `≈${(b.avgMargin * 100).toFixed(1).replace(".", ",")}%`;
 
 export const bookmakers: Bookmaker[] = [
   {
@@ -102,7 +105,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "P",
     rating: 4.5,
     homepage: "https://www.pari.ru",
-    bonus: { kind: "deposit", headline: "Бонус на первый депозит", detail: "Дополнительные средства для ставок после пополнения." },
+    bonus: { kind: "deposit", headline: "Бонус на первый депозит", detail: "Бонусные деньги на ставки после первого пополнения счёта." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.05,
@@ -153,7 +156,7 @@ export const bookmakers: Bookmaker[] = [
     monogram: "М",
     rating: 4.4,
     homepage: "https://www.marathonbet.ru",
-    bonus: { kind: "welcome", headline: "Бонус новым игрокам", detail: "Приветственное предложение после первой ставки." },
+    bonus: { kind: "welcome", headline: "Бонус новым игрокам", detail: "Приветственный бонус начисляется после первой ставки." },
     payout: "до 1 дня",
     minDeposit: "100 ₽",
     avgMargin: 0.04,

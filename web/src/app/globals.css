@@ -1,22 +1,32 @@
 @import "tailwindcss";
 
+/* A data desk on chalk-white paper. Colour carries meaning: the green scale is a
+   probability, yellow is a price above fair (like a highlighter on a printout),
+   red is a loss. Everything else is ink, grey and hairlines. */
 @theme {
-  --color-bg: #0b0b09;
-  --color-surface: #121210;
-  --color-surface-2: #1a1915;
-  --color-line: rgb(255 255 255 / 0.08);
-  --color-line-strong: rgb(255 255 255 / 0.14);
-  --color-fg: #f4f1e6;
-  --color-muted: #9a978a;
-  --color-subtle: #66645a;
-  --color-accent: #ffc629;
-  --color-accent-ink: #161300;
-  --color-violet: #6f9cff;
-  --color-danger: #ff5c5c;
-  --color-pitch: #3fae6a;
+  --color-bg: #f3f5f0;
+  --color-surface: #ffffff;
+  --color-surface-2: #f7f9f5;
+  --color-line: #dde2da;
+  --color-line-strong: #c7cfc4;
+  --color-fg: #111512;
+  --color-fg-2: #2f3631;
+  --color-muted: #5b635d;
+  --color-subtle: #6a726c;
+  --color-hi: #ffd84a;
+  --color-win: #1c7442;
+  --color-loss: #c4402e;
+  --color-draw: #9aa29c;
+
+  /* probability, low → high; the two darkest carry white text */
+  --color-p1: #e9f2eb;
+  --color-p2: #cfe5d6;
+  --color-p3: #a3cfb1;
+  --color-p4: #2e8555;
+  --color-p5: #1c6b3e;
 
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-num: var(--font-fira), var(--font-onest), "Roboto Condensed", "Arial Narrow", sans-serif;
 
   --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
   --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -24,8 +34,8 @@
   --animate-flip-once: flip-tile 0.6s cubic-bezier(0.3, 1.4, 0.5, 1);
 
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
   }
   @keyframes flip {
     from { transform: rotateX(-90deg); opacity: 0; }
@@ -43,7 +53,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -53,65 +63,91 @@ body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-accent-ink);
+  background: var(--color-hi);
+  color: var(--color-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Grid children may shrink below their content, so a row of chips scrolls
+   inside its column instead of widening the page on a phone */
+@layer base {
+  .grid > * { min-width: 0; }
 }
 
 @utility container-x {
-  @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  @apply mx-auto w-full max-w-[1180px] px-4 sm:px-5;
 }
 @utility card {
-  @apply rounded-2xl border border-line bg-surface;
+  @apply rounded-[10px] border border-line bg-surface;
 }
-@utility eyebrow {
-  @apply text-xs font-medium uppercase tracking-[0.16em] text-muted;
+/* Small label above a block: sentence case, never shouted */
+@utility kicker {
+  @apply inline-flex items-center gap-2 text-xs font-semibold text-fg-2;
+}
+/* Numbers: condensed, tabular, so columns line up like a printed table */
+@utility num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
 }
 @utility btn {
-  @apply inline-flex h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition
-    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold transition;
   transition-duration: 300ms;
   transition-timing-function: var(--ease-spring);
   &:hover { translate: 0 -1px; }
 }
 @utility btn-primary {
-  @apply btn bg-accent text-accent-ink hover:brightness-110 active:scale-[0.98];
+  @apply btn bg-fg text-bg hover:bg-fg-2 active:scale-[0.98];
 }
 @utility btn-ghost {
-  @apply btn border border-line-strong text-fg hover:bg-white/5;
+  @apply btn border border-line-strong bg-surface text-fg hover:border-fg;
 }
-@utility odds-pill {
-  @apply inline-flex min-w-16 items-center justify-center rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-sm font-medium tabular-nums;
+/* "Read more" style link: ink text on a yellow underline */
+@utility link-more {
+  @apply inline-flex items-center gap-1.5 border-b-2 border-hi text-sm font-semibold text-fg;
+  & > span { transition: transform 0.3s var(--ease-out); }
+  &:hover > span { transform: translateX(3px); }
 }
-@utility odds-pill-best {
-  @apply border-accent/40 bg-accent/10 text-accent;
+/* Inline links inside running text */
+@utility prose-links {
+  & a { @apply font-medium text-fg underline decoration-line-strong decoration-2 underline-offset-4 transition-colors; }
+  & a:hover { @apply decoration-hi; }
 }
-
-/* Soft grid backdrop used behind hero sections */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 30%, transparent 100%);
+/* Filter chip; aria-current or aria-selected marks the active one */
+@utility chip {
+  @apply inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-line-strong bg-surface px-3 py-1.5 text-sm font-medium text-fg-2 transition;
+  &:hover { @apply border-fg text-fg; }
+  &[aria-current="page"], &[aria-selected="true"], &[aria-pressed="true"] { @apply border-fg bg-fg text-bg; }
 }
-
-.text-gradient {
-  background: linear-gradient(180deg, #fff 20%, rgb(255 255 255 / 0.55));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* A row that scrolls sideways fades out at the right edge, so a cut-off item reads as "there is more" */
+@utility scroll-fade {
+  mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
+  scrollbar-width: none;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
-
 /* Number inputs in the calculators */
 @utility field {
-  @apply h-12 w-full min-w-0 rounded-xl border border-line bg-surface-2 px-3.5 text-lg font-semibold tabular-nums text-fg outline-none transition placeholder:text-subtle focus:border-accent/70 focus:bg-surface;
+  @apply h-12 w-full min-w-0 rounded-lg border border-line-strong bg-surface px-3.5 text-lg font-semibold text-fg outline-none transition placeholder:text-subtle focus:border-fg;
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Highlighter: a yellow stroke drawn behind a price that is above fair */
+.hl {
+  background-image: linear-gradient(var(--color-hi), var(--color-hi));
+  background-repeat: no-repeat;
+  background-position: 0 55%;
+  background-size: 100% 78%;
+  transition: background-size 0.7s var(--ease-out);
 }
 
 /* ------------------------------------------------------------------ motion
@@ -124,14 +160,19 @@ body {
 }
 
 .js [data-reveal] {
-  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
 }
 .js [data-reveal]:not(.in) {
-  opacity: 0.25;
-  transform: translateY(24px);
+  opacity: 0.3;
+  transform: translateY(14px);
 }
+/* In a table row that hasn't arrived yet the chances are uncoloured and the
+   highlighter isn't drawn; both fill in once the row is revealed. */
+.pc { transition: background-color 0.6s var(--ease-out), color 0.6s var(--ease-out); }
+.js [data-reveal]:not(.in) .pc { background-color: transparent; color: var(--color-subtle); }
+.js [data-reveal]:not(.in) .hl { background-size: 0 78%; }
 
-/* Probability bars fill from the left; inside a revealed block they wait for it */
+/* Bars fill from the left; inside a revealed block they wait for it */
 .bar-grow > span {
   transform-origin: left;
   animation: bar-grow 1.1s var(--ease-out) both;
@@ -140,10 +181,11 @@ body {
 .bar-grow > span:nth-child(3) { animation-delay: 0.24s; }
 .js [data-reveal]:not(.in) .bar-grow > span,
 .js [data-reveal]:not(.in) .draw-line,
-.js [data-reveal]:not(.in) .draw-fill { animation-play-state: paused; }
+.js [data-reveal]:not(.in) .draw-fill,
+.js [data-reveal]:not(.in) .pop { animation-play-state: paused; }
 @keyframes bar-grow { from { transform: scaleX(0); } }
 
-/* Headline words rise softly into place, one after another (no hard mask edge) */
+/* Headline words rise softly into place, one after another */
 .word-rise { display: inline-block; animation: word-rise 0.8s var(--ease-out) both; }
 @keyframes word-rise { from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); } }
 
@@ -152,30 +194,29 @@ body {
 /* Charts draw themselves */
 .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.8s var(--ease-out) 0.2s forwards; }
 .draw-fill { animation: fade-in 1s ease 1s both; }
+.pop { transform-box: fill-box; transform-origin: center; animation: pop 0.5s var(--ease-spring) both; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes fade-in { from { opacity: 0; } }
-
-/* A price flips over when hovered, like a scoreboard tile */
-.flip-hover { transition: transform 0.55s var(--ease-spring); }
-.flip-hover:hover { transform: rotateX(360deg); }
+@keyframes pop { from { transform: scale(0); } }
 
 /* Each page settles in after navigation */
 .page-enter { animation: rise 0.5s var(--ease-out) both; }
 
-/* Navigation underline */
+/* Section links: the current one is underlined in ink */
 .nav-link { position: relative; }
 .nav-link::after {
   content: "";
   position: absolute;
-  inset-inline: 12px;
-  bottom: 3px;
-  height: 1.5px;
+  inset-inline: 10px;
+  bottom: -1px;
+  height: 2px;
   background: var(--color-fg);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--ease-out);
 }
-.nav-link:hover::after, .nav-link[aria-current="page"]::after { transform: scaleX(1); }
+.nav-link:hover::after { transform: scaleX(0.4); }
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
 
 /* Warm light that follows the cursor on covers */
 .glow::before {
@@ -184,13 +225,24 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgb(255 198 41 / 0.1), transparent 45%);
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgb(255 216 74 / 0.22), transparent 50%);
   opacity: 0;
   transition: opacity 0.3s;
 }
 .glow:hover::before { opacity: 1; }
 
+/* Graph paper behind article and tool covers */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(17 21 18 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(17 21 18 / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
   .js [data-reveal]:not(.in) { opacity: 1; transform: none; }
+  .js [data-reveal]:not(.in) .pc { background-color: revert-layer; color: revert-layer; }
+  .js [data-reveal]:not(.in) .hl { background-size: 100% 78%; }
   .draw-line { stroke-dashoffset: 0; }
 }

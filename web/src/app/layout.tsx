@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Onest } from "next/font/google";
+import { Fira_Sans_Extra_Condensed, Onest } from "next/font/google";
 import { AgeGate } from "@/components/AgeGate";
 import { CookieConsent } from "@/components/CookieConsent";
 import { MotionRoot } from "@/components/MotionRoot";
@@ -8,37 +8,37 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/lib/site";
 import "./globals.css";
 
-const sans = Onest({ subsets: ["latin", "cyrillic"], variable: "--font-onest" });
-const mono = Geist_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-geist-mono" });
+const sans = Onest({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-onest" });
+// Figures only: odds, chances and scores line up in narrow columns
+const figures = Fira_Sans_Extra_Condensed({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-fira" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: `${site.name} — прогнозы на футбол по цифрам`, template: `%s · ${site.name}` },
+  title: { default: `${site.tagline} · ${site.name}`, template: `%s · ${site.name}` },
   description: site.description,
   applicationName: site.name,
   openGraph: { type: "website", siteName: site.name, url: site.url, locale: "ru_RU" },
   twitter: { card: "summary_large_image" },
   other: { rating: "adult" },
-  alternates: { canonical: "/" },
-  appleWebApp: { title: site.name, statusBarStyle: "black-translucent" },
+  appleWebApp: { title: site.name, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0b09",
-  colorScheme: "dark",
+  themeColor: "#f3f5f0",
+  colorScheme: "light",
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "Organization", name: site.name, url: site.url, logo: `${site.url}/icon.svg` },
-    { "@type": "WebSite", name: site.name, url: site.url },
+    { "@type": "Organization", name: site.name, url: site.url, logo: `${site.url}/icon.svg`, email: site.supportEmail },
+    { "@type": "WebSite", name: site.name, url: site.url, inLanguage: "ru" },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="ru" className={`${sans.variable} ${figures.variable}`}>
       <body className="min-h-dvh">
         <SiteHeader />
         <main>{children}</main>

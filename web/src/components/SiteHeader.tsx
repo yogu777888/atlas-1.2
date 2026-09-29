@@ -1,38 +1,23 @@
 import Link from "next/link";
-import { nav } from "@/lib/site";
 import { Logo } from "./Logo";
+import { NavLinks, Today } from "./NavLinks";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-xl">
-      <div className="container-x flex h-14 items-center justify-between gap-4">
-        <Link href="/" aria-label="tag.bet — главная" className="group/logo">
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-md">
+      <div className="container-x flex h-14 items-center gap-6 lg:gap-8">
+        <Link href="/" aria-label="tag.bet — на главную" className="group/logo shrink-0 [perspective:300px]">
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Основное меню">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="nav-link rounded-full px-3 py-1.5 text-sm text-muted transition hover:text-fg"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center gap-2">
-          <Link href="/matches?value=1" className="btn-primary h-8 gap-1.5 px-4 text-[13px]">
-            Выгодные кэфы
-          </Link>
+        <NavLinks className="hidden items-center gap-0.5 md:flex" />
+        <div className="ml-auto flex items-center gap-3 text-[13px] text-muted">
+          <Today className="hidden sm:inline" />
+          <span className="rounded border-[1.5px] border-fg-2 px-1.5 text-[11px] leading-[18px] font-bold text-fg-2" title="Сайт только для совершеннолетних">
+            18+
+          </span>
         </div>
       </div>
-      <nav className="container-x flex gap-1 overflow-x-auto pb-2 md:hidden" aria-label="Основное меню">
-        {nav.map((item) => (
-          <Link key={item.href} href={item.href} className="shrink-0 rounded-full px-3 py-1 text-sm text-muted hover:text-fg">
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+      <NavLinks className="container-x scroll-fade -mt-1 flex overflow-x-auto pb-1.5 md:hidden" />
     </header>
   );
 }

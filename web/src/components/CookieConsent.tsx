@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import { paths } from "@/lib/routes";
 
 const KEY = "tagbet:cookies";
 const YM_ID = process.env.NEXT_PUBLIC_YM_ID;
@@ -39,19 +40,18 @@ export function CookieConsent() {
       )}
       {ready && choice === null && (
         <div className="fixed inset-x-0 bottom-0 z-40 p-4" role="region" aria-label="Cookies">
-          <div className="card mx-auto flex max-w-3xl flex-col gap-3 p-4 text-sm shadow-2xl shadow-black sm:flex-row sm:items-center">
+          <div className="card mx-auto flex max-w-3xl flex-col gap-3 p-4 text-sm shadow-xl shadow-fg/10 sm:flex-row sm:items-center">
             <p className="flex-1 text-muted">
-              Мы используем cookies и Яндекс.Метрику, чтобы понимать, какие разделы полезны. Подробнее — в{" "}
-              <Link href="/privacy" className="text-fg underline">
-                политике конфиденциальности
+              Мы используем cookies и Яндекс Метрику, чтобы понимать, какие страницы читают. Метрика включится, только если вы согласитесь.{" "}
+              <Link href={paths.privacy} className="font-medium text-fg underline underline-offset-2">
+                Подробнее
               </Link>
-              .
             </p>
             <div className="flex shrink-0 gap-2">
-              <button className="btn-ghost h-9" onClick={() => save("no")}>
+              <button className="btn-ghost h-9 px-4" onClick={() => save("no")}>
                 Только необходимые
               </button>
-              <button className="btn-primary h-9" onClick={() => save("yes")}>
+              <button className="btn-primary h-9 px-4" onClick={() => save("yes")}>
                 Принять
               </button>
             </div>
