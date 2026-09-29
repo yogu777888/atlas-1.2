@@ -154,24 +154,30 @@ export default async function Home() {
 
       <section className="pt-16">
         <SectionHead title="Насколько точны эти шансы" href={paths.method} cta="Как мы считаем" />
-        <div data-reveal className="grid gap-px overflow-hidden rounded-[10px] border border-line bg-line md:grid-cols-[1.3fr_1fr_1fr]">
-          <div className="bg-surface p-5">
-            <h3 className="font-bold">Проверяем рынок на прошлом сезоне</h3>
+        <div data-reveal className="grid gap-px overflow-hidden rounded-[10px] border border-line bg-line md:grid-cols-[1.7fr_1fr]">
+          <div className="grid items-center gap-x-8 gap-y-3 bg-surface p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             {check ? (
               <>
+                <div>
+                <h3 className="font-bold">Проверяем рынок на прошлом сезоне</h3>
                 <p className="mt-1.5 text-sm text-muted">
                   {check.near60
                     ? `Исходы, которым рынок давал ${Math.round(check.near60.from * 100)}–${Math.round(check.near60.to * 100)}%, сбылись в ${Math.round(check.near60.actual * 100)}% случаев. `
                     : ""}
                   Каждая точка — группа исходов из {check.games.toLocaleString("ru-RU")} {plural(check.games, ["матча", "матчей", "матчей"])} сезона {check.season}. Чем ближе точки к диагонали, тем честнее шансы.
                 </p>
-                <Calibration bins={check.bins} className="mt-3 max-w-[340px]" />
-                {check.demo && <p className="mt-1 text-[11px] text-subtle">Демо-данные: график посчитан на модельном сезоне.</p>}
+                {check.demo && <p className="mt-2 text-[11px] text-subtle">Демо-данные: график посчитан на модельном сезоне.</p>}
+                </div>
+                <Calibration bins={check.bins} className="mx-auto max-w-[380px]" />
               </>
             ) : (
-              <p className="mt-1.5 text-sm text-muted">График появится, когда загрузятся результаты прошлого сезона.</p>
+              <div>
+                <h3 className="font-bold">Проверяем рынок на прошлом сезоне</h3>
+                <p className="mt-1.5 text-sm text-muted">График появится, когда загрузятся результаты прошлого сезона.</p>
+              </div>
             )}
           </div>
+          <div className="grid gap-px">
           <div className="bg-surface p-5">
             <h3 className="font-bold">Шансы считает рынок</h3>
             <p className="mt-1.5 text-sm text-muted">
@@ -184,6 +190,7 @@ export default async function Home() {
             <p className="mt-1.5 text-sm text-muted">
               У всех, о ком мы пишем, есть лицензия ФНС России. Партнёрские ссылки помечены как реклама, а коэффициенты и шансы от них не зависят.
             </p>
+          </div>
           </div>
         </div>
       </section>
