@@ -189,7 +189,10 @@ body {
 .js [data-reveal]:not(.in) .bar-grow > span,
 .js [data-reveal]:not(.in) .draw-line,
 .js [data-reveal]:not(.in) .draw-fill,
-.js [data-reveal]:not(.in) .pop { animation-play-state: paused; }
+.js [data-reveal]:not(.in) .pop,
+.js [data-reveal]:not(.in) .grow-x,
+.js [data-reveal]:not(.in) .draw-arc,
+.js [data-reveal]:not(.in) .animate-flip { animation-play-state: paused; }
 @keyframes bar-grow { from { transform: scaleX(0); } }
 
 /* Headline words rise softly into place, one after another */
@@ -202,6 +205,10 @@ body {
 .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.8s var(--ease-out) 0.2s forwards; }
 .draw-fill { animation: fade-in 1s ease 1s both; }
 .pop { transform-box: fill-box; transform-origin: center; animation: pop 0.5s var(--ease-spring) both; }
+/* Grows from its left edge; used by the small drawings on article covers */
+.grow-x { transform-origin: left; animation: bar-grow 0.9s var(--ease-out) both; }
+/* A partial ring (pathLength 1, dash = --arc) that draws itself */
+.draw-arc { stroke-dashoffset: var(--arc); animation: draw 1.4s var(--ease-out) 0.3s forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes pop { from { transform: scale(0); } }
@@ -251,5 +258,5 @@ body {
   .js [data-reveal]:not(.in) { opacity: 1; transform: none; }
   .js [data-reveal]:not(.in) .pc { background-color: revert-layer; color: revert-layer; }
   .js [data-reveal]:not(.in) .hl { background-size: 100% 78%; }
-  .draw-line { stroke-dashoffset: 0; }
+  .draw-line, .draw-arc { stroke-dashoffset: 0; }
 }

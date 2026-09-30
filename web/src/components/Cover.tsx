@@ -1,3 +1,4 @@
+import { FlipText } from "./FlipText";
 import { FlipMark } from "./Logo";
 
 /**
@@ -11,7 +12,9 @@ export function Cover({ figure, caption, size = "md", visual }: { figure: string
       <div className="bg-grid absolute inset-0" aria-hidden />
       {visual ? <div className="relative self-end">{visual}</div> : <FlipMark className={`relative self-end ${lg ? "size-4" : "size-3"}`} />}
       <div className="relative">
-        <p className={`num leading-none font-bold ${lg ? "text-6xl sm:text-7xl" : "text-5xl"}`}>{figure}</p>
+        <p className={`num leading-none font-bold ${lg ? "text-6xl sm:text-7xl" : "text-5xl"}`}>
+          <FlipText text={figure} delay={250} />
+        </p>
         <p className={`mt-2 text-muted ${lg ? "text-sm" : "line-clamp-2 text-xs"}`}>{caption}</p>
       </div>
     </div>

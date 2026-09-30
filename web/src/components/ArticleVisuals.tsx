@@ -72,9 +72,9 @@ function Overflow() {
     <div className="w-[136px]" aria-hidden>
       <div className="relative flex h-3" style={{ width: 104.2 * scale }}>
         {parts.map((p, i) => (
-          <span key={i} className={`h-full border-r border-surface ${["bg-p4", "bg-p3", "bg-p2"][i]}`} style={{ width: p * scale }} />
+          <span key={i} className={`grow-x h-full border-r border-surface ${["bg-p4", "bg-p3", "bg-p2"][i]}`} style={{ width: p * scale, animationDelay: `${200 + i * 250}ms` }} />
         ))}
-        <span className="absolute inset-y-[-3px] right-0 bg-hi ring-1 ring-fg/15" style={{ width: 4.2 * scale }} />
+        <span className="pop absolute inset-y-[-3px] right-0 bg-hi ring-1 ring-fg/15" style={{ width: 4.2 * scale, animationDelay: "1000ms" }} />
         <span className="absolute inset-y-[-6px] w-px bg-fg" style={{ left: 100 * scale }} />
       </div>
       <div className="num mt-2 flex justify-between text-[11px] text-subtle" style={{ width: 104.2 * scale }}>
@@ -91,7 +91,7 @@ function Donut() {
   return (
     <svg viewBox="0 0 56 56" className="size-14" aria-hidden>
       <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-p1)" strokeWidth="6" />
-      <circle cx="28" cy="28" r={r} fill="none" stroke="var(--color-p4)" strokeWidth="6" strokeDasharray={`${c * share} ${c}`} transform="rotate(-90 28 28)" />
+      <circle className="draw-arc" cx="28" cy="28" r={r} fill="none" stroke="var(--color-p4)" strokeWidth="6" pathLength={1} strokeDasharray={`${share} 1`} style={{ ["--arc" as string]: share }} transform="rotate(-90 28 28)" />
       <text x="28" y="31.5" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-fg)" className="num">
         1.90
       </text>
@@ -104,7 +104,7 @@ function Ruler() {
   return (
     <div className="num relative h-12 w-[136px] text-[11px]" aria-hidden>
       <span className="absolute inset-x-0 top-[22px] h-px bg-line-strong" />
-      <span className="absolute top-[18px] h-[9px] rounded-sm bg-hi ring-1 ring-fg/10" style={{ left: 44, width: 48 }} />
+      <span className="grow-x absolute top-[18px] h-[9px] rounded-sm bg-hi ring-1 ring-fg/10" style={{ left: 44, width: 48, animationDelay: "400ms" }} />
       <span className="absolute top-0 text-subtle" style={{ left: 30 }}>
         1.98
       </span>
@@ -124,7 +124,9 @@ function Multiply() {
       {[0, 1, 2].map((i) => (
         <span key={i} className="flex items-center gap-1">
           {i > 0 && <span className="text-subtle">×</span>}
-          <span className={cell}>1.90</span>
+          <span className={`pop ${cell}`} style={{ animationDelay: `${200 + i * 150}ms` }}>
+            1.90
+          </span>
         </span>
       ))}
     </div>
@@ -140,7 +142,7 @@ function Receipt() {
         <span>3 000</span>
       </div>
       <div className="mt-0.5 flex justify-between border-t border-dashed border-line-strong pt-0.5 font-semibold text-fg">
-        <span className="bg-hi px-0.5 font-sans">НДФЛ 13%</span>
+        <span className="grow-x bg-hi px-0.5 font-sans" style={{ animationDelay: "500ms" }}>НДФЛ 13%</span>
         <span>−390</span>
       </div>
     </div>
@@ -163,9 +165,11 @@ function Licensed() {
 function Chances() {
   return (
     <div className="num flex gap-[3px] text-sm font-bold" aria-hidden>
-      <span className="rounded bg-p4 px-2 py-0.5 text-white">52</span>
-      <span className="rounded bg-p2 px-2 py-0.5">26</span>
-      <span className="rounded bg-p2 px-2 py-0.5">22</span>
+      {[["52", "bg-p4 text-white"], ["26", "bg-p2"], ["22", "bg-p2"]].map(([v, c], i) => (
+        <span key={v} className={`pop rounded px-2 py-0.5 ${c}`} style={{ animationDelay: `${200 + i * 120}ms` }}>
+          {v}
+        </span>
+      ))}
     </div>
   );
 }
