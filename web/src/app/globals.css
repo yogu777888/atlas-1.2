@@ -31,6 +31,7 @@
   --color-p5: #1c6b3e;
 
   --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-onest), sans-serif;
   --font-num: var(--font-fira), var(--font-onest), "Roboto Condensed", "Arial Narrow", sans-serif;
 
   --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
@@ -73,9 +74,9 @@
   --color-win: #3cc877;
   --color-loss: #ff6b57;
   --color-draw: #5d665f;
-  --color-p1: #19241d;
-  --color-p2: #1d3325;
-  --color-p3: #25492f;
+  --color-p1: #1e2a22;
+  --color-p2: #243d2d;
+  --color-p3: #2d5a3c;
   --color-p4: #1f7a46;
   --color-p5: #23995a;
   --color-grid: rgb(238 241 236 / 0.045);

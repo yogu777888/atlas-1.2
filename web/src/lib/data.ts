@@ -1,3 +1,4 @@
+import { rememberLogo } from "./badges";
 import { demoGame, demoPrice, demoSeasonGames, demoUpcoming, poissonChances } from "./demo";
 import { goalMarkets, headToHead, missingPlayers, teamForm, toForm, toH2H, type FormGame, type GoalMarkets, type H2HGame, type Missing } from "./forecast";
 import { classifyLeague, CLUB_LEAGUES, otherLeague, type League } from "./leagues";
@@ -35,6 +36,8 @@ function leagueOf(g: SsGame): League {
 export function toMatch(g: SsGame, league: League, line?: PariLine | null, demo = false): Match {
   const start = (g.dateUtc ?? 0) * 1000;
   const home = teamRu(g.homeTeam.name), away = teamRu(g.awayTeam.name);
+  rememberLogo(home, g.homeTeam.logoUrl);
+  rememberLogo(away, g.awayTeam.logoUrl);
   const market = winner(g.odds);
   const status = statusFromCode(g.status, start);
   const h = num(g.homeResult), a = num(g.awayResult);

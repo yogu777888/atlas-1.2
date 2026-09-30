@@ -3,6 +3,7 @@
  * build the table, the team list, team pages and the "what if" replays. One
  * cached API call per league and season.
  */
+import { rememberLogo } from "./badges";
 import { demoSeasonGames } from "./demo";
 import { CLUB_LEAGUES, leagueSourceId, type ClubLeague } from "./leagues";
 import { fairFromOdds, OUTCOMES, winnerOf, type Probs1x2 } from "./matches";
@@ -25,6 +26,7 @@ export async function getSeason(league: ClubLeague, year = seasonYear()): Promis
   const current = year >= seasonYear();
   try {
     const games = await sstats<SsGame[]>("/Games/list", { LeagueId: leagueSourceId(league), Year: year, Limit: 1000 }, current ? 3_600 : 86_400);
+    for (const g of games) for (const t of [g.homeTeam, g.awayTeam]) rememberLogo(teamRu(t.name), t.logoUrl);
     return { league, year, games, demo: false };
   } catch (err) {
     if (process.env.NODE_ENV !== "test") console.error(`[season] ${league} ${year} unavailable, using demo data`, (err as Error).message);

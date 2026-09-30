@@ -1,9 +1,28 @@
-import { badgeOf } from "@/lib/badges";
+import { badgeOf, logoOf } from "@/lib/badges";
+import { Crest } from "./Crest";
 
 const LIGHT = /^#(f|e)/i;
 
-/** Flag for a national team, the club's two colours for a club; nothing for a team we have no mark for (a letter in a circle looked like a broken image). */
+/** Whether a team has any mark: flag, crest or club colours. */
+export const hasMark = (name: string) => !!logoOf(name) || !("initial" in badgeOf(name));
+
+/**
+ * Flag for a national team, the crest for a club (its two colours while the
+ * crest is unknown or fails to load); nothing for a team we have no mark for.
+ */
 export function TeamMark({ name, size = 16 }: { name: string; size?: number }) {
+  const logo = logoOf(name);
+  if (logo) {
+    return (
+      <Crest src={logo} size={size}>
+        <Plain name={name} size={size} />
+      </Crest>
+    );
+  }
+  return <Plain name={name} size={size} />;
+}
+
+function Plain({ name, size }: { name: string; size: number }) {
   const b = badgeOf(name);
   const box = { width: size, height: size };
   if ("flag" in b) {
@@ -26,13 +45,13 @@ export function TeamMark({ name, size = 16 }: { name: string; size?: number }) {
 export function Teams({ home, away, size = 16, className = "" }: { home: string; away: string; size?: number; className?: string }) {
   return (
     <span className={`block truncate ${className}`}>
-      {"initial" in badgeOf(home) ? null : (
+      {!hasMark(home) ? null : (
         <span className="mr-1.5 inline-block align-[-0.15em]">
           <TeamMark name={home} size={size} />
         </span>
       )}
       {home} —{" "}
-      {"initial" in badgeOf(away) ? null : (
+      {!hasMark(away) ? null : (
         <span className="mr-1.5 inline-block align-[-0.15em]">
           <TeamMark name={away} size={size} />
         </span>

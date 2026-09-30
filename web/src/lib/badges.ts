@@ -71,6 +71,17 @@ const COLORS: Record<string, [string, string]> = {
   Фенербахче: ["#163962", "#ffed00"],
 };
 
+const LOGO = new Map<string, string>();
+
+/**
+ * A club's crest from the match data (sstats logoUrl), under our Russian name.
+ * Filled as games are loaded; national teams keep their flags.
+ */
+export function rememberLogo(name: string, url?: string | null) {
+  if (url && /^https?:\/\//.test(url) && !FLAG[name]) LOGO.set(name, url);
+}
+export const logoOf = (name: string) => LOGO.get(name);
+
 export type Badge = { flag: string } | { colors: [string, string] } | { initial: string };
 
 export function badgeOf(name: string): Badge {

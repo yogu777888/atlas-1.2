@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fira_Sans_Extra_Condensed, Onest } from "next/font/google";
+import { Fira_Sans_Extra_Condensed, Onest, Unbounded } from "next/font/google";
 import { AgeGate } from "@/components/AgeGate";
 import { CookieConsent } from "@/components/CookieConsent";
 import { MotionRoot } from "@/components/MotionRoot";
@@ -11,6 +11,8 @@ import "./globals.css";
 
 const sans = Onest({ subsets: ["latin", "latin-ext", "cyrillic"], variable: "--font-onest" });
 // Figures only: odds, chances and scores line up in narrow columns
+// Headlines in the new look: wide and confident, with Cyrillic
+const display = Unbounded({ subsets: ["latin", "cyrillic"], weight: ["500", "600", "700"], variable: "--font-unbounded" });
 const figures = Fira_Sans_Extra_Condensed({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-fira" });
 
 export const metadata: Metadata = {
@@ -39,7 +41,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${sans.variable} ${figures.variable}`} suppressHydrationWarning>
+    <html lang="ru" className={`${sans.variable} ${figures.variable} ${display.variable}`} suppressHydrationWarning>
       <head>
         {/* Preview of the two looks being compared: ?look=dark | light | default, remembered in this browser */}
         <script

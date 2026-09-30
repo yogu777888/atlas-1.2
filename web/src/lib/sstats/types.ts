@@ -3,7 +3,7 @@
 export type SsPrice = { name: string; value: number };
 export type SsBet = { marketId: number; marketName: string | null; odds: SsPrice[] };
 
-export type SsTeam = { id: number; name: string; country?: { code: string; name: string } | null };
+export type SsTeam = { id: number; name: string; logoUrl?: string | null; country?: { code: string; name: string } | null };
 
 export type SsGame = {
   id: number;
