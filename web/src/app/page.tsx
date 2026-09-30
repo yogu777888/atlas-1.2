@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
-import { ToolVisual } from "@/components/ArticleVisuals";
 import { BankChart } from "@/components/BankChart";
 import { Board, BoardLegend } from "@/components/Board";
 import { BoardFilter } from "@/components/BoardFilter";
@@ -33,6 +32,13 @@ export const metadata: Metadata = {
 };
 
 const BOARD_ROWS = 14;
+
+/** Each calculator as a tiny equation: what you type in → what you get */
+const TOOL_EQ: Record<string, { in: string[]; out: string; text: string }> = {
+  marzha: { in: ["1.90", "3.60", "4.20"], out: "4,2%", text: "Коэффициенты на все исходы → маржа и честные шансы." },
+  veroyatnost: { in: ["1.90"], out: "52,6%", text: "Любой формат коэффициента → вероятность исхода." },
+  ekspress: { in: ["1.90", "×", "1.90", "×", "1.90"], out: "6.86", text: "События экспресса → итоговый коэффициент и его маржа." },
+};
 
 const faqs = [
   {
@@ -214,18 +220,27 @@ export default async function Home() {
         </div>
         <div className="mt-12">
           <SectionHead title="Калькуляторы" level={3} sub="Проверьте маржу, вероятность и экспресс на своих коэффициентах." href={paths.tools} cta="Все калькуляторы" />
-          <div className="grid gap-4 sm:grid-cols-3">
-            {tools.map((t) => (
-              <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="card group flex flex-col gap-4 p-5 transition-colors hover:border-fg">
-                <ToolVisual slug={t.slug} />
-                <span>
-                  <b className="block leading-snug font-bold">
+          <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+            {tools.map((t) => {
+              const eq = TOOL_EQ[t.slug];
+              return (
+                <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="card group p-5 transition-colors hover:border-fg">
+                  <span className="num flex flex-wrap items-center gap-1.5 text-lg font-semibold" aria-hidden>
+                    {eq.in.map((x, k) => (
+                      <span key={k} className={x === "×" ? "text-subtle" : "rounded-md bg-surface-2 px-2 py-0.5 ring-1 ring-line"}>
+                        {x}
+                      </span>
+                    ))}
+                    <span className="px-0.5 text-subtle">→</span>
+                    <span className="rounded-md bg-hi px-2 py-0.5 font-bold">{eq.out}</span>
+                  </span>
+                  <b className="mt-4 block leading-snug font-bold">
                     <span className="transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.4em_0_var(--color-hi)]">{t.title}</span>
                   </b>
-                  <small className="mt-1 block text-sm text-muted">{t.description}</small>
-                </span>
-              </Link>
-            ))}
+                  <small className="mt-1 block text-sm text-muted">{eq.text}</small>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
