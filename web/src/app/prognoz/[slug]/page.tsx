@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Board } from "@/components/Board";
+import { CompareBars } from "@/components/CompareBars";
+import { Scorers } from "@/components/Scorers";
 import { FlipText } from "@/components/FlipText";
 import { FormColumn, HeadToHead, MissingList, Verdict } from "@/components/ForecastBlocks";
 import { OutboundButton } from "@/components/OutboundButton";
@@ -13,7 +15,10 @@ import { getBookmaker } from "@/lib/bookmakers";
 import { findMatch, getMatchDetail, getMatches, type MatchDetail } from "@/lib/data";
 import { dayMonth, dayMonthYear, mskDay, mskTime, whenRu } from "@/lib/dates";
 import { pointsPerGame } from "@/lib/forecast";
-import { isClubTop } from "@/lib/leagues";
+import { pairSlug, teamRows } from "@/lib/compare";
+import { CLUB_LEAGUES, isClubTop, type ClubLeague } from "@/lib/leagues";
+import { getSeason, standings } from "@/lib/season";
+import { pairStats } from "@/lib/stats-store";
 import { edge, isSuspect, isValue, margin, moved, odds, OUTCOMES, outcomeLabel, parseMatchRef, pct, plural, probClass, UPSET, verdict, winnerOf, type Match, type Probs1x2 } from "@/lib/matches";
 import { paths } from "@/lib/routes";
 import { site } from "@/lib/site";
@@ -64,7 +69,14 @@ export default async function MatchPage({ params }: Props) {
   if (!m) notFound();
   if (slug !== m.slug) permanentRedirect(paths.match(m.slug));
 
-  const [d, upcoming] = await Promise.all([getMatchDetail(m), getMatches().catch(() => [] as Match[])]);
+  const club = CLUB_LEAGUES.find((k): k is ClubLeague => k === m.league.key);
+  const withStats = !!club && !!m.homeId && !!m.awayId && m.status !== "finished";
+  const [d, upcoming, pair, season] = await Promise.all([
+    getMatchDetail(m),
+    getMatches().catch(() => [] as Match[]),
+    withStats ? pairStats(club!, m.homeId!, m.awayId!).catch(() => null) : Promise.resolve(null),
+    withStats ? getSeason(club!).catch(() => null) : Promise.resolve(null),
+  ]);
   const fair = d.world ?? m.fair;
   const pari = getBookmaker("pari")!;
   const finished = m.status === "finished" && !!m.score;
@@ -185,6 +197,34 @@ export default async function MatchPage({ params }: Props) {
           )}
         </section>
       </div>
+
+      {pair?.ok && (
+        <section className="mt-block">
+          <SectionHead
+            title="Сравнение команд"
+            sub={`Средние за последние ${Math.min(pair.a.games, pair.b.games)} ${plural(Math.min(pair.a.games, pair.b.games), ["матч", "матча", "матчей"])} ${m.league.gen} у каждой команды${pair.demo ? " (демо-данные)" : ""}. Тёмная полоса — у кого показатель лучше.`}
+            href={paths.pair(pairSlug(m.home, m.away))}
+            cta="Полное сравнение"
+          />
+          <CompareBars
+            left={m.home}
+            right={m.away}
+            rows={teamRows(pair.a.profile!, pair.b.profile!, season ? standings(season.games).find((r) => r.id === m.homeId) : null, season ? standings(season.games).find((r) => r.id === m.awayId) : null, true)}
+          />
+        </section>
+      )}
+
+      {pair?.ok && (
+        <section className="mt-block">
+          <SectionHead title="Кто может забить" sub="Лучшие бомбардиры команд в последних матчах чемпионата. Красным отмечены игроки, которые пропустят матч." />
+          <Scorers
+            sides={[
+              { team: m.home, players: pair.a.scorers, games: pair.a.games, missing: d.missing.filter((x) => x.team === "home") },
+              { team: m.away, players: pair.b.scorers, games: pair.b.games, missing: d.missing.filter((x) => x.team === "away") },
+            ]}
+          />
+        </section>
+      )}
 
       {(d.form.home.length > 0 || d.form.away.length > 0) && (
         <section className="mt-block">

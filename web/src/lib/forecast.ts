@@ -10,7 +10,7 @@ import { teamRu } from "./teams";
 export type Result = "W" | "D" | "L";
 export type FormGame = { date: string; opponent: string; home: boolean; gf: number; ga: number; result: Result };
 export type H2HGame = { date: string; home: string; away: string; hg: number; ag: number };
-export type Missing = { team: "home" | "away"; player: string; reason: string };
+export type Missing = { team: "home" | "away"; player: string; reason: string; id?: number };
 export type GoalMarkets = { over25: number | null; btts: number | null; books: number };
 
 const num = (x: unknown) => (x === null || x === undefined || x === "" ? null : Number(x));
@@ -87,5 +87,5 @@ export async function missingPlayers(gameId: number, homeId: number): Promise<Mi
   const list = await sstats<SsInjury[]>("/Games/injuries", { gameId }, 3_600).catch(() => []);
   return list
     .filter((i) => i.player?.name)
-    .map((i) => ({ team: Number(i.teamId) === homeId ? ("home" as const) : ("away" as const), player: i.player!.name!, reason: reasonRu(i.reason) }));
+    .map((i) => ({ team: Number(i.teamId) === homeId ? ("home" as const) : ("away" as const), player: i.player!.name!, reason: reasonRu(i.reason), id: i.player!.id ? Number(i.player!.id) : undefined }));
 }

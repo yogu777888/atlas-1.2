@@ -12,6 +12,7 @@ import { dayMonth, mskTime, shortDay } from "@/lib/dates";
 import { getLeague } from "@/lib/leagues";
 import { plural, type Match } from "@/lib/matches";
 import { paths } from "@/lib/routes";
+import { featuredPairs, pairSlug } from "@/lib/compare";
 import { findTeam, seasonLabel, teamSeason } from "@/lib/season";
 import { site } from "@/lib/site";
 import { clubLeagueOf, teamRu } from "@/lib/teams";
@@ -137,6 +138,23 @@ export default async function TeamPage({ params }: Props) {
               </div>
             </section>
           )}
+
+          <section>
+            <SectionHead title={`Сравнить ${team.name} с соперниками`} sub="Голы, xG, удары, угловые, форма и бомбардиры двух команд рядом." href={paths.compare} cta="Любая пара" />
+            <div className="flex flex-wrap gap-1.5">
+              {(featuredPairs(season).some(([x, y]) => x.id === team.id || y.id === team.id)
+                ? featuredPairs(season)
+                    .filter(([x, y]) => x.id === team.id || y.id === team.id)
+                    .map(([x, y]) => (x.id === team.id ? y : x))
+                : ts.table.filter((r) => r.id !== team.id).slice(0, 6)
+              ).map((o) => (
+                <Link key={o.id} href={paths.pair(pairSlug(team.name, o.name))} className="chip">
+                  <TeamMark name={o.name} size={14} />
+                  {team.name} или {o.name}
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <section>
             <SectionHead title={`Таблица ${l.gen} ${seasonLabel(season.year)}`} href={paths.league(l.slug)} cta={`Прогнозы на ${l.acc}`} />

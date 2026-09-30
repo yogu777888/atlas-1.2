@@ -65,7 +65,7 @@ export function poissonChances(lh: number, la: number) {
   return { home: home / sum, draw: draw / sum, away: away / sum, over25: 1 - under, btts: (1 - Math.exp(-lh)) * (1 - Math.exp(-la)) };
 }
 
-type DemoGame = SsGame & { xg: [number, number] };
+export type DemoGame = SsGame & { xg: [number, number] };
 
 const leagueIndex = (key: ClubLeague) => CLUB_LEAGUES.indexOf(key);
 /** Team ids and game ids are made up but stable: league index in the high digits. */

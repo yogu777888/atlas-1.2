@@ -15,6 +15,7 @@ const columns = [
     title: "Команды",
     links: [
       { href: paths.teams, label: "Все команды" },
+      { href: paths.compare, label: "Сравнение команд" },
       ...POPULAR.slice(0, 8).map((t) => ({ href: paths.team(teamSlug(t)), label: t })),
       { href: paths.whatIf, label: "А что, если" },
     ],

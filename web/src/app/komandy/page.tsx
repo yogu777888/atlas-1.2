@@ -22,7 +22,14 @@ export default async function TeamsPage() {
         crumbs={[{ label: "Команды", href: paths.teams }]}
         title="Команды"
         animate
-        lead="Клубы РПЛ и пяти главных лиг Европы. На странице команды — прогноз на её следующий матч, форма, место в таблице и сколько принесли бы ставки на неё с начала сезона."
+        lead={
+          <>
+            Клубы РПЛ и пяти главных лиг Европы. На странице команды — прогноз на её следующий матч, форма, место в таблице и сколько принесли бы ставки на неё с начала сезона.{" "}
+            <Link href={paths.compare} className="font-semibold text-fg underline decoration-hi decoration-2 underline-offset-4">
+              Сравнить две команды
+            </Link>
+          </>
+        }
       />
       <div className="mt-6 grid gap-10 md:grid-cols-2">
         {CLUB_LEAGUES.map((key, i) => {

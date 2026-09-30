@@ -9,6 +9,8 @@ export const paths = {
   league: (slug: string) => `/prognozy/${slug}`,
   match: (slug: string) => `/prognoz/${slug}`,
   teams: "/komandy",
+  compare: "/sravnenie",
+  pair: (slug: string) => `/sravnenie/${slug}`,
   team: (slug: string) => `/komandy/${slug}`,
   bookmakers: "/bukmekery",
   bookmaker: (slug: string) => `/bukmekery/${slug}`,

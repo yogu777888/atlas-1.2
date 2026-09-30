@@ -20,7 +20,7 @@ export type SsGame = {
   awayResult?: number | string | null;
 };
 
-export type SsInjury = { teamId: number | string; player: { id?: number; name?: string | null } | null; reason: string | null };
+export type SsInjury = { teamId: number | string; player: { id?: number | string | null; name?: string | null } | null; reason: string | null };
 
 export type SsBookmakerOdds = { bookmakerId: number; bookmakerName: string; odds: SsBet[] };
 
@@ -52,4 +52,26 @@ export type PariMarket = {
   description: string | null;
   hasParameter: boolean;
   outcomes: { id: number; name: string; period: string; parameter: number | null }[];
+};
+
+/** /Games/{id}: the parts of a finished game we keep for team and player stats. */
+export type SsNum = number | string | null | undefined;
+export type SsGameFull = {
+  game: SsGame;
+  statistics: Record<string, SsNum | object> | null;
+  lineupPlayers: { teamId: number | string; playerId: SsNum; playerName: string; position: string | null; startXI: boolean | null }[] | null;
+  playerStats: {
+    playerId: number | string;
+    minutes: SsNum;
+    shotsTotal: SsNum;
+    shotsOn: SsNum;
+    goalsTotal: SsNum;
+    goalsAssists: SsNum;
+    passesKey: SsNum;
+    cardsYellow: SsNum;
+    cardsRed: SsNum;
+    penaltyScored: SsNum;
+    rating: SsNum;
+  }[] | null;
+  events: { teamId: number | string; type: number | string; name: string; player: { id: SsNum; name: string } | null }[] | null;
 };
