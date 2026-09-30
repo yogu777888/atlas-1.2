@@ -210,7 +210,7 @@ export default async function Home() {
       <section className="pt-16">
         <SectionHead title="Разобраться за пять минут" href={paths.articles} cta="Все статьи" />
         <div className="border-t border-line">
-          {["marzha-bukmekera", "koefficient-v-veroyatnost", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
+          {["kak-chitat-prognoz", "marzha-bukmekera", "koefficient-v-veroyatnost", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
             const a = articles.find((x) => x.slug === slug)!;
             return (
               <Link key={slug} href={paths.article(slug)} data-reveal className="group grid grid-cols-[5rem_minmax(0,1fr)] items-baseline gap-4 border-b border-line py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:gap-5">
@@ -224,11 +224,14 @@ export default async function Home() {
             );
           })}
         </div>
-        <div className="mt-5 flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-sm text-muted">Калькуляторы:</span>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
           {tools.map((t) => (
-            <Link key={t.slug} href={paths.tool(t.slug)} className="chip">
-              {t.short}
+            <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="card group flex items-center gap-4 p-4 transition-colors hover:border-fg">
+              <span className="num w-[4.5rem] shrink-0 text-[28px] leading-none font-bold">{t.cover.figure}</span>
+              <span className="min-w-0">
+                <span className="block text-xs text-subtle">Калькулятор</span>
+                <b className="block leading-snug font-semibold">{t.title}</b>
+              </span>
             </Link>
           ))}
         </div>

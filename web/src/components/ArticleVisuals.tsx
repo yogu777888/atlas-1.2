@@ -19,6 +19,8 @@ export function ArticleVisual({ slug }: { slug: string }) {
       return <Receipt />;
     case "kak-proverit-bukmekera":
       return <Licensed />;
+    case "kak-chitat-prognoz":
+      return <Chances />;
     default:
       return null;
   }
@@ -153,6 +155,17 @@ function Licensed() {
         <BookLogo key={s} slug={s} size="sm" />
       ))}
       <span className="rounded-md bg-hi px-2 py-0.5 text-[11px] font-bold text-fg ring-1 ring-fg/10">ФНС</span>
+    </div>
+  );
+}
+
+/** A row of the forecasts table: three chances on the green scale. */
+function Chances() {
+  return (
+    <div className="num flex gap-[3px] text-sm font-bold" aria-hidden>
+      <span className="rounded bg-p4 px-2 py-0.5 text-white">52</span>
+      <span className="rounded bg-p2 px-2 py-0.5">26</span>
+      <span className="rounded bg-p2 px-2 py-0.5">22</span>
     </div>
   );
 }

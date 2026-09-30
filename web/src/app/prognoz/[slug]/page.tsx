@@ -234,7 +234,7 @@ export default async function MatchPage({ params }: Props) {
         </div>
         <div className="space-y-2.5">
           <p className="text-sm font-semibold text-fg-2">Как мы это считаем</p>
-          {["koefficient-v-veroyatnost", "valuinaya-stavka"].map((slug) => (
+          {["kak-chitat-prognoz", "valuinaya-stavka"].map((slug) => (
             <ArticleLink key={slug} slug={slug} />
           ))}
           <div className="flex flex-wrap gap-x-5 gap-y-2 pt-1">

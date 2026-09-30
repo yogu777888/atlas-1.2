@@ -47,6 +47,9 @@ export function Note({ children, tone = "info" }: { children: React.ReactNode; t
   return <div className={`rounded-r-[10px] border-l-[3px] bg-surface px-5 py-3 text-sm leading-relaxed text-fg-2 ${tone === "warn" ? "border-loss" : "border-hi"}`}>{children}</div>;
 }
 
+/** Cells that are only figures get the condensed number face; words keep the text face. */
+const NUMERIC = /^[\d\s.,%+−₽×/–-]+$/;
+
 /** Simple table that scrolls on its own at phone width. */
 export function Table({ head, rows }: { head: string[]; rows: (string | number)[][] }) {
   return (
@@ -65,7 +68,7 @@ export function Table({ head, rows }: { head: string[]; rows: (string | number)[
           {rows.map((r, i) => (
             <tr key={i}>
               {r.map((c, j) => (
-                <td key={j} className={`px-4 py-2.5 ${j === 0 ? "font-medium text-fg" : "num text-base text-fg-2"}`}>
+                <td key={j} className={`px-4 py-2.5 ${j === 0 ? "font-medium text-fg" : NUMERIC.test(String(c)) ? "num text-base text-fg-2" : "text-fg-2"}`}>
                   {c}
                 </td>
               ))}
