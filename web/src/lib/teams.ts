@@ -8,7 +8,9 @@ import { slugify } from "./translit";
 const GROUPS = {
   // РПЛ
   rpl: {
-    "zenit": "Зенит", "zenit saint petersburg": "Зенит", "zenit st petersburg": "Зенит",
+    "zenit": "Зенит", "dynamo": "Динамо", "dinamo": "Динамо", "cska": "ЦСКА", "spartak": "Спартак", "lokomotiv": "Локомотив",
+    "akhmat": "Ахмат", "pari nizhny novgorod": "Пари НН", "nizhny novgorod pari": "Пари НН", "krylia sovetov samara": "Крылья Советов",
+    "krylya sovetov samara": "Крылья Советов", "dynamo makhachkala": "Динамо Махачкала", "makhachkala": "Динамо Махачкала", "zenit saint petersburg": "Зенит", "zenit st petersburg": "Зенит",
     "spartak moscow": "Спартак", "spartak moskva": "Спартак", "cska moscow": "ЦСКА", "cska moskva": "ЦСКА",
     "lokomotiv moscow": "Локомотив", "lokomotiv moskva": "Локомотив", "dinamo moscow": "Динамо", "dynamo moscow": "Динамо",
     "krasnodar": "Краснодар", "rostov": "Ростов", "rubin": "Рубин", "rubin kazan": "Рубин", "akhmat grozny": "Ахмат",

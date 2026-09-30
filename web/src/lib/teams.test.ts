@@ -13,3 +13,8 @@ describe("teamRu", () => {
     expect(teamRu("America Mineiro")).toBe("America Mineiro");
   });
 });
+
+it("knows short spellings of RPL clubs", () => {
+  expect(teamRu("Dynamo")).toBe("Динамо");
+  expect(teamRu("Dynamo Makhachkala")).toBe("Динамо Махачкала");
+});
