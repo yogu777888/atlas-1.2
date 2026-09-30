@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { dayHeading, mskDay } from "@/lib/dates";
-import { isValue, moved, odds, OUTCOMES, outcomeLabel, plural, probClass, type Match } from "@/lib/matches";
+import { hasValue, isValue, moved, odds, OUTCOMES, outcomeLabel, plural, probClass, type Match } from "@/lib/matches";
 import { paths } from "@/lib/routes";
 import { LocalClock, ZoneNote } from "./LocalClock";
 import { Teams } from "./TeamMark";
@@ -28,7 +28,7 @@ export function Board({ matches, empty, showLeague = true }: { matches: Match[];
       <div className="hidden grid-cols-[3.2rem_minmax(0,1fr)_auto_1rem] items-end gap-3.5 border-b border-line bg-surface-2 px-4 py-2 text-[11px] text-subtle sm:grid" aria-hidden>
         <span>Время</span>
         <span>Матч</span>
-        <span className="flex gap-3.5">
+        <span className="bd-detail flex gap-3.5">
           <Cols title="шансы, %" />
           {hasOdds && <Cols title="коэффициенты" />}
         </span>
@@ -85,7 +85,8 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
         <Teams home={m.home} away={m.away} className="font-semibold" />
         {showLeague && <small className="block truncate text-xs text-muted">{m.league.short === m.league.label ? m.league.label : m.league.label.replace(" УЕФА", "")}</small>}
       </span>
-      <span className="col-span-3 flex gap-2.5 sm:col-span-1 sm:gap-3.5">
+      <Brief m={m} />
+      <span className="bd-detail col-span-3 flex gap-2.5 sm:col-span-1 sm:gap-3.5">
         <span className="sr-only">Шансы: {chances}.</span>
         <span className="grid auto-cols-[2.6rem] grid-flow-col gap-[3px] text-center sm:auto-cols-[3.1rem]" aria-hidden>
           {OUTCOMES.map((o, j) =>
@@ -133,6 +134,22 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
         →
       </span>
     </Link>
+  );
+}
+
+/** The short view of a row: the call in words with its chance on the colour scale. */
+function Brief({ m }: { m: Match }) {
+  const f = m.fair;
+  if (!f) return <span className="bd-brief col-span-3 text-sm text-subtle sm:col-span-1">шансов пока нет</span>;
+  const max = Math.max(f.home, f.draw, f.away);
+  const o = f.home === max ? "home" : f.away === max ? "away" : "draw";
+  const text = max < 0.4 ? "Равный матч" : o === "draw" ? "Скорее ничья" : `Фаворит — ${o === "home" ? m.home : m.away}`;
+  return (
+    <span className="bd-brief col-span-3 min-w-0 items-center justify-end gap-2 text-sm sm:col-span-1">
+      <span className="truncate font-medium text-fg-2">{text}</span>
+      <span className={`num shrink-0 rounded-[5px] px-2 py-0.5 text-base font-semibold ${probClass(max)}`}>{Math.round(max * 100)}%</span>
+      {hasValue(m) && <span className="size-2.5 shrink-0 rounded-sm bg-hi ring-1 ring-fg/15" title="Есть коэффициент выше честной цены" />}
+    </span>
   );
 }
 

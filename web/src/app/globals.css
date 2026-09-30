@@ -148,6 +148,11 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Forecast table views: "short" swaps the six figures for one call in words */
+.bd-brief { display: none; }
+[data-view="short"] .bd-brief { display: flex; }
+[data-view="short"] .bd-detail { display: none; }
+
 /* Highlighter: a yellow stroke drawn behind a price that is above fair */
 .hl {
   background-image: linear-gradient(var(--color-hi), var(--color-hi));

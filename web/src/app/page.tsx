@@ -16,9 +16,9 @@ import { badgeOf } from "@/lib/badges";
 import { bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatchDetail, getMatches, type MatchDetail } from "@/lib/data";
 import { mskTime } from "@/lib/dates";
-import { marketCheck, whatIfFact } from "@/lib/insights";
+import { marketCheck, weekHighlights, weekRecap, whatIfFact } from "@/lib/insights";
 import { getLeague, isClubTop, leagues } from "@/lib/leagues";
-import { hasValue, plural, type Match } from "@/lib/matches";
+import { hasValue, matchSlug, plural, type Match } from "@/lib/matches";
 import { paths } from "@/lib/routes";
 import { POPULAR, teamSlug } from "@/lib/teams";
 import { tools } from "@/lib/tools";
@@ -61,7 +61,7 @@ const faqs = [
 ];
 
 export default async function Home() {
-  const [matches, fact, check] = await Promise.all([getMatches(), whatIfFact().catch(() => null), marketCheck().catch(() => null)]);
+  const [matches, fact, check, recap] = await Promise.all([getMatches(), whatIfFact().catch(() => null), marketCheck().catch(() => null), weekRecap().catch(() => null)]);
   const live = dataSource() === "live";
   const main = matches.filter((m) => m.league.key !== "other");
   const board = (main.length ? main : matches).slice(0, BOARD_ROWS);
@@ -72,6 +72,7 @@ export default async function Home() {
     .map((l) => ({ key: l.key, short: l.short, label: `Все прогнозы на ${l.acc}`, href: paths.league(l.slug), count: board.filter((m) => m.league.key === l.key).length }))
     .filter((l) => l.count > 0);
   const top = bookmakersByRating();
+  const highlights = weekHighlights(matches);
   const popular = matches.filter((m) => POPULAR.includes(m.home) || POPULAR.includes(m.away)).slice(0, 5);
   const rplTable = popular.length ? [] : await getSeason("rpl").then((s) => standings(s.games)).catch(() => []);
 
@@ -141,6 +142,48 @@ export default async function Home() {
           </article>
         </aside>
       </div>
+
+      {(highlights.length > 0 || recap) && (
+        <section className="mt-block">
+          <SectionHead title="Главное на неделе" sub="Короткая сводка, которую сайт собирает из цифр сам." />
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <ol className="card divide-y divide-line">
+              {highlights.map((h, i) => (
+                <li key={h.kind}>
+                  <Link href={paths.match(h.match.slug)} className="group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-surface-2">
+                    <span className="num mt-0.5 grid size-7 shrink-0 place-items-center rounded-md bg-hi text-base font-bold ring-1 ring-fg/10">{i + 1}</span>
+                    <span className="min-w-0 flex-1 text-[15px] text-fg-2">{h.text}</span>
+                    <span className="mt-0.5 text-subtle transition group-hover:translate-x-[3px] group-hover:text-fg" aria-hidden>
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            {recap && (
+              <article className="card p-5">
+                <span className="kicker">Итоги {recap.days === 7 ? "прошлой недели" : `последних ${recap.days} дней`} · топ-лиги</span>
+                <p className="mt-3 text-sm text-muted">Фавориты выиграли</p>
+                <p className="num text-[56px] leading-none font-bold">{Math.round(recap.favWon * 100)}%</p>
+                <p className="mt-1 text-sm text-muted">
+                  из {recap.games} {plural(recap.games, ["матча", "матчей", "матчей"])}. Рынок давал им в среднем {Math.round(recap.favExpected * 100)}%
+                  {Math.abs(recap.favWon - recap.favExpected) < 0.08 ? ": шансы оказались честными." : recap.favWon > recap.favExpected ? ": неделя вышла удачной для фаворитов." : ": неделя вышла неудачной для фаворитов."}
+                </p>
+                {recap.upset && (
+                  <Link href={paths.match(matchSlug(recap.upset.home, recap.upset.away, recap.upset.id))} className="mt-4 block rounded-lg bg-surface-2 p-3 text-sm ring-1 ring-line transition hover:ring-fg">
+                    <span className="mr-1.5 rounded bg-hi px-1 text-xs font-semibold">сенсация</span>
+                    <b className="font-semibold">
+                      {recap.upset.home} — {recap.upset.away} {recap.upset.score}
+                    </b>
+                    <span className="block text-muted">рынок давал этому исходу {Math.round(recap.upset.chance * 100)}%</span>
+                  </Link>
+                )}
+                {recap.demo && <p className="mt-2 text-[11px] text-subtle">Демо-данные.</p>}
+              </article>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="mt-block">
         <SectionHead title="Ваша команда" sub="Прогноз на следующий матч, форма и что было бы, если ставить на неё весь сезон." href={paths.teams} cta="Все команды" />
