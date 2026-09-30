@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleVisual, OddsInputs } from "@/components/ArticleVisuals";
+import { LiveCover } from "@/components/LiveCover";
 import { Cover } from "@/components/Cover";
 import { Fine, PageHead } from "@/components/Page";
 import { articles, getArticle, type Article } from "@/content/articles";
@@ -38,7 +39,7 @@ export default function ArticlesPage() {
       />
 
       <Link href={paths.article(featured.slug)} className="card group mt-8 grid items-center gap-6 p-3 transition-colors hover:border-line-strong md:grid-cols-[1.1fr_1fr] md:gap-8 md:p-4">
-        <Cover figure={featured.cover.figure} caption={featured.cover.caption} size="lg" visual={<ArticleVisual slug={featured.slug} />} />
+        <LiveCover slug={featured.slug} size="lg" fallback={<Cover figure={featured.cover.figure} caption={featured.cover.caption} size="lg" visual={<ArticleVisual slug={featured.slug} />} />} />
         <div className="space-y-3 px-2 pb-3 md:px-3 md:pb-0">
           <span className="kicker">
             <span className="size-2.5 rounded-sm bg-hi ring-1 ring-fg/10" aria-hidden />

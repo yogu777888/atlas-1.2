@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/ArticleCard";
-import { ArticleVisual } from "@/components/ArticleVisuals";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Cover } from "@/components/Cover";
+import { ArticleVisual } from "@/components/ArticleVisuals";
+import { LiveCover } from "@/components/LiveCover";
 import { FlipMark } from "@/components/Logo";
 import { Faq, Fine } from "@/components/Page";
 import { articles, getArticle } from "@/content/articles";
@@ -57,7 +58,7 @@ export default async function ArticlePage({ params }: Props) {
           <h1 className="mt-3 text-[clamp(30px,4.2vw,48px)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">{a.title}</h1>
           <p className="mt-4 max-w-xl text-lg text-pretty text-muted">{a.description}</p>
         </div>
-        <Cover figure={a.cover.figure} caption={a.cover.caption} size="lg" visual={<ArticleVisual slug={a.slug} />} />
+        <LiveCover slug={a.slug} size="lg" fallback={<Cover figure={a.cover.figure} caption={a.cover.caption} size="lg" visual={<ArticleVisual slug={a.slug} />} />} />
       </header>
 
       <div className="mt-block grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem]">
