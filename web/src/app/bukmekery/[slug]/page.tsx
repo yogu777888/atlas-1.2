@@ -74,7 +74,7 @@ export default async function BookmakerPage({ params }: Props) {
             </div>
           </header>
 
-          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-3">
+          <dl className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-3">
             {facts.map((f) => (
               <div key={f.k} className="bg-surface p-4">
                 <dt className="text-xs text-subtle">{f.k}</dt>
@@ -112,7 +112,7 @@ export default async function BookmakerPage({ params }: Props) {
             </div>
           </div>
 
-          <section className="mt-10 max-w-[68ch] space-y-3 leading-relaxed text-fg-2 prose-links">
+          <section className="mt-block max-w-[68ch] space-y-3 leading-relaxed text-fg-2 prose-links">
             <h2 className="text-xl font-extrabold tracking-tight text-fg">Итог</h2>
             <p>
               Средняя маржа на исход футбольного матча — {marginText(b).replace("≈", "около ")}: {level}. {b.pros[0]}. Главный минус:{" "}
@@ -140,7 +140,7 @@ export default async function BookmakerPage({ params }: Props) {
           </div>
         </aside>
       </div>
-      <Fine className="mt-10">Оценка и маржа — по данным редакции. Условия бонусов меняются: проверяйте их на сайте букмекера. {site.warning}</Fine>
+      <Fine className="mt-12">Оценка и маржа — по данным редакции. Условия бонусов меняются: проверяйте их на сайте букмекера. {site.warning}</Fine>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </div>
   );

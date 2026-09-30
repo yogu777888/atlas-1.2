@@ -35,7 +35,7 @@ export default async function MethodologyPage() {
         lead="Все цифры на tag.bet получаются из коэффициентов букмекеров по формулам, которые можно проверить самому. Экспертных мнений в расчёте нет."
       />
 
-      <ol className="mt-8 grid gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+      <ol className="mt-6 grid gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((s, i) => (
           <li key={s.title} data-reveal className="bg-surface p-5">
             <span className="num grid size-8 place-items-center rounded-md bg-hi text-lg font-bold ring-1 ring-fg/10">{i + 1}</span>

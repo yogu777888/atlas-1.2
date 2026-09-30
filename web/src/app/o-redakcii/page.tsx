@@ -28,7 +28,7 @@ export default function AboutPage() {
         lead="tag.bet — независимый информационный сайт о ставках на футбол. Мы не принимаем ставки и не храним деньги игроков. Наша задача — чтобы вы понимали, сколько на самом деле стоит ставка, до того как её сделать."
       />
 
-      <div className="mt-8 grid gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2">
+      <div className="mt-6 grid gap-px overflow-hidden rounded-[10px] border border-line bg-line sm:grid-cols-2">
         {principles.map((p) => (
           <div key={p.t} data-reveal className="bg-surface p-5">
             <FlipMark className="size-4" />
@@ -38,7 +38,7 @@ export default function AboutPage() {
         ))}
       </div>
 
-      <div className="mt-12 max-w-[68ch] space-y-8 leading-relaxed text-fg-2 prose-links [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:tracking-tight [&_h2]:text-fg">
+      <div className="mt-block max-w-[68ch] space-y-8 leading-relaxed text-fg-2 prose-links [&_h2]:text-xl [&_h2]:font-extrabold [&_h2]:tracking-tight [&_h2]:text-fg">
         <section className="space-y-3">
           <h2>Как мы пишем</h2>
           <p>

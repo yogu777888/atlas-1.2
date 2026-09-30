@@ -60,7 +60,7 @@ export default async function ArticlePage({ params }: Props) {
         <Cover figure={a.cover.figure} caption={a.cover.caption} size="lg" visual={<ArticleVisual slug={a.slug} />} />
       </header>
 
-      <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem]">
+      <div className="mt-block grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem]">
         <article className="max-w-[68ch] space-y-5 leading-relaxed text-fg-2 prose-links [&_li]:ml-5 [&_li]:list-disc [&_ul]:space-y-3">
           {a.body()}
           <div className="pt-8">
@@ -95,7 +95,7 @@ export default async function ArticlePage({ params }: Props) {
         </aside>
       </div>
 
-      <section className="mt-20 border-t border-line pt-10">
+      <section className="mt-block border-t border-line pt-8">
         <h2 className="mb-6 text-2xl font-extrabold tracking-tight">Читать дальше</h2>
         <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
           {related.map((r) => (

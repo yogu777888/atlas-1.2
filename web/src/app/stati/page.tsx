@@ -57,7 +57,7 @@ export default function ArticlesPage() {
       {sections.map(({ cat, about }) => {
         const list = articles.filter((a) => a.category === cat && a.slug !== FEATURED);
         return (
-          <section key={cat} className="mt-14 grid gap-6 border-t border-line pt-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
+          <section key={cat} className="mt-block grid gap-6 border-t border-line pt-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
             <div className="lg:sticky lg:top-24 lg:self-start">
               <h2 className="text-xl font-extrabold tracking-tight">{cat}</h2>
               <p className="mt-1 max-w-xs text-sm text-muted">{about}</p>
@@ -85,7 +85,7 @@ export default function ArticlesPage() {
           </section>
         );
       })}
-      <Fine className="mt-14">{site.warning}</Fine>
+      <Fine className="mt-12">{site.warning}</Fine>
     </div>
   );
 }

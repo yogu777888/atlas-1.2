@@ -24,7 +24,7 @@ export default async function TeamsPage() {
         animate
         lead="Клубы РПЛ и пяти главных лиг Европы. На странице команды — прогноз на её следующий матч, форма, место в таблице и сколько принесли бы ставки на неё с начала сезона."
       />
-      <div className="mt-8 grid gap-10 md:grid-cols-2">
+      <div className="mt-6 grid gap-10 md:grid-cols-2">
         {CLUB_LEAGUES.map((key, i) => {
           const s = seasons[i];
           const l = getLeague(key)!;

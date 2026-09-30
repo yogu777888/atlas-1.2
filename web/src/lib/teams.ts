@@ -16,7 +16,7 @@ const GROUPS = {
     "krasnodar": "Краснодар", "rostov": "Ростов", "rubin": "Рубин", "rubin kazan": "Рубин", "akhmat grozny": "Ахмат",
     "krylya sovetov": "Крылья Советов", "krylia sovetov": "Крылья Советов", "fakel": "Факел", "fakel voronezh": "Факел",
     "orenburg": "Оренбург", "gazovik orenburg": "Оренбург", "nizhny novgorod": "Пари НН", "pari nn": "Пари НН",
-    "dynamo makhachkala": "Динамо Махачкала", "dinamo makhachkala": "Динамо Махачкала", "akron": "Акрон", "akron togliatti": "Акрон",
+    "dinamo makhachkala": "Динамо Махачкала", "akron": "Акрон", "akron togliatti": "Акрон",
     "baltika": "Балтика", "baltika kaliningrad": "Балтика", "sochi": "Сочи", "khimki": "Химки", "torpedo moscow": "Торпедо",
   },
   // АПЛ

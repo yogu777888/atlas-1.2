@@ -60,13 +60,13 @@ export async function ForecastsView({ valueOnly = false }: { valueOnly?: boolean
       </BoardFilter>
 
       {main.length > 0 && others.length > 0 && (
-        <section className="mt-12">
+        <section className="mt-block">
           <SectionHead title="Другие турниры" sub="Когда в топ-лигах пауза, показываем матчи других чемпионатов, на которые уже есть коэффициенты." />
           <Board matches={others} />
         </section>
       )}
 
-      <section className="mt-14 grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <section className="mt-block grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <h2 className="text-xl font-extrabold tracking-tight">Как читать таблицу</h2>
         <div className="max-w-[68ch] space-y-3 text-muted prose-links">
           <p>
@@ -81,7 +81,7 @@ export async function ForecastsView({ valueOnly = false }: { valueOnly?: boolean
         </div>
       </section>
 
-      <Fine className="mt-10">Коэффициенты меняются. Перед ставкой проверьте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
+      <Fine className="mt-12">Коэффициенты меняются. Перед ставкой проверьте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
     </div>
   );
 }

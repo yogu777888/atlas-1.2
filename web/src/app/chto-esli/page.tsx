@@ -87,7 +87,7 @@ export default async function WhatIfPage({ searchParams }: Props) {
       {!games.length && <p className="card mt-8 p-8 text-center text-muted">В этом сезоне ещё нет сыгранных матчей с коэффициентами. Выберите прошлый сезон.</p>}
 
       {team && back && against && draw && (
-        <section className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <section className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <div className="card p-5 sm:p-6">
             <p className="text-xl font-extrabold tracking-tight">
               <Link href={paths.team(teamSlug(team.name))} className="underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hi">
@@ -123,7 +123,7 @@ export default async function WhatIfPage({ searchParams }: Props) {
       )}
 
       {table.length > 0 && (
-        <section className="mt-14">
+        <section className="mt-block">
           <SectionHead
             title={`На кого было выгодно ставить: ${league.label}, ${season.label}`}
             sub={`В плюсе ${inPlus} из ${table.length} ${plural(table.length, ["команды", "команд", "команд"])}. В среднем ставка на победу возвращала ${pctSigned(avgRoi)}: это и есть маржа букмекера, которую платит тот, кто ставит всегда.`}
@@ -146,7 +146,7 @@ export default async function WhatIfPage({ searchParams }: Props) {
         </section>
       )}
 
-      <Fine className="mt-10">
+      <Fine className="mt-12">
         Коэффициенты закрытия — средние по рынку за несколько минут до начала матча. У конкретного букмекера результат был бы другим. {site.warning}
       </Fine>
     </div>

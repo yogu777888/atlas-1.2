@@ -99,8 +99,8 @@ export default async function TeamPage({ params }: Props) {
         }
       />
 
-      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0 space-y-12">
+      <div className="mt-6 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 space-y-12 sm:space-y-16">
           {recent.length > 0 && (
             <section>
               <SectionHead title="Форма" sub={season.demo ? "Последние матчи сезона (демо-данные)." : "Последние матчи во всех турнирах."} />
@@ -202,7 +202,7 @@ export default async function TeamPage({ params }: Props) {
           }),
         }}
       />
-      <Fine className="mt-10">
+      <Fine className="mt-12">
         Прогнозы — оценка шансов по рынку, а не гарантия результата. {site.warning}
       </Fine>
     </div>

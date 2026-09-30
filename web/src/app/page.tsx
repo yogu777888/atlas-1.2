@@ -87,7 +87,7 @@ export default async function Home() {
         </div>
       </header>
 
-      <div className="grid items-start gap-10 pt-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="mt-6 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section aria-labelledby="board-title">
           <h2 id="board-title" className="sr-only">
             Прогнозы на ближайшие матчи
@@ -131,7 +131,7 @@ export default async function Home() {
         </aside>
       </div>
 
-      <section className="pt-16">
+      <section className="mt-block">
         <SectionHead title="Ваша команда" sub="Прогноз на следующий матч, форма и что было бы, если ставить на неё весь сезон." href={paths.teams} cta="Все команды" />
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div className="space-y-6">
@@ -164,7 +164,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="pt-16">
+      <section className="mt-block">
         <SectionHead title="Насколько точны эти шансы" href={paths.method} cta="Как мы считаем" />
         <div data-reveal className="grid gap-px overflow-hidden rounded-[10px] border border-line bg-line md:grid-cols-[1.7fr_1fr]">
           <div className="grid items-center gap-x-8 gap-y-3 bg-surface p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
@@ -207,7 +207,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="pt-16">
+      <section className="mt-block">
         <SectionHead title="Разобраться за пять минут" href={paths.articles} cta="Все статьи" />
         <div className="border-t border-line">
           {["kak-chitat-prognoz", "marzha-bukmekera", "koefficient-v-veroyatnost", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
@@ -237,7 +237,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <div className="pt-16">
+      <div className="mt-block">
         <Faq items={faqs} />
       </div>
     </div>

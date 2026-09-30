@@ -21,7 +21,7 @@ export default function ToolsPage() {
         animate
         lead="Три калькулятора, которые показывают, сколько на самом деле стоит ставка: маржу букмекера, вероятность за коэффициентом и цену экспресса. Считают прямо в браузере."
       />
-      <div className="mt-8 grid gap-x-6 gap-y-10 md:grid-cols-3">
+      <div className="mt-6 grid gap-x-6 gap-y-10 md:grid-cols-3">
         {tools.map((t) => (
           <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="group flex flex-col gap-4">
             <div className="h-44 transition group-hover:-translate-y-0.5">

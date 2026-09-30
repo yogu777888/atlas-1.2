@@ -75,7 +75,7 @@ export default async function ToolPage({ params }: Props) {
         lead={t.description}
       />
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
         <section className="card p-5 sm:p-7">{c.calc}</section>
         <aside className="space-y-5">
           <Formula note={c.formulaNote}>{c.formula}</Formula>
@@ -98,7 +98,7 @@ export default async function ToolPage({ params }: Props) {
         </aside>
       </div>
 
-      <section className="mt-14">
+      <section className="mt-block">
         <p className="mb-3 text-sm font-semibold text-fg-2">Другие калькуляторы</p>
         <div className="flex flex-wrap gap-1.5">
           {others.map((o) => (

@@ -121,7 +121,7 @@ export default async function MatchPage({ params }: Props) {
         </section>
       )}
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <section className="card p-5 sm:p-6">
           <h2 className="font-bold">Шансы по мировому рынку</h2>
           <p className="mt-1 text-sm text-muted">
@@ -187,7 +187,7 @@ export default async function MatchPage({ params }: Props) {
       </div>
 
       {(d.form.home.length > 0 || d.form.away.length > 0) && (
-        <section className="mt-12">
+        <section className="mt-block">
           <SectionHead title="Форма команд" sub={finished ? "Матчи перед этой игрой, во всех турнирах." : "Последние матчи во всех турнирах."} />
           <div className="grid gap-4 md:grid-cols-2">
             <FormColumn team={m.home} games={d.form.home} href={teamLink ? paths.team(teamSlug(m.home)) : undefined} />
@@ -197,14 +197,14 @@ export default async function MatchPage({ params }: Props) {
       )}
 
       {d.h2h.length > 0 && (
-        <section className="mt-12">
+        <section className="mt-block">
           <SectionHead title="Личные встречи" />
           <HeadToHead games={d.h2h} home={m.home} />
         </section>
       )}
 
       {d.missing.length > 0 && !finished && (
-        <section className="mt-12">
+        <section className="mt-block">
           <SectionHead title="Кто не сыграет" sub="Травмы и дисквалификации по данным к началу матча." />
           <div className="grid gap-4 md:grid-cols-2">
             <MissingList team={m.home} list={d.missing.filter((p) => p.team === "home")} />
@@ -225,7 +225,7 @@ export default async function MatchPage({ params }: Props) {
         </section>
       )}
 
-      <section className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <section className="mt-block grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <div className="max-w-[68ch] space-y-3 leading-relaxed text-fg-2">
           <h2 className="text-xl font-extrabold tracking-tight text-fg">Коротко о матче</h2>
           {summary(m, fair, d).map((line) => (
@@ -249,7 +249,7 @@ export default async function MatchPage({ params }: Props) {
       </section>
 
       {sameDay.length > 0 && (
-        <section className="mt-14">
+        <section className="mt-block">
           <SectionHead
             title={finished ? `Ближайшие матчи: ${m.league.short}` : `Ещё прогнозы на ${dayMonth(m.commenceTime)}`}
             href={finished && m.league.key !== "other" ? paths.league(m.league.slug) : paths.forecasts}
@@ -280,7 +280,7 @@ export default async function MatchPage({ params }: Props) {
           }),
         }}
       />
-      <Fine className="mt-10">Прогноз — это оценка шансов, а не гарантия результата. Коэффициенты меняются: проверяйте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
+      <Fine className="mt-12">Прогноз — это оценка шансов, а не гарантия результата. Коэффициенты меняются: проверяйте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
     </div>
   );
 }

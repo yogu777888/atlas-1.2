@@ -65,7 +65,7 @@ export default async function BonusesPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <section className="mt-14 grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <section className="mt-block grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <h2 className="text-xl font-extrabold tracking-tight">Как читать условия</h2>
         <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
           {legend.map((l) => (
@@ -77,11 +77,11 @@ export default async function BonusesPage({ searchParams }: Props) {
         </dl>
       </section>
 
-      <div className="mt-14">
+      <div className="mt-block">
         <Faq items={faqs} />
       </div>
 
-      <Fine className="mt-10">
+      <Fine className="mt-12">
         {BONUS_TERMS} {site.warning}
       </Fine>
     </div>

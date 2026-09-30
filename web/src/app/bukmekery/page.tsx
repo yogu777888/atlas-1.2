@@ -65,10 +65,10 @@ export default function BookmakersPage() {
         рассказываем в <Link href={paths.article("kak-proverit-bukmekera")}>отдельной статье</Link>.
       </p>
 
-      <div className="mt-14">
+      <div className="mt-block">
         <Faq items={faqs} />
       </div>
-      <Fine className="mt-10">Оценки и маржа — по данным редакции, условия бонусов меняются: проверяйте их на сайте букмекера. {site.warning}</Fine>
+      <Fine className="mt-12">Оценки и маржа — по данным редакции, условия бонусов меняются: проверяйте их на сайте букмекера. {site.warning}</Fine>
     </div>
   );
 }

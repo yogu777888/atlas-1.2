@@ -129,6 +129,13 @@ body {
   &:hover { @apply border-fg text-fg; }
   &[aria-current="page"], &[aria-selected="true"], &[aria-pressed="true"] { @apply border-fg bg-fg text-bg; }
 }
+/* Vertical rhythm: 24px from a page's masthead to its first block (mt-6),
+   this between blocks, 16px from a block's heading to its content (SectionHead),
+   48px to the small print at the bottom (mt-12). */
+@utility mt-block {
+  margin-top: 3rem;
+  @media (width >= 40rem) { margin-top: 4rem; }
+}
 /* A row that scrolls sideways fades out at the right edge, so a cut-off item reads as "there is more" */
 @utility scroll-fade {
   mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);

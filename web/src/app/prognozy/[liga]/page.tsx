@@ -95,7 +95,7 @@ export default async function LeaguePage({ params }: Props) {
       {season && table.length > 0 && <SeasonBlocks l={l} season={season} />}
 
       {l.format && (
-        <section className="mt-14 grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <section className="mt-block grid gap-8 border-t border-line pt-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
           <h2 className="text-xl font-extrabold tracking-tight">О турнире</h2>
           <div className="max-w-[68ch] space-y-3 text-muted prose-links">
             <p>{l.format}</p>
@@ -107,7 +107,7 @@ export default async function LeaguePage({ params }: Props) {
         </section>
       )}
 
-      <Fine className="mt-10">Коэффициенты меняются. Перед ставкой проверьте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
+      <Fine className="mt-12">Коэффициенты меняются. Перед ставкой проверьте итоговый коэффициент в купоне букмекера. {site.warning}</Fine>
     </div>
   );
 }
@@ -118,7 +118,7 @@ function SeasonBlocks({ l, season }: { l: League; season: Season }) {
   const teams = teamsOf(games);
   return (
     <>
-      <div className="mt-14 grid items-start gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      <div className="mt-block grid items-start gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <section>
           <SectionHead
             title={`Таблица ${l.gen} ${seasonLabel(season.year)}`}
@@ -131,7 +131,7 @@ function SeasonBlocks({ l, season }: { l: League; season: Season }) {
           <Results games={games} limit={10} />
         </section>
       </div>
-      <section className="mt-14">
+      <section className="mt-block">
         <SectionHead title={`Команды ${l.gen}`} sub="Прогноз на следующий матч, форма и что было бы, если ставить на команду весь сезон." />
         <nav aria-label={`Команды ${l.gen}`} className="flex flex-wrap gap-1.5">
           {teams.map((t) => (
