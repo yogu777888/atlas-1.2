@@ -214,10 +214,10 @@ export default async function Home() {
             const a = articles.find((x) => x.slug === slug)!;
             return (
               <Link key={slug} href={paths.article(slug)} data-reveal className="group grid grid-cols-[5rem_minmax(0,1fr)] items-baseline gap-4 border-b border-line py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:gap-5">
-                <span className="num text-[28px] leading-none font-bold sm:text-[34px]">{a.cover.figure}</span>
+                <span className="num translate-y-[3px] text-[28px] leading-none font-bold sm:text-[34px]">{a.cover.figure}</span>
                 <span className="min-w-0">
                   <b className="text-[17px] font-semibold transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.45em_0_var(--color-hi)]">{a.title}</b>
-                  <small className="mt-0.5 block text-sm text-muted">{a.description}</small>
+                  <small className="mt-0.5 block max-w-[68ch] text-sm text-muted">{a.description}</small>
                 </span>
                 <span className="hidden text-[13px] text-subtle sm:block">{a.minutes} мин</span>
               </Link>
