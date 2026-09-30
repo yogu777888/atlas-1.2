@@ -12,6 +12,7 @@ export { winner };
 export type DataSource = "live" | "demo";
 
 const DAYS_AHEAD = 7;
+const YOUTH = /\b(u-?\d{2}|women|w|youth|olympic)\b/i;
 /** Other leagues' games shown when the top leagues are quiet (midweek, international breaks) */
 const MIN_TOP_MATCHES = 12;
 const OTHER_LIMIT = 30;
@@ -86,6 +87,8 @@ async function liveMatches(): Promise<Match[]> {
   for (const g of games) {
     const top = classifyLeague(g.season?.league ?? null);
     if (!g.dateUtc || !g.season?.league) continue;
+    // Youth and women's sides turn up in "Friendlies"; they are not what readers come for
+    if (YOUTH.test(g.homeTeam.name) || YOUTH.test(g.awayTeam.name)) continue;
     // Outside the top leagues keep only games with a priced market
     if (!top && !winner(g.odds)) continue;
     const start = g.dateUtc * 1000;

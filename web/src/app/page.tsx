@@ -12,6 +12,7 @@ import { Calibration } from "@/components/Calibration";
 import { MatchCard } from "@/components/MatchCard";
 import { Faq, SectionHead, Stats, words } from "@/components/Page";
 import { articles } from "@/content/articles";
+import { badgeOf } from "@/lib/badges";
 import { bookmakersByRating } from "@/lib/bookmakers";
 import { dataSource, getMatchDetail, getMatches, type MatchDetail } from "@/lib/data";
 import { mskTime } from "@/lib/dates";
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
 };
 
 const BOARD_ROWS = 14;
+
+const MAJOR = new Set(["Россия", "Англия", "Франция", "Германия", "Испания", "Италия", "Португалия", "Нидерланды", "Бельгия", "Хорватия", "Сербия", "Швейцария", "Австрия", "Дания", "Швеция", "Норвегия", "Польша", "Чехия", "Турция", "Украина", "Шотландия", "Уэльс", "Бразилия", "Аргентина", "Уругвай", "Колумбия", "Мексика", "США", "Япония", "Южная Корея", "Марокко", "Сенегал", "Казахстан", "Беларусь", "Грузия", "Армения", "Узбекистан", "Венгрия", "Греция", "Румыния", "Словакия", "Словения", "Ирландия", "Исландия", "Финляндия", "Эквадор", "Чили", "Перу", "Парагвай", "Канада", "Австралия", "Иран", "Саудовская Аравия", "Египет", "Нигерия", "Кот-д'Ивуар", "Гана", "Камерун", "Алжир", "Тунис"]);
 
 /** Each calculator as a tiny equation: what you type in → what you get */
 const TOOL_EQ: Record<string, { in: string[]; out: string; text: string }> = {
@@ -282,7 +285,8 @@ function pickFeatured(matches: Match[]): Match | undefined {
   const soon = Date.now() + 30 * 60_000;
   const pool = matches.filter((m) => m.fair && Date.parse(m.commenceTime) > soon);
   // Teams we have Russian names for are the ones readers know; "Belize — St. Vincent" is never the match of the day
-  const known = (m: Match) => /[а-яё]/i.test(m.home) && /[а-яё]/i.test(m.away);
+  // Teams readers know: a club with a colour badge, or a national side from Europe or the big football countries
+  const known = (m: Match) => [m.home, m.away].every((t) => MAJOR.has(t) || "colors" in badgeOf(t));
   const score = (m: Match) =>
     (isClubTop(m.league.key) ? 5 : m.league.key === "intl" ? 4 : 0) + (known(m) ? 4 : -6) + (m.pari ? 2 : 0) + (hasValue(m) ? 1 : 0) + (POPULAR.includes(m.home) || POPULAR.includes(m.away) ? 2 : 0);
   return [...pool].sort((a, b) => score(b) - score(a) || a.commenceTime.localeCompare(b.commenceTime))[0] ?? matches[0];
