@@ -64,7 +64,9 @@ export default async function Home() {
   const [matches, fact, check, recap] = await Promise.all([getMatches(), whatIfFact().catch(() => null), marketCheck().catch(() => null), weekRecap().catch(() => null)]);
   const live = dataSource() === "live";
   const main = matches.filter((m) => m.league.key !== "other");
-  const board = (main.length ? main : matches).slice(0, BOARD_ROWS);
+  const pool = main.length ? main : matches;
+  // Matches without a line yet go to the forecasts page; the home table shows ones with numbers
+  const board = (pool.some((m) => m.fair || m.pari) ? pool.filter((m) => m.fair || m.pari) : pool).slice(0, BOARD_ROWS);
   const featured = pickFeatured(main.length ? main : matches);
   const detail: MatchDetail | null = featured ? await getMatchDetail(featured).catch(() => null) : null;
   const valueCount = matches.filter(hasValue).length;
@@ -78,28 +80,33 @@ export default async function Home() {
 
   return (
     <div className="container-x">
-      <header className="grid items-end gap-x-12 gap-y-5 border-b border-line pt-7 pb-5 lg:grid-cols-[minmax(0,1fr)_auto]">
-        <div>
-          <h1 className="text-[clamp(28px,3.4vw,40px)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">{words("Прогнозы на футбол по цифрам")}</h1>
-          <p className="fade-up mt-2 max-w-[62ch] text-[15px] text-pretty text-muted [animation-delay:300ms]">
-            Шансы на каждый матч РПЛ, топ-лиг Европы и Лиги чемпионов. Считаем их по коэффициентам мировых букмекеров без маржи и отмечаем,
-            где легальный букмекер платит больше честной цены.
+      <header className="flex flex-wrap items-end justify-between gap-x-10 gap-y-3 pt-6 pb-1">
+        <div className="min-w-0">
+          <h1 className="text-[clamp(26px,3vw,34px)] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance">{words("Прогнозы на футбол по цифрам")}</h1>
+          <p className="fade-up mt-1.5 max-w-[62ch] text-sm text-pretty text-muted [animation-delay:300ms]">
+            Шансы на матчи РПЛ и топ-лиг Европы по коэффициентам мировых букмекеров, без маржи. Жёлтым — где легальный букмекер платит больше.
           </p>
         </div>
-        <div className="fade-up [animation-delay:450ms]">
-          <Stats
-            items={[
-              { label: "Матчей на неделе", value: matches.length },
-              { label: "Выше честной цены", value: valueCount },
-              live
-                ? { label: <><span className="mr-1.5 inline-block size-[7px] animate-pulse-dot rounded-full bg-p4 align-middle" />Обновлено</>, value: mskTime(new Date().toISOString()), unit: "мск" }
-                : { label: "Данные", value: "демо" },
-            ]}
-          />
-        </div>
+        <dl className="fade-up flex gap-x-6 text-xs text-muted [animation-delay:450ms]">
+          <div>
+            <dt>Матчей</dt>
+            <dd className="num text-2xl leading-tight font-bold text-fg">{matches.length}</dd>
+          </div>
+          <div>
+            <dt>Выше честной цены</dt>
+            <dd className="num text-2xl leading-tight font-bold text-fg">{valueCount}</dd>
+          </div>
+          <div>
+            <dt className="inline-flex items-center gap-1.5">
+              {live && <span className="inline-block size-[7px] animate-pulse-dot rounded-full bg-p4" />}
+              {live ? "Обновлено" : "Данные"}
+            </dt>
+            <dd className="num text-2xl leading-tight font-bold text-fg">{live ? mskTime(new Date().toISOString()) : "демо"}</dd>
+          </div>
+        </dl>
       </header>
 
-      <div className="mt-6 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="mt-5 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section aria-labelledby="board-title">
           <h2 id="board-title" className="sr-only">
             Прогнозы на ближайшие матчи

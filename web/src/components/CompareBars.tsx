@@ -21,7 +21,7 @@ export function CompareBars({ left, right, rows, marks = true }: { left: string;
           {marks && <TeamMark name={right} size={18} />}
         </span>
       </div>
-      <dl className="divide-y divide-[#eef1ec]">
+      <dl className="divide-y divide-row">
         {shown.map((row, i) => {
           const s = sideOf(row);
           const max = Math.max(row.l ?? 0, row.r ?? 0) || 1;

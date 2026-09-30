@@ -162,7 +162,7 @@ export default async function PairPage({ params }: Props) {
         <section className="mt-block">
           <SectionHead
             title="Команды в цифрах"
-            sub={`Средние за последние ${window} ${plural(window, ["матч", "матча", "матчей"])} ${l.gen} у каждой команды${stats.demo ? " (демо-данные)" : ""}. Тёмная полоса — у кого показатель лучше.`}
+            sub={`Средние за последние ${window} ${plural(window, ["матч", "матча", "матчей"])} ${l.gen} у каждой команды${stats.demo ? " (демо-данные)" : ""}. Выделенная полоса — у кого показатель лучше.`}
           />
           <CompareBars left={a.name} right={b.name} rows={rows} />
           <p className="mt-3 max-w-[70ch] text-xs leading-relaxed text-subtle">

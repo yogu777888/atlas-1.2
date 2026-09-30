@@ -5,7 +5,7 @@ import { pointsPerGame } from "@/lib/forecast";
 import { plural } from "@/lib/matches";
 import { FlipText } from "./FlipText";
 
-const RESULT = { W: { t: "В", c: "bg-p5 text-white", name: "победа" }, D: { t: "Н", c: "bg-draw text-white", name: "ничья" }, L: { t: "П", c: "bg-loss text-white", name: "поражение" } } as const;
+const RESULT = { W: { t: "В", c: "bg-p5 text-on-strong", name: "победа" }, D: { t: "Н", c: "bg-draw text-on-strong", name: "ничья" }, L: { t: "П", c: "bg-loss text-on-strong", name: "поражение" } } as const;
 const short = (iso: string) => (iso ? shortDay(iso).replace(/^[а-я]{2}, /, "") : "");
 
 /** The headline calls: result, goals, both teams to score. */

@@ -5,6 +5,9 @@ import { paths } from "@/lib/routes";
 import { LocalClock, ZoneNote } from "./LocalClock";
 import { Teams } from "./TeamMark";
 
+/** A row is worth showing up front once there are chances or a bookmaker price. */
+const priced = (m: Match) => !!m.fair || !!m.pari;
+
 const n = (k: number) => `${k} ${plural(k, ["матч", "матча", "матчей"])}`;
 
 /**
@@ -46,9 +49,24 @@ export function Board({ matches, empty, showLeague = true }: { matches: Match[];
               </span>
               <span data-count className="ml-auto text-xs text-subtle">{n(list.length)}</span>
             </div>
-            {list.map((m) => (
+            {list.filter(priced).map((m) => (
               <Row key={m.id} m={m} i={i++} showLeague={showLeague} hasOdds={hasOdds} />
             ))}
+            {list.some((m) => !priced(m)) && (
+              <details className="group/more border-t border-row">
+                <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-xs text-subtle transition-colors hover:text-fg [&::-webkit-details-marker]:hidden">
+                  <span className="transition group-open/more:rotate-90" aria-hidden>
+                    ›
+                  </span>
+                  Ещё {n(list.filter((m) => !priced(m)).length)} без линии: букмекеры пока не дали коэффициенты
+                </summary>
+                {list
+                  .filter((m) => !priced(m))
+                  .map((m) => (
+                    <Row key={m.id} m={m} i={i++} showLeague={showLeague} hasOdds={hasOdds} />
+                  ))}
+              </details>
+            )}
           </section>
         );
       })}
@@ -78,7 +96,7 @@ function Row({ m, i, showLeague, hasOdds }: { m: Match; i: number; showLeague: b
       data-lg={m.league.key}
       data-reveal
       style={{ transitionDelay: `${(i % 8) * 60}ms` }}
-      className="group grid grid-cols-[2.8rem_minmax(0,1fr)_1rem] items-center gap-x-3.5 gap-y-2 border-t border-[#eef1ec] px-4 py-2.5 transition-colors hover:bg-surface-2 sm:grid-cols-[3.2rem_minmax(0,1fr)_auto_1rem]"
+      className="group grid grid-cols-[2.8rem_minmax(0,1fr)_1rem] items-center gap-x-3.5 gap-y-2 border-t border-row px-4 py-2.5 transition-colors hover:bg-surface-2 sm:grid-cols-[3.2rem_minmax(0,1fr)_auto_1rem]"
     >
       <LocalClock iso={m.commenceTime} className="num text-lg font-semibold text-fg-2" />
       <span className="min-w-0">

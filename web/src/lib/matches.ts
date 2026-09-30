@@ -116,7 +116,7 @@ export const pct = (x: number, digits = 0) => `${(x * 100).toFixed(digits).repla
 export const probLevel = (p: number) => (p >= 0.65 ? 5 : p >= 0.5 ? 4 : p >= 0.35 ? 3 : p >= 0.2 ? 2 : 1);
 
 /** Background and text for each step; the two darkest carry white text. */
-export const PROB_CLASS = ["", "bg-p1 text-fg", "bg-p2 text-fg", "bg-p3 text-fg", "bg-p4 text-white", "bg-p5 text-white"] as const;
+export const PROB_CLASS = ["", "bg-p1 text-fg", "bg-p2 text-fg", "bg-p3 text-fg", "bg-p4 text-on-strong", "bg-p5 text-on-strong"] as const;
 export const probClass = (p: number) => PROB_CLASS[probLevel(p)];
 export const odds = (x: number) => x.toFixed(2);
 

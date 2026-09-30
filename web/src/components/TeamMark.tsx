@@ -2,7 +2,7 @@ import { badgeOf } from "@/lib/badges";
 
 const LIGHT = /^#(f|e)/i;
 
-/** Flag for a national team, the club's two colours for a club, the first letter otherwise. */
+/** Flag for a national team, the club's two colours for a club; nothing for a team we have no mark for (a letter in a circle looked like a broken image). */
 export function TeamMark({ name, size = 16 }: { name: string; size?: number }) {
   const b = badgeOf(name);
   const box = { width: size, height: size };
@@ -19,24 +19,24 @@ export function TeamMark({ name, size = 16 }: { name: string; size?: number }) {
       />
     );
   }
-  return (
-    <span className="inline-grid shrink-0 place-items-center rounded-full bg-surface-2 font-bold text-subtle ring-1 ring-line" style={{ ...box, fontSize: size * 0.55 }} aria-hidden>
-      {b.initial}
-    </span>
-  );
+  return null;
 }
 
 /** "◐ Зенит — ◐ Спартак", one line that truncates as a whole */
 export function Teams({ home, away, size = 16, className = "" }: { home: string; away: string; size?: number; className?: string }) {
   return (
     <span className={`block truncate ${className}`}>
-      <span className="mr-1.5 inline-block align-[-0.15em]">
-        <TeamMark name={home} size={size} />
-      </span>
+      {"initial" in badgeOf(home) ? null : (
+        <span className="mr-1.5 inline-block align-[-0.15em]">
+          <TeamMark name={home} size={size} />
+        </span>
+      )}
       {home} —{" "}
-      <span className="mr-1.5 inline-block align-[-0.15em]">
-        <TeamMark name={away} size={size} />
-      </span>
+      {"initial" in badgeOf(away) ? null : (
+        <span className="mr-1.5 inline-block align-[-0.15em]">
+          <TeamMark name={away} size={size} />
+        </span>
+      )}
       {away}
     </span>
   );

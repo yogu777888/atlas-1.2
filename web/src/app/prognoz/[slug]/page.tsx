@@ -202,7 +202,7 @@ export default async function MatchPage({ params }: Props) {
         <section className="mt-block">
           <SectionHead
             title="Сравнение команд"
-            sub={`Средние за последние ${Math.min(pair.a.games, pair.b.games)} ${plural(Math.min(pair.a.games, pair.b.games), ["матч", "матча", "матчей"])} ${m.league.gen} у каждой команды${pair.demo ? " (демо-данные)" : ""}. Тёмная полоса — у кого показатель лучше.`}
+            sub={`Средние за последние ${Math.min(pair.a.games, pair.b.games)} ${plural(Math.min(pair.a.games, pair.b.games), ["матч", "матча", "матчей"])} ${m.league.gen} у каждой команды${pair.demo ? " (демо-данные)" : ""}. Выделенная полоса — у кого показатель лучше.`}
             href={paths.pair(pairSlug(m.home, m.away))}
             cta="Полное сравнение"
           />
@@ -327,8 +327,8 @@ export default async function MatchPage({ params }: Props) {
 
 function StatusPill({ children, tone }: { children: React.ReactNode; tone?: "live" }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-semibold ${tone === "live" ? "bg-loss text-white" : "bg-surface-2 text-fg-2 ring-1 ring-line"}`}>
-      {tone === "live" && <span className="size-1.5 animate-pulse-dot rounded-full bg-white" aria-hidden />}
+    <span className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-semibold ${tone === "live" ? "bg-loss text-on-strong" : "bg-surface-2 text-fg-2 ring-1 ring-line"}`}>
+      {tone === "live" && <span className="size-1.5 animate-pulse-dot rounded-full bg-on-strong" aria-hidden />}
       {children}
     </span>
   );

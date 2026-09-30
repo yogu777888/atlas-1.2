@@ -17,6 +17,11 @@
   --color-win: #1c7442;
   --color-loss: #c4402e;
   --color-draw: #9aa29c;
+  /* hairline between table rows, text on the two darkest greens and on red, text on the yellow highlighter */
+  --color-row: #eef1ec;
+  --color-on-strong: #ffffff;
+  --color-ink: #111512;
+  --color-grid: rgb(17 21 18 / 0.05);
 
   /* probability, low → high; the two darkest carry white text */
   --color-p1: #e9f2eb;
@@ -50,6 +55,48 @@
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
+}
+
+/* Looks being compared: ?look=dark or ?look=light on any page (remembered in this browser) */
+:root[data-look="dark"] {
+  color-scheme: dark;
+  --color-bg: #0c0e0d;
+  --color-surface: #141715;
+  --color-surface-2: #1a1e1b;
+  --color-line: #252a26;
+  --color-line-strong: #353b36;
+  --color-row: #1d211e;
+  --color-fg: #eef1ec;
+  --color-fg-2: #cdd3ce;
+  --color-muted: #9aa39c;
+  --color-subtle: #7f8881;
+  --color-win: #3cc877;
+  --color-loss: #ff6b57;
+  --color-draw: #5d665f;
+  --color-p1: #19241d;
+  --color-p2: #1d3325;
+  --color-p3: #25492f;
+  --color-p4: #1f7a46;
+  --color-p5: #23995a;
+  --color-grid: rgb(238 241 236 / 0.045);
+}
+:root[data-look="light"] {
+  --color-bg: #f6f6f4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f5f2;
+  --color-line: #e6e6e1;
+  --color-line-strong: #d0d0c9;
+  --color-row: #f0f0ec;
+  --color-fg: #0e0f0f;
+  --color-fg-2: #2c2e2d;
+  --color-muted: #5e6260;
+  --color-subtle: #6c706e;
+  --color-p1: #f1f1ee;
+  --color-p2: #e5e5e0;
+  --color-p3: #d3d4cd;
+  --color-p4: #1f7a47;
+  --color-p5: #145c34;
+  --color-grid: rgb(14 15 15 / 0.045);
 }
 
 html {
@@ -253,8 +300,8 @@ body {
 /* Graph paper behind article and tool covers */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgb(17 21 18 / 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(17 21 18 / 0.05) 1px, transparent 1px);
+    linear-gradient(to right, var(--color-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-grid) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -265,3 +312,6 @@ body {
   .js [data-reveal]:not(.in) .hl { background-size: 100% 78%; }
   .draw-line, .draw-arc { stroke-dashoffset: 0; }
 }
+
+/* Anything on the yellow keeps dark ink, in every look */
+.hl, .bg-hi { color: var(--color-ink); }

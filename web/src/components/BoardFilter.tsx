@@ -57,8 +57,18 @@ export function BoardFilter({ chips, legend, children }: { chips: Chip[]; legend
         ) : (
           <span />
         )}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          {view === "full" && legend}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-expanded={hint}
+            onClick={() => (hint ? closeHint() : setHint(true))}
+            className="inline-flex h-[30px] items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium text-muted transition hover:text-fg aria-expanded:text-fg"
+          >
+            <span className="grid size-4 place-items-center rounded-full border border-current text-[10px] font-bold" aria-hidden>
+              ?
+            </span>
+            Как читать
+          </button>
           <div role="group" aria-label="Вид таблицы" className="inline-flex overflow-hidden rounded-lg border border-line-strong bg-surface text-[13px]">
             {(["short", "full"] as const).map((v) => (
               <button
@@ -66,7 +76,7 @@ export function BoardFilter({ chips, legend, children }: { chips: Chip[]; legend
                 type="button"
                 aria-pressed={view === v}
                 onClick={() => choose(v)}
-                className="border-l border-line px-3 py-1.5 font-medium text-muted transition first:border-l-0 hover:text-fg aria-pressed:bg-fg aria-pressed:text-bg"
+                className="border-l border-line px-3 py-1 font-medium text-muted transition first:border-l-0 hover:text-fg aria-pressed:bg-fg aria-pressed:text-bg"
               >
                 {v === "short" ? "Коротко" : "Подробно"}
               </button>
@@ -75,17 +85,12 @@ export function BoardFilter({ chips, legend, children }: { chips: Chip[]; legend
         </div>
       </div>
       {hint && (
-        <div className="mb-3 flex items-start gap-3 rounded-[10px] bg-surface px-4 py-3 text-sm text-fg-2 ring-1 ring-line">
-          <span className="mt-0.5 size-3 shrink-0 rounded-sm bg-hi ring-1 ring-fg/15" aria-hidden />
-          <p className="flex-1">
-            {view === "short"
-              ? "Для каждого матча — кто фаворит и с каким шансом. Жёлтая метка: у букмекера есть коэффициент выше честного. "
-              : "Числа слева — шансы на победу хозяев, ничью и победу гостей в %: чем темнее зелёный, тем вероятнее. Справа коэффициенты букмекера, жёлтым — выше честной цены. "}
-            <Link href="/stati/kak-chitat-prognoz" className="font-semibold text-fg underline decoration-hi decoration-2 underline-offset-4">
-              Как читать прогноз
-            </Link>
-          </p>
-          <button type="button" onClick={closeHint} className="-m-1 p-1 text-subtle hover:text-fg" aria-label="Скрыть подсказку">
+        <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-y border-line py-2 text-xs text-muted">
+          {view === "short" ? <span>Для каждого матча — кто фаворит и с каким шансом. Жёлтая метка: есть коэффициент выше честного.</span> : legend}
+          <Link href="/stati/kak-chitat-prognoz" className="font-semibold text-fg underline decoration-hi decoration-2 underline-offset-4">
+            Подробнее
+          </Link>
+          <button type="button" onClick={closeHint} className="ml-auto p-1 text-subtle hover:text-fg" aria-label="Скрыть пояснение">
             ✕
           </button>
         </div>

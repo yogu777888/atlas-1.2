@@ -165,7 +165,7 @@ function Licensed() {
 function Chances() {
   return (
     <div className="num flex gap-[3px] text-sm font-bold" aria-hidden>
-      {[["52", "bg-p4 text-white"], ["26", "bg-p2"], ["22", "bg-p2"]].map(([v, c], i) => (
+      {[["52", "bg-p4 text-on-strong"], ["26", "bg-p2"], ["22", "bg-p2"]].map(([v, c], i) => (
         <span key={v} className={`pop rounded px-2 py-0.5 ${c}`} style={{ animationDelay: `${200 + i * 120}ms` }}>
           {v}
         </span>

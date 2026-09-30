@@ -39,7 +39,15 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${sans.variable} ${figures.variable}`}>
+    <html lang="ru" className={`${sans.variable} ${figures.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Preview of the two looks being compared: ?look=dark | light | default, remembered in this browser */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var q=new URLSearchParams(location.search).get("look");if(q)localStorage.setItem("tagbet:look",q);var l=localStorage.getItem("tagbet:look");if(l==="dark"||l==="light")document.documentElement.dataset.look=l}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-dvh">
         <SiteHeader />
         <main>{children}</main>

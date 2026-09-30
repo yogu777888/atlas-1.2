@@ -27,7 +27,7 @@ export function Standings({ rows, highlight, limit }: { rows: Row[]; highlight?:
         </thead>
         <tbody>
           {list.map((r, i) => (
-            <tr key={r.id} className={`border-b border-[#eef1ec] last:border-0 ${r.id === highlight ? "bg-hi/25" : ""}`}>
+            <tr key={r.id} className={`border-b border-row last:border-0 ${r.id === highlight ? "bg-hi/25" : ""}`}>
               <td className="num py-2 pl-4 text-base font-semibold text-subtle">{i + 1}</td>
               <td className="py-2 pr-2 whitespace-nowrap">
                 <Link href={paths.team(r.slug)} className="inline-flex items-center gap-2 font-semibold underline decoration-transparent decoration-2 underline-offset-4 transition hover:decoration-hi">
