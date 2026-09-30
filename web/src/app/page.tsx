@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArticleCard } from "@/components/ArticleCard";
+import { ToolVisual } from "@/components/ArticleVisuals";
 import { BankChart } from "@/components/BankChart";
 import { Board, BoardLegend } from "@/components/Board";
 import { BoardFilter } from "@/components/BoardFilter";
@@ -133,34 +135,30 @@ export default async function Home() {
 
       <section className="mt-block">
         <SectionHead title="Ваша команда" sub="Прогноз на следующий матч, форма и что было бы, если ставить на неё весь сезон." href={paths.teams} cta="Все команды" />
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <div className="space-y-6">
-            <nav aria-label="Популярные команды" className="flex flex-wrap gap-1.5">
-              {POPULAR.map((t) => (
-                <Link key={t} href={paths.team(teamSlug(t))} className="chip px-3.5 py-2 hover:-translate-y-0.5">
-                  <TeamMark name={t} size={16} />
-                  {t}
-                </Link>
-              ))}
-            </nav>
-            {popular.length > 0 ? (
-              <div>
-                <p className="mb-2 text-sm font-semibold text-fg-2">Ближайшие матчи этих команд</p>
-                <Board matches={popular} />
-              </div>
-            ) : (
-              rplTable.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-semibold text-fg-2">Топ-лиги на паузе. Верх таблицы РПЛ сейчас такой:</p>
-                  <Standings rows={rplTable} limit={6} />
-                  <Link href={paths.league("rpl")} className="link-more mt-3">
-                    Таблица и прогнозы на РПЛ <span aria-hidden>→</span>
-                  </Link>
-                </div>
-              )
-            )}
+        <nav aria-label="Популярные команды" className="flex flex-wrap gap-1.5">
+          {POPULAR.map((t) => (
+            <Link key={t} href={paths.team(teamSlug(t))} className="chip px-3.5 py-2 hover:-translate-y-0.5">
+              <TeamMark name={t} size={16} />
+              {t}
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="flex flex-col">
+            <p className="mb-2 text-sm font-semibold text-fg-2">{popular.length ? "Ближайшие матчи этих команд" : "Топ-лиги на паузе · верх таблицы РПЛ"}</p>
+            <div>{popular.length ? <Board matches={popular} /> : rplTable.length > 0 && <Standings rows={rplTable} limit={6} />}</div>
+            <Link href={popular.length ? paths.forecasts : paths.league("rpl")} className="link-more mt-3 self-start">
+              {popular.length ? "Все прогнозы на неделю" : "Таблица и прогнозы на РПЛ"} <span aria-hidden>→</span>
+            </Link>
           </div>
-          {fact && <WhatIfCard fact={fact} />}
+          {fact && (
+            <div className="flex flex-col">
+              <p className="mb-2 text-sm font-semibold text-fg-2">
+                А что, если · {getLeague(fact.league)?.short} {fact.season}
+              </p>
+              <WhatIfCard fact={fact} />
+            </div>
+          )}
         </div>
       </section>
 
@@ -209,31 +207,26 @@ export default async function Home() {
 
       <section className="mt-block">
         <SectionHead title="Разобраться за пять минут" href={paths.articles} cta="Все статьи" />
-        <div className="border-t border-line">
-          {["kak-chitat-prognoz", "marzha-bukmekera", "koefficient-v-veroyatnost", "valuinaya-stavka", "ekspress-matematika"].map((slug) => {
-            const a = articles.find((x) => x.slug === slug)!;
-            return (
-              <Link key={slug} href={paths.article(slug)} data-reveal className="group grid grid-cols-[5rem_minmax(0,1fr)] items-baseline gap-4 border-b border-line py-4 sm:grid-cols-[7.5rem_minmax(0,1fr)_auto] sm:gap-5">
-                <span className="num translate-y-[3px] text-[28px] leading-none font-bold sm:text-[34px]">{a.cover.figure}</span>
-                <span className="min-w-0">
-                  <b className="text-[17px] font-semibold transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.45em_0_var(--color-hi)]">{a.title}</b>
-                  <small className="mt-0.5 block max-w-[68ch] text-sm text-muted">{a.description}</small>
-                </span>
-                <span className="hidden text-[13px] text-subtle sm:block">{a.minutes} мин</span>
-              </Link>
-            );
-          })}
-        </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {tools.map((t) => (
-            <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="card group flex items-center gap-4 p-4 transition-colors hover:border-fg">
-              <span className="num w-[4.5rem] shrink-0 text-[28px] leading-none font-bold">{t.cover.figure}</span>
-              <span className="min-w-0">
-                <span className="block text-xs text-subtle">Калькулятор</span>
-                <b className="block leading-snug font-semibold">{t.title}</b>
-              </span>
-            </Link>
+        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {["kak-chitat-prognoz", "marzha-bukmekera", "valuinaya-stavka"].map((slug) => (
+            <ArticleCard key={slug} a={articles.find((x) => x.slug === slug)!} />
           ))}
+        </div>
+        <div className="mt-12">
+          <SectionHead title="Калькуляторы" level={3} sub="Проверьте маржу, вероятность и экспресс на своих коэффициентах." href={paths.tools} cta="Все калькуляторы" />
+          <div className="grid gap-4 sm:grid-cols-3">
+            {tools.map((t) => (
+              <Link key={t.slug} href={paths.tool(t.slug)} data-reveal className="card group flex flex-col gap-4 p-5 transition-colors hover:border-fg">
+                <ToolVisual slug={t.slug} />
+                <span>
+                  <b className="block leading-snug font-bold">
+                    <span className="transition-[box-shadow] duration-300 group-hover:shadow-[inset_0_-0.4em_0_var(--color-hi)]">{t.title}</span>
+                  </b>
+                  <small className="mt-1 block text-sm text-muted">{t.description}</small>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -247,20 +240,16 @@ export default async function Home() {
 function WhatIfCard({ fact }: { fact: NonNullable<Awaited<ReturnType<typeof whatIfFact>>> }) {
   const { ledger: l, team } = fact;
   const rub = `${l.profit > 0 ? "+" : l.profit < 0 ? "−" : ""}${Math.abs(l.profit).toLocaleString("ru-RU")} ₽`;
-  const league = getLeague(fact.league);
   return (
     <article className="card p-5">
-      <span className="kicker">
-        А что, если · {league?.short} {fact.season}
-      </span>
-      <p className="mt-2.5">
+      <p>
         100 ₽ на победу команды {team.name} в каждом матче сезона, {l.steps.length} {plural(l.steps.length, ["матч", "матча", "матчей"])}:
       </p>
       <p className={`num mt-1 text-[56px] leading-none font-bold ${l.profit >= 0 ? "text-win" : "text-loss"}`}>{rub}</p>
       <div className="mt-3">
-        <BankChart steps={l.steps} compact />
+        <BankChart steps={l.steps} />
       </div>
-      <p className="mt-2 text-sm text-muted">
+      <p className="mt-3 text-sm text-muted">
         Посчитано по коэффициентам закрытия линии и реальным результатам{fact.demo ? " (сейчас демо-данные)" : ""}.{" "}
         <Link href={`${paths.whatIf}?league=${fact.league}&season=${fact.year}&team=${team.id}`} className="font-semibold text-fg underline decoration-hi decoration-2 underline-offset-4">
           Посчитать для своей команды
